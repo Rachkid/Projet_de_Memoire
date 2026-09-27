@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  # Service de base de données PostgreSQL
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      # Port hôte 5433 -> port 5432 à l'intérieur du conteneur.
+      # On évite ainsi tout conflit avec un PostgreSQL déjà installé localement
+      # (qui, lui, écoute en général sur le port 5432 de la machine).
+      # Ce port n'est utile que si tu veux te connecter à cette base depuis un outil
+      # externe (pgAdmin, DBeaver...) ; l'application, elle, communique avec la base
+      # via le réseau interne de Docker et n'est donc pas concernée par ce changement.
+      - "5433:5432"
+
+  # Service de l'application FastAPI
+  api:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - db
+    env_file: .env
+    ports:
+      - "8000:8000"
+
+# Volume nommé pour que les données de la base survivent aux redémarrages du conteneur
+volumes:
+  pgdata:
