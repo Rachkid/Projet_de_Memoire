@@ -17,13 +17,23 @@ services:
       # externe (pgAdmin, DBeaver...) ; l'application, elle, communique avec la base
       # via le réseau interne de Docker et n'est donc pas concernée par ce changement.
       - "5433:5432"
+    # Vérification de santé : Docker teste régulièrement si PostgreSQL est
+    # réellement prêt à accepter des connexions (et pas seulement démarré).
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
 
   # Service de l'application FastAPI
   api:
     build: .
     restart: unless-stopped
+    # L'API ne démarre qu'une fois la base déclarée "healthy" : cela évite
+    # qu'elle tente de se connecter à PostgreSQL avant qu'il ne soit prêt.
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     env_file: .env
     ports:
       - "8000:8000"
