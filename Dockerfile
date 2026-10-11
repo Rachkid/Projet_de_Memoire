@@ -14,8 +14,15 @@ COPY requirements.txt .
 #    où la précédente s'était arrêtée, au lieu de tout retélécharger ;
 #  - --default-timeout et --retries laissent à pip plus de temps et plus
 #    d'essais avant d'abandonner un téléchargement.
+#  - la boucle ci-dessous relance automatiquement l'installation (jusqu'à 8 fois)
+#    si elle échoue, ce qui évite d'avoir à relancer la construction à la main.
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --default-timeout=120 --retries 10 -r requirements.txt
+    for i in 1 2 3 4 5 6 7 8; do \
+        pip install --default-timeout=120 --retries 10 -r requirements.txt && exit 0; \
+        echo "Tentative $i echouee, nouvel essai dans 10 secondes..."; \
+        sleep 10; \
+    done; \
+    exit 1
 
 # On copie ensuite le code de l'application
 COPY ./app ./app
