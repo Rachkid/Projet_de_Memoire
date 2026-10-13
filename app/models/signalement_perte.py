@@ -6,8 +6,9 @@ section 5.1.3).
 """
 
 import uuid
+from datetime import date
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import Date, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -29,6 +30,11 @@ class SignalementPerte(Base):
 
     categorie: Mapped[str] = mapped_column(String(80), nullable=False)
     description: Mapped[str] = mapped_column(String(1000), nullable=True)
+
+    # Informations utilisées par le rapprochement automatique : à quelle date
+    # (approximative) l'objet a été perdu, et à peu près où.
+    date_perte: Mapped[date] = mapped_column(Date, nullable=True)
+    lieu_approximatif: Mapped[str] = mapped_column(String(255), nullable=True)
 
     statut: Mapped[str] = mapped_column(
         String(30), nullable=False, default=StatutSignalement.EN_ATTENTE.value

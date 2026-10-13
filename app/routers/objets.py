@@ -17,6 +17,7 @@ from app.models.objet import Objet
 from app.models.organisation import Organisation
 from app.models.utilisateur import Utilisateur
 from app.schemas.objet import ObjetCreate, ObjetRead
+from app.services.rapprochement import traiter_nouvel_objet
 
 router = APIRouter(prefix="/objets", tags=["Objets"])
 
@@ -58,6 +59,10 @@ def enregistrer_objet(payload: ObjetCreate, db: Session = Depends(get_db)):
     db.add(objet)
     db.commit()
     db.refresh(objet)
+
+    # Rapprochement automatique : des usagers ont-ils déjà signalé la perte
+    # d'un objet de ce type ? Si oui, ils sont marqués et prévenus.
+    traiter_nouvel_objet(db, objet)
     return objet
 
 

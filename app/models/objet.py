@@ -42,6 +42,12 @@ class Objet(Base):
     # physique de l'objet (cahier des charges, section 5.1.1).
     qr_code: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
 
+    # Détail caché : une caractéristique que seul le vrai propriétaire peut
+    # connaître (fond d'écran, contenu d'un sac, rayure...). Elle sert de
+    # contrôle anti-fraude lors de la restitution (cahier des charges,
+    # section 5.1.4). Ce champ ne doit JAMAIS être renvoyé par l'API publique.
+    detail_cache: Mapped[str] = mapped_column(String(255), nullable=True)
+
     statut: Mapped[str] = mapped_column(
         String(20), nullable=False, default=StatutObjet.EN_ATTENTE.value
     )

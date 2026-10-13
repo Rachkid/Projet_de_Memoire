@@ -27,6 +27,9 @@ class ObjetBase(BaseModel):
 class ObjetCreate(ObjetBase):
     organisation_id: uuid.UUID
     agent_id: uuid.UUID
+    # Détail caché : accepté à la création, mais volontairement ABSENT de
+    # ObjetRead pour qu'il ne sorte jamais dans les réponses publiques.
+    detail_cache: Optional[str] = None
 
 
 class ObjetRead(ObjetBase):

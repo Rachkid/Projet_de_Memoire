@@ -15,7 +15,7 @@ from app.models import (  # noqa: F401 — l'import garantit que tous les modèl
     Restitution,
     SignalementPerte,
 )
-from app.routers import objets, organisations, usagers, utilisateurs
+from app.routers import objets, organisations, restitutions, signalements, usagers, utilisateurs
 
 # Crée les tables dans la base de données si elles n'existent pas encore.
 # Cette approche simple convient à cette étape de développement ; une
@@ -39,6 +39,8 @@ app.include_router(organisations.router)
 app.include_router(utilisateurs.router)
 app.include_router(usagers.router)
 app.include_router(objets.router)
+app.include_router(signalements.router)
+app.include_router(restitutions.router)
 
 
 @app.get("/", tags=["Racine"])

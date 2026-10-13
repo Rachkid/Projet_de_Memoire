@@ -3,6 +3,7 @@ Schémas Pydantic pour la ressource SignalementPerte.
 """
 
 import uuid
+from datetime import date
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
@@ -13,6 +14,8 @@ from app.models.enums import StatutSignalement
 class SignalementPerteBase(BaseModel):
     categorie: str
     description: Optional[str] = None
+    date_perte: Optional[date] = None
+    lieu_approximatif: Optional[str] = None
 
 
 class SignalementPerteCreate(SignalementPerteBase):
