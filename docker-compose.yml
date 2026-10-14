@@ -35,9 +35,14 @@ services:
       db:
         condition: service_healthy
     env_file: .env
+    volumes:
+      # Les photos envoyées par les agents sont conservées dans ce volume :
+      # sans lui, elles disparaîtraient à chaque reconstruction du conteneur.
+      - uploads:/app/uploads
     ports:
       - "8000:8000"
 
 # Volume nommé pour que les données de la base survivent aux redémarrages du conteneur
 volumes:
   pgdata:
+  uploads:

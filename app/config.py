@@ -28,6 +28,12 @@ class Settings(BaseSettings):
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 8  # 8 heures : une journée de travail
 
+    # Stockage des photos (étape 7). Dans Docker, ce dossier est relié à un
+    # volume persistant : les photos survivent aux redémarrages du conteneur.
+    upload_dir: str = "uploads"
+    photo_max_octets: int = 5 * 1024 * 1024  # 5 Mo par photo reçue
+    photo_max_cote: int = 1600  # la plus grande dimension est ramenée à 1600 px
+
     # Indique à Pydantic de lire les valeurs manquantes depuis le fichier .env
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

@@ -5,6 +5,7 @@ FastAPI exécutable.
 """
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from app.database import Base, engine
 from app.models import (  # noqa: F401 — l'import garantit que tous les modèles
@@ -15,7 +16,7 @@ from app.models import (  # noqa: F401 — l'import garantit que tous les modèl
     Restitution,
     SignalementPerte,
 )
-from app.routers import objets, organisations, restitutions, signalements, usagers, utilisateurs
+from app.routers import objets, organisations, photos, restitutions, signalements, usagers, utilisateurs
 
 # Crée les tables dans la base de données si elles n'existent pas encore.
 # Cette approche simple convient à cette étape de développement ; une
@@ -41,6 +42,12 @@ app.include_router(usagers.router)
 app.include_router(objets.router)
 app.include_router(signalements.router)
 app.include_router(restitutions.router)
+app.include_router(photos.router)
+
+# Les photos d'OBJETS sont publiques : on expose leur dossier tel quel. Le
+# dossier des photos de propriétaires n'est volontairement PAS exposé ici.
+photos.DOSSIER_OBJETS.mkdir(parents=True, exist_ok=True)
+app.mount("/fichiers/objets", StaticFiles(directory=photos.DOSSIER_OBJETS), name="photos_objets")
 
 
 @app.get("/", tags=["Racine"])
