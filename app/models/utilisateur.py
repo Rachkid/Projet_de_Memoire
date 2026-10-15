@@ -23,6 +23,9 @@ class Utilisateur(Base):
         UUID(as_uuid=True), ForeignKey("organisations.id"), nullable=False
     )
 
+    # Identifiant de connexion, unique dans tout le système (stocké en minuscules).
+    identifiant: Mapped[str] = mapped_column(String(100), unique=True, index=True, nullable=False)
+
     nom: Mapped[str] = mapped_column(String(150), nullable=False)
 
     # "agent", "administrateur" ou "super_administrateur"
@@ -35,8 +38,11 @@ class Utilisateur(Base):
     droit_enregistrement: Mapped[bool] = mapped_column(Boolean, default=False)
     droit_restitution: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    # Mot de passe déjà chiffré (jamais stocké en clair) : sera renseigné et
-    # vérifié à l'étape d'authentification, pas encore codée à ce stade.
+    # Un compte n'est jamais supprimé (les objets et restitutions qu'il a
+    # traités doivent rester traçables) : il est simplement désactivé.
+    actif: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+    # Mot de passe chiffré avec bcrypt (jamais stocké en clair).
     mot_de_passe_hash: Mapped[str] = mapped_column(String(255), nullable=False)
 
     organisation: Mapped["Organisation"] = relationship(back_populates="utilisateurs")

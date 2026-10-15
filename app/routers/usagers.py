@@ -7,6 +7,8 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.usager import Usager
+from app.models.utilisateur import Utilisateur
+from app.security import exiger_super_administrateur
 from app.schemas.usager import UsagerCreate, UsagerRead
 
 router = APIRouter(prefix="/usagers", tags=["Usagers"])
@@ -33,6 +35,6 @@ def creer_ou_recuperer_usager(payload: UsagerCreate, db: Session = Depends(get_d
 
 
 @router.get("/", response_model=list[UsagerRead])
-def lister_usagers(db: Session = Depends(get_db)):
-    """Liste tous les usagers connus du système (profil réservé à l'administration)."""
+def lister_usagers(db: Session = Depends(get_db), _: Utilisateur = Depends(exiger_super_administrateur)):
+    """Liste tous les usagers (numéros de téléphone : données personnelles, super-administrateur seulement)."""
     return db.query(Usager).all()

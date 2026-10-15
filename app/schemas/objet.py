@@ -25,8 +25,8 @@ class ObjetBase(BaseModel):
 
 
 class ObjetCreate(ObjetBase):
-    organisation_id: uuid.UUID
-    agent_id: uuid.UUID
+    # L'organisation et l'agent ne sont plus fournis par le client : ils sont
+    # déduits de la personne connectée (jeton), donc impossibles à falsifier.
     # Détail caché : accepté à la création, mais volontairement ABSENT de
     # ObjetRead pour qu'il ne sorte jamais dans les réponses publiques.
     detail_cache: Optional[str] = None

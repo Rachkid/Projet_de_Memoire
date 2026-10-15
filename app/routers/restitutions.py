@@ -3,12 +3,9 @@ Points d'accès de l'API pour la restitution d'un objet à son propriétaire
 (cahier des charges, section 5.1.4). Le contrôle du détail caché est le
 verrou anti-fraude : sans validation, aucune restitution n'est créée.
 
-AVERTISSEMENT : l'identité de l'agent est ici transmise dans la requête
-(agent_id), comme aux étapes précédentes. Tant que l'authentification par
-jeton (JWT) n'est pas en place, n'importe qui connaissant cet identifiant
-peut se faire passer pour l'agent. Cette protection est prévue à l'étape
-« Authentification » ; elle est INDISPENSABLE avant toute mise en production,
-en particulier pour l'endpoint qui révèle le détail caché.
+Accès : toutes les routes exigent d'être connecté avec le droit de
+restitution. L'agent est identifié par son jeton (plus d'agent_id dans les
+requêtes) et ne peut agir que sur les objets de sa propre organisation.
 """
 
 import uuid
@@ -23,56 +20,48 @@ from app.models.objet import Objet
 from app.models.restitution import Restitution
 from app.models.usager import Usager
 from app.models.utilisateur import Utilisateur
+from app.security import exiger_restitution
 from app.schemas.restitution import DetailCacheRead, RestitutionCreate, RestitutionRead
 
 router = APIRouter(prefix="/restitutions", tags=["Restitutions"])
 
 
-def _agent_autorise(db: Session, agent_id: uuid.UUID, objet: Objet) -> Utilisateur:
-    """Vérifie que l'agent existe, a le droit de restitution et est de la même organisation."""
-    agent = db.get(Utilisateur, agent_id)
-    if agent is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Agent introuvable")
-    if not agent.droit_restitution:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Cet agent ne dispose pas du droit de restitution.",
-        )
-    if agent.organisation_id != objet.organisation_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Cet agent n'appartient pas à l'organisation propriétaire de l'objet.",
-        )
-    return agent
+def _objet_de_mon_organisation(db: Session, objet_id: uuid.UUID, agent: Utilisateur) -> Objet:
+    """Charge l'objet ; s'il appartient à une autre organisation, il « n'existe pas »."""
+    objet = db.get(Objet, objet_id)
+    if objet is None or objet.organisation_id != agent.organisation_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Objet introuvable")
+    return objet
 
 
 @router.get("/detail-cache/{objet_id}", response_model=DetailCacheRead)
-def lire_detail_cache(objet_id: uuid.UUID, agent_id: uuid.UUID, db: Session = Depends(get_db)):
+def lire_detail_cache(
+    objet_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    agent: Utilisateur = Depends(exiger_restitution),
+):
     """
     Réservé à l'agent de restitution : lui permet de comparer la réponse du
     demandeur avec le détail caché enregistré. Ne figure dans aucune autre
     réponse de l'API.
     """
-    objet = db.get(Objet, objet_id)
-    if objet is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Objet introuvable")
-    _agent_autorise(db, agent_id, objet)
+    objet = _objet_de_mon_organisation(db, objet_id, agent)
     return DetailCacheRead(objet_id=objet.id, detail_cache=objet.detail_cache)
 
 
 @router.post("/", response_model=RestitutionRead, status_code=status.HTTP_201_CREATED)
-def restituer_objet(payload: RestitutionCreate, db: Session = Depends(get_db)):
+def restituer_objet(
+    payload: RestitutionCreate,
+    db: Session = Depends(get_db),
+    agent: Utilisateur = Depends(exiger_restitution),
+):
     """Valide la remise d'un objet à son propriétaire, après contrôle anti-fraude."""
-    objet = db.get(Objet, payload.objet_id)
-    if objet is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Objet introuvable")
+    objet = _objet_de_mon_organisation(db, payload.objet_id, agent)
     if objet.statut in (StatutObjet.RESTITUE.value, StatutObjet.ARCHIVE.value):
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Cet objet a déjà été restitué ou archivé.",
         )
-
-    _agent_autorise(db, payload.agent_id, objet)
 
     if db.get(Usager, payload.usager_id) is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usager introuvable")
@@ -87,6 +76,7 @@ def restituer_objet(payload: RestitutionCreate, db: Session = Depends(get_db)):
 
     restitution = Restitution(
         **payload.model_dump(),
+        agent_id=agent.id,  # l'agent connecté, pas une valeur fournie par le client
         date_heure=datetime.now(timezone.utc),  # fixée par le serveur
     )
     objet.statut = StatutObjet.RESTITUE.value

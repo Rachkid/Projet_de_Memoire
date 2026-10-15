@@ -16,7 +16,7 @@ from app.models import (  # noqa: F401 — l'import garantit que tous les modèl
     Restitution,
     SignalementPerte,
 )
-from app.routers import objets, organisations, photos, restitutions, signalements, usagers, utilisateurs
+from app.routers import auth, objets, organisations, photos, restitutions, signalements, usagers, utilisateurs
 
 # Crée les tables dans la base de données si elles n'existent pas encore.
 # Cette approche simple convient à cette étape de développement ; une
@@ -31,11 +31,12 @@ app = FastAPI(
         "API du projet de mémoire de fin de cycle M2 Génie Logiciel — "
         "Institut Africain de Technologie (IAT), Niamey, Niger."
     ),
-    version="0.1.0",
+    version="0.2.0",
 )
 
 # Chaque router déclare lui-même son préfixe d'URL (ex. : /objets) ;
 # il suffit donc de l'enregistrer ici pour que ses routes deviennent actives.
+app.include_router(auth.router)
 app.include_router(organisations.router)
 app.include_router(utilisateurs.router)
 app.include_router(usagers.router)

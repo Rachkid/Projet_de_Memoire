@@ -24,7 +24,7 @@ class RestitutionBase(BaseModel):
 
 class RestitutionCreate(RestitutionBase):
     objet_id: uuid.UUID
-    agent_id: uuid.UUID
+    # L'agent est la personne connectée (jeton) : il n'est plus envoyé ici.
     usager_id: uuid.UUID
     # Verdict de l'agent après avoir comparé la réponse du demandeur au
     # détail caché de l'objet.

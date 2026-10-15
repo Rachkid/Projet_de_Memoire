@@ -3,6 +3,10 @@ Points d'accès de l'API pour les signalements de perte (cahier des charges,
 section 5.1.3). Un usager déclare ce qu'il a perdu ; le système cherche
 immédiatement dans les objets déjà trouvés, puis continuera de surveiller
 chaque nouvel objet enregistré (voir routers/objets.py).
+
+Accès : la DÉCLARATION est publique (l'usager n'a pas de compte). La
+CONSULTATION des signalements est réservée au personnel connecté, et limitée
+à sa propre organisation.
 """
 
 import uuid
@@ -14,8 +18,10 @@ from app.database import get_db
 from app.models.organisation import Organisation
 from app.models.signalement_perte import SignalementPerte
 from app.models.usager import Usager
+from app.models.utilisateur import Utilisateur
 from app.schemas.objet import ObjetRead
 from app.schemas.signalement_perte import SignalementPerteCreate, SignalementPerteRead
+from app.security import get_utilisateur_courant
 from app.services.rapprochement import objets_correspondants, traiter_nouveau_signalement
 
 router = APIRouter(prefix="/signalements", tags=["Signalements de perte"])
@@ -23,7 +29,7 @@ router = APIRouter(prefix="/signalements", tags=["Signalements de perte"])
 
 @router.post("/", response_model=SignalementPerteRead, status_code=status.HTTP_201_CREATED)
 def declarer_perte(payload: SignalementPerteCreate, db: Session = Depends(get_db)):
-    """Enregistre un signalement puis lance le rapprochement automatique."""
+    """Enregistre un signalement (public) puis lance le rapprochement automatique."""
     if db.get(Organisation, payload.organisation_id) is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organisation introuvable")
     if db.get(Usager, payload.usager_id) is None:
@@ -40,18 +46,24 @@ def declarer_perte(payload: SignalementPerteCreate, db: Session = Depends(get_db
 
 
 @router.get("/", response_model=list[SignalementPerteRead])
-def lister_signalements(organisation_id: uuid.UUID | None = None, db: Session = Depends(get_db)):
-    """Liste les signalements, filtrables par organisation (isolation multi-tenant)."""
-    requete = db.query(SignalementPerte)
-    if organisation_id is not None:
-        requete = requete.filter(SignalementPerte.organisation_id == organisation_id)
-    return requete.all()
+def lister_signalements(
+    db: Session = Depends(get_db),
+    personnel: Utilisateur = Depends(get_utilisateur_courant),
+):
+    """Liste les signalements de l'organisation de la personne connectée (jamais ceux d'une autre)."""
+    return db.query(SignalementPerte).filter(SignalementPerte.organisation_id == personnel.organisation_id).all()
 
 
 @router.get("/{signalement_id}/correspondances", response_model=list[ObjetRead])
-def correspondances(signalement_id: uuid.UUID, db: Session = Depends(get_db)):
+def correspondances(
+    signalement_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    personnel: Utilisateur = Depends(get_utilisateur_courant),
+):
     """Objets actuellement en attente qui correspondent à ce signalement."""
     signalement = db.get(SignalementPerte, signalement_id)
-    if signalement is None:
+    # Signalement d'une autre organisation : on répond « introuvable », pas « interdit »,
+    # pour ne même pas révéler qu'il existe.
+    if signalement is None or signalement.organisation_id != personnel.organisation_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Signalement introuvable")
     return objets_correspondants(db, signalement)

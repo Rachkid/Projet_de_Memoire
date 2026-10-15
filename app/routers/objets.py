@@ -14,9 +14,9 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.objet import Objet
-from app.models.organisation import Organisation
 from app.models.utilisateur import Utilisateur
 from app.schemas.objet import ObjetCreate, ObjetRead
+from app.security import exiger_enregistrement
 from app.services.rapprochement import traiter_nouvel_objet
 
 router = APIRouter(prefix="/objets", tags=["Objets"])
@@ -34,28 +34,23 @@ def generer_code_qr() -> str:
 
 
 @router.post("/", response_model=ObjetRead, status_code=status.HTTP_201_CREATED)
-def enregistrer_objet(payload: ObjetCreate, db: Session = Depends(get_db)):
+def enregistrer_objet(
+    payload: ObjetCreate,
+    db: Session = Depends(get_db),
+    agent: Utilisateur = Depends(exiger_enregistrement),
+):
     """
-    Enregistre un nouvel objet trouvé. Avant toute création, on vérifie que
-    l'organisation et l'agent indiqués existent réellement, et que l'agent
-    dispose bien du droit d'enregistrement (mémoire, chapitre 2, section 2.2) :
-    mieux vaut un message d'erreur clair ici qu'une erreur technique obscure
-    renvoyée directement par la base de données.
+    Enregistre un nouvel objet trouvé. L'agent et son organisation viennent du
+    jeton de connexion : il est impossible d'enregistrer un objet au nom d'un
+    autre agent ou dans une autre organisation. Le droit d'enregistrement est
+    vérifié par la dépendance exiger_enregistrement (403 sinon).
     """
-    organisation = db.get(Organisation, payload.organisation_id)
-    if organisation is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organisation introuvable")
-
-    agent = db.get(Utilisateur, payload.agent_id)
-    if agent is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Agent introuvable")
-    if not agent.droit_enregistrement:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Cet agent ne dispose pas du droit d'enregistrement.",
-        )
-
-    objet = Objet(**payload.model_dump(), qr_code=generer_code_qr())
+    objet = Objet(
+        **payload.model_dump(),
+        organisation_id=agent.organisation_id,
+        agent_id=agent.id,
+        qr_code=generer_code_qr(),
+    )
     db.add(objet)
     db.commit()
     db.refresh(objet)

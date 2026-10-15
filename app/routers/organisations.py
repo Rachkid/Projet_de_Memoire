@@ -13,7 +13,9 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.organisation import Organisation
+from app.models.utilisateur import Utilisateur
 from app.schemas.organisation import OrganisationCreate, OrganisationRead
+from app.security import exiger_super_administrateur
 
 # Un APIRouter regroupe les points d'accès liés à une même ressource.
 # prefix="/organisations" évite de le répéter devant chaque route ci-dessous.
@@ -23,8 +25,12 @@ router = APIRouter(prefix="/organisations", tags=["Organisations"])
 
 
 @router.post("/", response_model=OrganisationRead, status_code=status.HTTP_201_CREATED)
-def creer_organisation(payload: OrganisationCreate, db: Session = Depends(get_db)):
-    """Crée une nouvelle organisation (établissement ou compagnie) cliente du système."""
+def creer_organisation(
+    payload: OrganisationCreate,
+    db: Session = Depends(get_db),
+    _: Utilisateur = Depends(exiger_super_administrateur),
+):
+    """Crée une nouvelle organisation cliente. Réservé au super-administrateur."""
     organisation = Organisation(**payload.model_dump())
     db.add(organisation)
     db.commit()
@@ -34,7 +40,7 @@ def creer_organisation(payload: OrganisationCreate, db: Session = Depends(get_db
 
 @router.get("/", response_model=list[OrganisationRead])
 def lister_organisations(db: Session = Depends(get_db)):
-    """Liste toutes les organisations enregistrées (vue réservée, à terme, au super-administrateur)."""
+    """Liste les organisations (publique : le portail en a besoin pour que l'usager choisisse la sienne)."""
     return db.query(Organisation).all()
 
 
