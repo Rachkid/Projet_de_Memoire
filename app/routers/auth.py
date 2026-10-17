@@ -9,8 +9,8 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.utilisateur import Utilisateur
 from app.schemas.auth import Jeton
-from app.schemas.utilisateur import UtilisateurRead
-from app.security import creer_jeton_acces, get_utilisateur_courant, verifier_mot_de_passe
+from app.schemas.utilisateur import ChangementMotDePasse, UtilisateurRead
+from app.security import creer_jeton_acces, get_utilisateur_courant, hacher_mot_de_passe, verifier_mot_de_passe
 
 router = APIRouter(prefix="/auth", tags=["Authentification"])
 
@@ -43,3 +43,25 @@ def se_connecter(formulaire: OAuth2PasswordRequestForm = Depends(), db: Session 
 def mon_profil(utilisateur: Utilisateur = Depends(get_utilisateur_courant)):
     """Renvoie le profil de la personne connectée (utile pour vérifier son jeton)."""
     return utilisateur
+
+
+@router.post("/mot-de-passe")
+def changer_mot_de_passe(
+    payload: ChangementMotDePasse,
+    db: Session = Depends(get_db),
+    utilisateur: Utilisateur = Depends(get_utilisateur_courant),
+):
+    """
+    Change le mot de passe de la personne connectée. L'ancien mot de passe est
+    exigé : si quelqu'un utilise une session laissée ouverte sur un poste, il
+    ne peut pas prendre le contrôle du compte en changeant le mot de passe.
+    Erreur 400 (et non 401) en cas d'ancien mot de passe faux : la session
+    elle-même reste valable.
+    """
+    if not verifier_mot_de_passe(payload.ancien_mot_de_passe, utilisateur):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Ancien mot de passe incorrect.")
+    if payload.nouveau_mot_de_passe == payload.ancien_mot_de_passe:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Le nouveau mot de passe doit être différent de l'ancien.")
+    utilisateur.mot_de_passe_hash = hacher_mot_de_passe(payload.nouveau_mot_de_passe)
+    db.commit()
+    return {"message": "Mot de passe modifié."}

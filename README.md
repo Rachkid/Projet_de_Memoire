@@ -1,7 +1,8 @@
-# Système de gestion des objets trouvés
+# Rendia — Système de gestion des objets perdus
 
-Projet réalisé dans le cadre d'un mémoire de fin de cycle Master 2 — Génie Logiciel,
-Institut Africain de Technologie (IAT), Niamey, Niger.
+Rendia (de « rendre » : rendre l'objet à son propriétaire) est une plateforme de gestion des objets perdus et trouvés pour les établissements d'enseignement et les compagnies de transport. Projet réalisé dans le cadre d'un
+mémoire de fin de cycle Master 2 — Génie Logiciel, Institut Africain de
+Technologie (IAT), Niamey, Niger.
 
 ## Structure du projet
 

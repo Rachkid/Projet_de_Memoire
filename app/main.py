@@ -26,12 +26,12 @@ from app.routers import auth, objets, organisations, photos, restitutions, signa
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Système de gestion des objets trouvés",
+    title="Rendia — Système de gestion des objets perdus",
     description=(
         "API du projet de mémoire de fin de cycle M2 Génie Logiciel — "
         "Institut Africain de Technologie (IAT), Niamey, Niger."
     ),
-    version="0.2.0",
+    version="0.3.0",
 )
 
 # Chaque router déclare lui-même son préfixe d'URL (ex. : /objets) ;
@@ -55,6 +55,6 @@ app.mount("/fichiers/objets", StaticFiles(directory=photos.DOSSIER_OBJETS), name
 def accueil():
     """Simple point de contrôle confirmant que l'API est en ligne."""
     return {
-        "message": "API Système de gestion des objets trouvés.",
+        "message": "API Rendia — Système de gestion des objets perdus.",
         "documentation_interactive": "/docs",
     }

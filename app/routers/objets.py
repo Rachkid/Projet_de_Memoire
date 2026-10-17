@@ -15,8 +15,9 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.objet import Objet
 from app.models.utilisateur import Utilisateur
-from app.schemas.objet import ObjetCreate, ObjetRead
-from app.security import exiger_enregistrement
+from app.models.enums import StatutObjet
+from app.schemas.objet import ObjetCreate, ObjetRead, ObjetUpdate
+from app.security import exiger_enregistrement, exiger_enregistrement_ou_administrateur
 from app.services.rapprochement import traiter_nouvel_objet
 
 router = APIRouter(prefix="/objets", tags=["Objets"])
@@ -70,7 +71,8 @@ def lister_objets(organisation_id: uuid.UUID | None = None, db: Session = Depend
     objets d'une autre organisation (isolation multi-tenant, chapitre 3,
     section 3.1 ; maquettes, sections 3.4.2 et 3.4.3).
     """
-    requete = db.query(Objet)
+    # Les objets archivés (saisie erronée, objet détruit...) sont retirés des listes.
+    requete = db.query(Objet).filter(Objet.statut != StatutObjet.ARCHIVE.value)
     if organisation_id is not None:
         requete = requete.filter(Objet.organisation_id == organisation_id)
     return requete.order_by(Objet.date_heure_decouverte.desc()).all()
@@ -82,6 +84,63 @@ def obtenir_objet(objet_id: uuid.UUID, db: Session = Depends(get_db)):
     objet = db.get(Objet, objet_id)
     if objet is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Objet introuvable")
+    return objet
+
+
+def _objet_modifiable(db: Session, objet_id: uuid.UUID, utilisateur: Utilisateur) -> Objet:
+    """
+    Charge un objet de l'organisation de la personne connectée. Un objet d'une
+    autre organisation « n'existe pas » (404). Un objet déjà restitué ou
+    archivé n'est plus modifiable (409) : son dossier est clos et doit rester
+    tel qu'il était au moment de la remise.
+    """
+    objet = db.get(Objet, objet_id)
+    if objet is None or objet.organisation_id != utilisateur.organisation_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Objet introuvable")
+    if objet.statut in (StatutObjet.RESTITUE.value, StatutObjet.ARCHIVE.value):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Cet objet est déjà restitué ou archivé : il n'est plus modifiable.")
+    return objet
+
+
+@router.patch("/{objet_id}", response_model=ObjetRead)
+def corriger_objet(
+    objet_id: uuid.UUID,
+    payload: ObjetUpdate,
+    db: Session = Depends(get_db),
+    agent: Utilisateur = Depends(exiger_enregistrement),
+):
+    """
+    Corrige un objet (erreur de saisie). PATCH = modification partielle : seuls
+    les champs envoyés changent. Si la catégorie ou la date change, le
+    rapprochement avec les signalements est relancé.
+    """
+    objet = _objet_modifiable(db, objet_id, agent)
+    modifications = payload.model_dump(exclude_unset=True)
+    if not modifications:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Aucune modification fournie.")
+    for champ, valeur in modifications.items():
+        setattr(objet, champ, valeur)
+    db.commit()
+    db.refresh(objet)
+    if "categorie" in modifications or "date_heure_decouverte" in modifications:
+        traiter_nouvel_objet(db, objet)
+    return objet
+
+
+@router.patch("/{objet_id}/archiver", response_model=ObjetRead)
+def archiver_objet(
+    objet_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    utilisateur: Utilisateur = Depends(exiger_enregistrement_ou_administrateur),
+):
+    """
+    Retire un objet des listes (saisie erronée, objet détruit ou donné...) SANS
+    le supprimer : la trace de son enregistrement est conservée.
+    """
+    objet = _objet_modifiable(db, objet_id, utilisateur)
+    objet.statut = StatutObjet.ARCHIVE.value
+    db.commit()
+    db.refresh(objet)
     return objet
 
 

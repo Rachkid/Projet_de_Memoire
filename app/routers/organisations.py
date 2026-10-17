@@ -14,8 +14,9 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.organisation import Organisation
 from app.models.utilisateur import Utilisateur
-from app.schemas.organisation import OrganisationCreate, OrganisationRead
-from app.security import exiger_super_administrateur
+from app.models.enums import RoleUtilisateur
+from app.schemas.organisation import OrganisationCreate, OrganisationRead, OrganisationUpdate
+from app.security import exiger_administrateur, exiger_super_administrateur
 
 # Un APIRouter regroupe les points d'accès liés à une même ressource.
 # prefix="/organisations" évite de le répéter devant chaque route ci-dessous.
@@ -50,4 +51,37 @@ def obtenir_organisation(organisation_id: uuid.UUID, db: Session = Depends(get_d
     organisation = db.get(Organisation, organisation_id)
     if organisation is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organisation introuvable")
+    return organisation
+
+
+@router.patch("/{organisation_id}", response_model=OrganisationRead)
+def modifier_organisation(
+    organisation_id: uuid.UUID,
+    payload: OrganisationUpdate,
+    db: Session = Depends(get_db),
+    demandeur: Utilisateur = Depends(exiger_administrateur),
+):
+    """
+    Modifie une organisation (seuls les champs envoyés changent).
+    - Le super-administrateur peut tout modifier (nom, consultation à distance, délai de rétention).
+    - Un administrateur ne modifie QUE sa propre organisation, et seulement ses
+      paramètres de fonctionnement (consultation à distance, délai de rétention) :
+      le nom de l'organisation reste réservé au super-administrateur.
+    """
+    est_super = demandeur.role == RoleUtilisateur.SUPER_ADMINISTRATEUR.value
+    if not est_super and demandeur.organisation_id != organisation_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organisation introuvable")
+    organisation = db.get(Organisation, organisation_id)
+    if organisation is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organisation introuvable")
+
+    modifications = payload.model_dump(exclude_unset=True)
+    if not modifications:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Aucune modification fournie.")
+    if "nom" in modifications and not est_super:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Seul le super-administrateur peut renommer une organisation.")
+    for champ, valeur in modifications.items():
+        setattr(organisation, champ, valeur)
+    db.commit()
+    db.refresh(organisation)
     return organisation

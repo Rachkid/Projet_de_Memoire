@@ -15,6 +15,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.models.enums import StatutSignalement
 from app.models.organisation import Organisation
 from app.models.signalement_perte import SignalementPerte
 from app.models.usager import Usager
@@ -67,3 +68,21 @@ def correspondances(
     if signalement is None or signalement.organisation_id != personnel.organisation_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Signalement introuvable")
     return objets_correspondants(db, signalement)
+
+
+@router.patch("/{signalement_id}/cloturer", response_model=SignalementPerteRead)
+def cloturer_signalement(
+    signalement_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    personnel: Utilisateur = Depends(get_utilisateur_courant),
+):
+    """Clôture un signalement (l'usager a retrouvé son objet, ou ne le cherche plus)."""
+    signalement = db.get(SignalementPerte, signalement_id)
+    if signalement is None or signalement.organisation_id != personnel.organisation_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Signalement introuvable")
+    if signalement.statut == StatutSignalement.CLOTURE.value:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Ce signalement est déjà clôturé.")
+    signalement.statut = StatutSignalement.CLOTURE.value
+    db.commit()
+    db.refresh(signalement)
+    return signalement

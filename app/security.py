@@ -95,6 +95,16 @@ def exiger_enregistrement(utilisateur: Utilisateur = Depends(get_utilisateur_cou
     return utilisateur
 
 
+def exiger_enregistrement_ou_administrateur(
+    utilisateur: Utilisateur = Depends(get_utilisateur_courant),
+) -> Utilisateur:
+    """Accepte un agent d'enregistrement OU un administrateur (ex. : archiver un objet)."""
+    est_admin = utilisateur.role in (RoleUtilisateur.ADMINISTRATEUR.value, RoleUtilisateur.SUPER_ADMINISTRATEUR.value)
+    if not (utilisateur.droit_enregistrement or est_admin):
+        raise _interdit("Réservé aux agents d'enregistrement et aux administrateurs.")
+    return utilisateur
+
+
 def exiger_restitution(utilisateur: Utilisateur = Depends(get_utilisateur_courant)) -> Utilisateur:
     if not utilisateur.droit_restitution:
         raise _interdit("Vous ne disposez pas du droit de restitution.")

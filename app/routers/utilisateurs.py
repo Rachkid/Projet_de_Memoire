@@ -17,7 +17,7 @@ from app.database import get_db
 from app.models.enums import RoleUtilisateur
 from app.models.organisation import Organisation
 from app.models.utilisateur import Utilisateur
-from app.schemas.utilisateur import UtilisateurCreate, UtilisateurRead
+from app.schemas.utilisateur import UtilisateurCreate, UtilisateurRead, UtilisateurUpdate
 from app.security import exiger_administrateur, hacher_mot_de_passe
 
 router = APIRouter(prefix="/utilisateurs", tags=["Utilisateurs"])
@@ -73,6 +73,41 @@ def lister_utilisateurs(
     return requete.all()
 
 
+def _compte_gerable(db: Session, utilisateur_id: uuid.UUID, demandeur: Utilisateur) -> Utilisateur:
+    """
+    Charge le compte visé par une action d'administration.
+    - Pour un administrateur, un compte d'une autre organisation « n'existe pas » (404).
+    - Un administrateur ne gère que des AGENTS (403 sinon) : il ne peut pas toucher
+      au compte d'un autre administrateur ni du super-administrateur.
+    - Le super-administrateur gère tous les comptes.
+    """
+    cible = db.get(Utilisateur, utilisateur_id)
+    if cible is None or (not _est_super(demandeur) and cible.organisation_id != demandeur.organisation_id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Utilisateur introuvable")
+    if not _est_super(demandeur) and cible.role != RoleUtilisateur.AGENT.value:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Vous ne pouvez gérer que des agents.")
+    return cible
+
+
+@router.patch("/{utilisateur_id}", response_model=UtilisateurRead)
+def modifier_utilisateur(
+    utilisateur_id: uuid.UUID,
+    payload: UtilisateurUpdate,
+    db: Session = Depends(get_db),
+    demandeur: Utilisateur = Depends(exiger_administrateur),
+):
+    """Modifie le nom et/ou les droits d'un compte (seuls les champs envoyés changent)."""
+    cible = _compte_gerable(db, utilisateur_id, demandeur)
+    modifications = payload.model_dump(exclude_unset=True)
+    if not modifications:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Aucune modification fournie.")
+    for champ, valeur in modifications.items():
+        setattr(cible, champ, valeur)
+    db.commit()
+    db.refresh(cible)
+    return cible
+
+
 @router.patch("/{utilisateur_id}/desactiver", response_model=UtilisateurRead)
 def desactiver_utilisateur(
     utilisateur_id: uuid.UUID,
@@ -83,15 +118,26 @@ def desactiver_utilisateur(
     Désactive un compte (départ d'un agent, téléphone perdu...). Effet immédiat :
     son jeton, même encore valide, ne donne plus aucun accès (voir security.py).
     """
-    cible = db.get(Utilisateur, utilisateur_id)
-    # Pour un administrateur, un compte d'une autre organisation « n'existe pas ».
-    if cible is None or (not _est_super(demandeur) and cible.organisation_id != demandeur.organisation_id):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Utilisateur introuvable")
+    cible = _compte_gerable(db, utilisateur_id, demandeur)
     if cible.id == demandeur.id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Vous ne pouvez pas désactiver votre propre compte.")
-    if not _est_super(demandeur) and cible.role != RoleUtilisateur.AGENT.value:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Vous ne pouvez désactiver que des agents.")
     cible.actif = False
+    db.commit()
+    db.refresh(cible)
+    return cible
+
+
+@router.patch("/{utilisateur_id}/reactiver", response_model=UtilisateurRead)
+def reactiver_utilisateur(
+    utilisateur_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    demandeur: Utilisateur = Depends(exiger_administrateur),
+):
+    """Réactive un compte désactivé (retour d'un agent). Mêmes règles d'accès que la désactivation."""
+    cible = _compte_gerable(db, utilisateur_id, demandeur)
+    if cible.actif:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Ce compte est déjà actif.")
+    cible.actif = True
     db.commit()
     db.refresh(cible)
     return cible

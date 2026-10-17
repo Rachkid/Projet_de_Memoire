@@ -11,7 +11,7 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from app.models.enums import StatutObjet, TypeEmplacement
 
@@ -30,6 +30,37 @@ class ObjetCreate(ObjetBase):
     # Détail caché : accepté à la création, mais volontairement ABSENT de
     # ObjetRead pour qu'il ne sorte jamais dans les réponses publiques.
     detail_cache: Optional[str] = None
+
+
+class ObjetUpdate(BaseModel):
+    """
+    Correction d'un objet déjà enregistré (PATCH) : seuls les champs envoyés
+    sont modifiés. Le statut, le code QR, l'organisation et l'agent
+    d'enregistrement ne peuvent pas être modifiés par cette voie.
+    """
+
+    categorie: Optional[str] = None
+    photo_url: Optional[str] = None
+    date_heure_decouverte: Optional[datetime] = None
+    type_emplacement: Optional[TypeEmplacement] = None
+    lieu_detail: Optional[str] = None
+    detail_cache: Optional[str] = None
+
+    @field_validator("categorie", "date_heure_decouverte")
+    @classmethod
+    def pas_de_valeur_nulle(cls, valeur):
+        # Obligatoires en base : on peut les corriger, pas les vider.
+        if valeur is None:
+            raise ValueError("Ce champ ne peut pas être vide.")
+        return valeur
+
+    @field_validator("categorie")
+    @classmethod
+    def categorie_non_vide(cls, valeur: str) -> str:
+        valeur = valeur.strip()
+        if not valeur:
+            raise ValueError("La catégorie ne peut pas être vide.")
+        return valeur
 
 
 class ObjetRead(ObjetBase):
