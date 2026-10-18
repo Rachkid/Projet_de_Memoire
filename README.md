@@ -15,6 +15,10 @@ objets_trouves/
 │   ├── models/           # Tables de la base de données (SQLAlchemy)
 │   ├── schemas/          # Formats de données validés en entrée/sortie de l'API (Pydantic)
 │   ├── routers/          # Points d'accès de l'API, regroupés par ressource
+│   ├── services/         # Logique réutilisable (photos, habillage, couleurs, rapprochement...)
+│   ├── migrations/       # Évolutions du schéma de la base (Alembic)
+│   ├── scripts/          # Outils en ligne de commande (super-administrateur, habillage de démonstration)
+│   ├── assets/demo/      # Logos et photos de démonstration (IAT, Rimbo)
 │   └── static/           # Pages HTML/CSS/JS (interface agent, écran, portail)
 ├── tests/                # Tests automatisés
 ├── requirements.txt      # Dépendances Python du projet
@@ -29,6 +33,18 @@ objets_trouves/
 2. Lancer : `docker compose up --build`
 3. L'API est accessible sur http://localhost:8000
 4. La documentation interactive générée automatiquement par FastAPI est accessible sur http://localhost:8000/docs
+
+## Habillage des organisations (Étape 10)
+
+Chaque organisation a son identité visuelle : identifiant d'adresse (`iat`), logo, photo de fond et
+couleurs. Pour appliquer l'habillage de démonstration à IAT et Rimbo :
+
+```
+docker compose exec api python -m app.scripts.habillage_demo
+```
+
+Les évolutions de la base sont gérées par Alembic et appliquées automatiquement au démarrage :
+mettre l'application à jour ne fait perdre aucune donnée.
 
 ## Documentation du projet
 

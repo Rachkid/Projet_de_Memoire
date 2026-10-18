@@ -5,6 +5,8 @@ Règles d'accès (étape 8) :
 - le super-administrateur gère tous les comptes de toutes les organisations ;
 - un administrateur gère uniquement les AGENTS de sa propre organisation ;
 - un agent n'a accès à aucune gestion de comptes.
+
+Étape 9 bis : un administrateur peut réinitialiser le mot de passe d'un agent qui l'a oublié.
 """
 
 import uuid
@@ -17,7 +19,12 @@ from app.database import get_db
 from app.models.enums import RoleUtilisateur
 from app.models.organisation import Organisation
 from app.models.utilisateur import Utilisateur
-from app.schemas.utilisateur import UtilisateurCreate, UtilisateurRead, UtilisateurUpdate
+from app.schemas.utilisateur import (
+    ReinitialisationMotDePasse,
+    UtilisateurCreate,
+    UtilisateurRead,
+    UtilisateurUpdate,
+)
 from app.security import exiger_administrateur, hacher_mot_de_passe
 
 router = APIRouter(prefix="/utilisateurs", tags=["Utilisateurs"])
@@ -138,6 +145,32 @@ def reactiver_utilisateur(
     if cible.actif:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Ce compte est déjà actif.")
     cible.actif = True
+    db.commit()
+    db.refresh(cible)
+    return cible
+
+
+@router.patch("/{utilisateur_id}/reinitialiser-mot-de-passe", response_model=UtilisateurRead)
+def reinitialiser_mot_de_passe(
+    utilisateur_id: uuid.UUID,
+    payload: ReinitialisationMotDePasse,
+    db: Session = Depends(get_db),
+    demandeur: Utilisateur = Depends(exiger_administrateur),
+):
+    """
+    Fixe un mot de passe provisoire pour un compte dont le titulaire a oublié le sien.
+    Mêmes règles d'accès que les autres actions de gestion de comptes : un administrateur
+    ne réinitialise que les agents de son organisation. Personne ne peut lire un mot de
+    passe : l'administrateur en choisit un nouveau et le transmet à l'agent, qui le
+    changera lui-même avec POST /auth/mot-de-passe.
+    """
+    cible = _compte_gerable(db, utilisateur_id, demandeur)
+    if cible.id == demandeur.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Pour changer votre propre mot de passe, utilisez /auth/mot-de-passe.",
+        )
+    cible.mot_de_passe_hash = hacher_mot_de_passe(payload.nouveau_mot_de_passe)
     db.commit()
     db.refresh(cible)
     return cible

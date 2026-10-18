@@ -28,6 +28,18 @@ class Organisation(Base):
     consultation_distance: Mapped[bool] = mapped_column(Boolean, default=False)
     delai_retention_jours: Mapped[int] = mapped_column(Integer, default=90)
 
+    # Habillage (Étape 10) : ce qui fait reconnaître l'organisation au premier regard.
+    # Tout est facultatif : sans choix, l'interface utilise le thème par défaut de Rendia.
+    # - slug : identifiant court utilisé dans l'adresse des pages (ex. : « iat » -> /iat)
+    # - logo_url / fond_url : adresses publiques des images enregistrées sur le serveur
+    # - couleurs au format #rrggbb
+    slug: Mapped[str | None] = mapped_column(String(50), unique=True, index=True, nullable=True)
+    logo_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    fond_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    couleur_principale: Mapped[str | None] = mapped_column(String(7), nullable=True)
+    couleur_accent: Mapped[str | None] = mapped_column(String(7), nullable=True)
+    couleur_fond: Mapped[str | None] = mapped_column(String(7), nullable=True)
+
     # Relations vers les tables qui appartiennent à cette organisation.
     # back_populates crée le lien dans les deux sens : depuis une Organisation,
     # on peut lister ses utilisateurs (organisation.utilisateurs), et depuis un

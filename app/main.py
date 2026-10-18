@@ -16,14 +16,14 @@ from app.models import (  # noqa: F401 — l'import garantit que tous les modèl
     Restitution,
     SignalementPerte,
 )
+from app.migrations_runner import appliquer_migrations
 from app.routers import auth, objets, organisations, photos, restitutions, signalements, usagers, utilisateurs
 
-# Crée les tables dans la base de données si elles n'existent pas encore.
-# Cette approche simple convient à cette étape de développement ; une
-# gestion plus rigoureuse des évolutions futures du schéma (ajout d'une
-# colonne, par exemple, sans perdre les données déjà présentes chez un
-# client) sera mise en place avec Alembic lors d'une prochaine étape.
+# 1) Crée les tables qui n'existent pas encore (base neuve).
 Base.metadata.create_all(bind=engine)
+# 2) Applique les migrations Alembic en attente (Étape 10) : met à niveau, sans rien perdre,
+#    une base créée par une étape précédente (ajout de colonnes, par exemple).
+appliquer_migrations()
 
 app = FastAPI(
     title="Rendia — Système de gestion des objets perdus",
@@ -31,7 +31,7 @@ app = FastAPI(
         "API du projet de mémoire de fin de cycle M2 Génie Logiciel — "
         "Institut Africain de Technologie (IAT), Niamey, Niger."
     ),
-    version="0.3.0",
+    version="0.4.0",
 )
 
 # Chaque router déclare lui-même son préfixe d'URL (ex. : /objets) ;
@@ -49,6 +49,15 @@ app.include_router(photos.router)
 # dossier des photos de propriétaires n'est volontairement PAS exposé ici.
 photos.DOSSIER_OBJETS.mkdir(parents=True, exist_ok=True)
 app.mount("/fichiers/objets", StaticFiles(directory=photos.DOSSIER_OBJETS), name="photos_objets")
+
+
+# Logos et photos de fond des organisations : publics aussi (page de connexion, portail, écran d'affichage).
+organisations.DOSSIER_ORGANISATIONS.mkdir(parents=True, exist_ok=True)
+app.mount(
+    organisations.URL_ORGANISATIONS,
+    StaticFiles(directory=organisations.DOSSIER_ORGANISATIONS),
+    name="images_organisations",
+)
 
 
 @app.get("/", tags=["Racine"])

@@ -100,6 +100,22 @@ class ChangementMotDePasse(BaseModel):
         return verifier_regles_mot_de_passe(valeur)
 
 
+class ReinitialisationMotDePasse(BaseModel):
+    """
+    Réinitialisation par un administrateur (agent qui a oublié son mot de passe).
+    L'ancien mot de passe n'est pas demandé : la personne ne le connaît plus.
+    Le mot de passe fourni est PROVISOIRE : l'agent le changera lui-même dès sa
+    première connexion avec POST /auth/mot-de-passe.
+    """
+
+    nouveau_mot_de_passe: str
+
+    @field_validator("nouveau_mot_de_passe")
+    @classmethod
+    def nouveau_valide(cls, valeur: str) -> str:
+        return verifier_regles_mot_de_passe(valeur)
+
+
 class UtilisateurRead(UtilisateurBase):
     id: uuid.UUID
     identifiant: str

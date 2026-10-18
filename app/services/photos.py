@@ -38,8 +38,12 @@ def nom_fichier_valide(nom: str) -> bool:
     return bool(_MOTIF_NOM.match(nom))
 
 
-def enregistrer_photo(contenu: bytes, dossier: Path, cote_max: int) -> str:
-    """Vérifie, nettoie et enregistre une photo. Renvoie le nom du fichier créé."""
+def ouvrir_image_verifiee(contenu: bytes) -> Image.Image:
+    """
+    Ouvre réellement le fichier avec Pillow et le décode entièrement. Lève
+    PhotoInvalide si ce n'est pas une image JPEG, PNG ou WEBP saine. Partagé par
+    les photos d'objets et par les logos/photos de fond des organisations.
+    """
     if not contenu:
         raise PhotoInvalide("Fichier vide.")
     try:
@@ -51,8 +55,12 @@ def enregistrer_photo(contenu: bytes, dossier: Path, cote_max: int) -> str:
         raise
     except (UnidentifiedImageError, OSError, Image.DecompressionBombError, SyntaxError, ValueError):
         raise PhotoInvalide("Le fichier n'est pas une image valide.")
+    return ImageOps.exif_transpose(image)  # remet l'image à l'endroit selon l'orientation du téléphone
 
-    image = ImageOps.exif_transpose(image)  # remet la photo à l'endroit selon l'orientation du téléphone
+
+def enregistrer_photo(contenu: bytes, dossier: Path, cote_max: int) -> str:
+    """Vérifie, nettoie et enregistre une photo. Renvoie le nom du fichier créé."""
+    image = ouvrir_image_verifiee(contenu)
     image = image.convert("RGB")  # JPEG ne gère pas la transparence
     image.thumbnail((cote_max, cote_max))
 
