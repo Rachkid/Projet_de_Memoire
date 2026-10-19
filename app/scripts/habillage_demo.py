@@ -1,6 +1,6 @@
 """
 Applique l'habillage de démonstration (logo, photo de fond, couleurs, identifiant
-d'adresse) aux organisations de test : IAT, Rimbo, STM et Amana.
+d'adresse) aux organisations de test : IAT, Rimbo, STM, Amana et SONITRAV.
 
 C'est un raccourci pour la démonstration : tout ce que fait ce script peut aussi se
 faire par l'API (PATCH /organisations/{id}, POST /organisations/{id}/logo et /fond).
@@ -9,7 +9,7 @@ d'ambiguïté, il l'indique et on lui donne l'identifiant à la main.
 
 Utilisation :
     docker compose exec api python -m app.scripts.habillage_demo
-    docker compose exec api python -m app.scripts.habillage_demo --iat <id> --rimbo <id> --stm <id> --amana <id>
+    docker compose exec api python -m app.scripts.habillage_demo --iat <id> --rimbo <id> --stm <id> --amana <id> --sonitrav <id> --nizar <id> --ema <id> --salim <id>
     docker compose exec api python -m app.scripts.habillage_demo --seulement stm
 """
 
@@ -56,6 +56,34 @@ DEMO = {
         "logo": "amana_logo.png",
         "fond": "amana_fond.jpg",
     },
+    "sonitrav": {
+        "motifs": ["sonitrav"],
+        "slug": "sonitrav",
+        "couleurs": ("#183c94", "#fcc433", "#fffbf0"),
+        "logo": "sonitrav_logo.png",
+        "fond": "sonitrav_fond.jpg",
+    },
+    "nizar": {
+        "motifs": ["nizar"],
+        "slug": "nizar",
+        "couleurs": ("#1f6fb5", "#e8731a", "#f4f8fc"),
+        "logo": "nizar_logo.png",
+        "fond": "nizar_fond.jpg",
+    },
+    "ema": {
+        "motifs": ["ema transport"],
+        "slug": "ema",
+        "couleurs": ("#1f8a3a", "#f47b20", "#f7faf3"),
+        "logo": "ema_logo.png",
+        "fond": "ema_fond.jpg",
+    },
+    "salim": {
+        "motifs": ["salim"],
+        "slug": "salim",
+        "couleurs": ("#0f2a8f", "#f47b20", "#f5f7fc"),
+        "logo": "salim_logo.png",
+        "fond": "salim_fond.jpg",
+    },
 }
 
 
@@ -94,17 +122,16 @@ def habiller(db, cle: str, organisation: Organisation) -> None:
 
 
 def main() -> None:
-    analyseur = argparse.ArgumentParser(description="Habillage de démonstration (IAT, Rimbo, STM et Amana).")
-    analyseur.add_argument("--iat", help="identifiant de l'organisation IAT (si le nom ne suffit pas)")
-    analyseur.add_argument("--rimbo", help="identifiant de l'organisation Rimbo (si le nom ne suffit pas)")
-    analyseur.add_argument("--stm", help="identifiant de l'organisation STM (si le nom ne suffit pas)")
-    analyseur.add_argument("--amana", help="identifiant de l'organisation Amana (si le nom ne suffit pas)")
+    analyseur = argparse.ArgumentParser(description="Habillage de démonstration (IAT, Rimbo, STM, Amana et SONITRAV).")
+    for cle in DEMO:  # une option --<cle> par organisation de démonstration
+        analyseur.add_argument(f"--{cle}", help=f"identifiant de l'organisation « {cle} » (si le nom ne suffit pas)")
     analyseur.add_argument("--seulement", choices=list(DEMO), help="n'habiller que cette organisation")
     arguments = analyseur.parse_args()
 
     db = SessionLocal()
     try:
-        for cle, identifiant in (("iat", arguments.iat), ("rimbo", arguments.rimbo), ("stm", arguments.stm), ("amana", arguments.amana)):
+        for cle in DEMO:
+            identifiant = getattr(arguments, cle)
             if arguments.seulement and cle != arguments.seulement:
                 continue
             organisation = _trouver(db, cle, identifiant)

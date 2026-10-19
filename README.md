@@ -18,7 +18,7 @@ objets_trouves/
 │   ├── services/         # Logique réutilisable (photos, habillage, couleurs, rapprochement...)
 │   ├── migrations/       # Évolutions du schéma de la base (Alembic)
 │   ├── scripts/          # Outils en ligne de commande (super-administrateur, habillage de démonstration)
-│   ├── assets/demo/      # Logos et photos de démonstration (IAT, Rimbo, STM, Amana)
+│   ├── assets/demo/      # Logos et photos de démonstration (IAT, Rimbo, STM, Amana, SONITRAV)
 │   └── static/           # Pages HTML/CSS/JS (interface agent, écran, portail)
 ├── tests/                # Tests automatisés
 ├── requirements.txt      # Dépendances Python du projet
@@ -37,7 +37,7 @@ objets_trouves/
 ## Habillage des organisations (Étape 10)
 
 Chaque organisation a son identité visuelle : identifiant d'adresse (`iat`), logo, photo de fond et
-couleurs. Pour appliquer l'habillage de démonstration à IAT, Rimbo, STM et Amana :
+couleurs. Pour appliquer l'habillage de démonstration à IAT, Rimbo, STM, Amana et SONITRAV :
 
 ```
 docker compose exec api python -m app.scripts.habillage_demo
@@ -46,7 +46,7 @@ docker compose exec api python -m app.scripts.habillage_demo
 ## Portail public (Étape 11)
 
 Chaque organisation a une page publique à son identifiant court : `http://localhost:8000/iat`,
-`/rimbo`, `/stm`, `/amana`. Un usager sans compte y déclare un objet perdu (le système cherche aussitôt
+`/rimbo`, `/stm`, `/amana`, `/sonitrav`, `/nizar`, `/ema`, `/salim`. Un usager sans compte y déclare un objet perdu (le système cherche aussitôt
 une correspondance) et, si l'organisation a activé la consultation à distance, voit les objets trouvés.
 La page est conçue d'abord pour un téléphone et s'habille des couleurs, du logo et de la photo de
 l'organisation. Fichiers : `app/static/portail/` ; routes : `app/routers/portail.py`.
