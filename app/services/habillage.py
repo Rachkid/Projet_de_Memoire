@@ -16,7 +16,7 @@ nom, ce qui évite que le navigateur continue d'afficher l'ancienne image en cac
 import uuid
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageChops, ImageDraw
 
 from app.services.photos import ouvrir_image_verifiee
 
@@ -48,10 +48,37 @@ def supprimer_fond_blanc(image: Image.Image, tolerance: int = 40) -> Image.Image
     return resultat
 
 
+def rogner_marges(image: Image.Image, marge: float = 0.05) -> Image.Image:
+    """
+    Coupe les marges vides autour du logo (Étape 11). Beaucoup de logos sont livrés au centre
+    d'une grande image blanche ou transparente : sans ce rognage, ils apparaissent minuscules
+    dans la plaque de l'accueil et dans la barre du haut du portail.
+    - image avec transparence : le contenu est tout ce qui n'est pas transparent ;
+    - image opaque : le contenu est tout ce qui n'est pas (presque) blanc.
+    Une petite marge (5 %) est conservée pour que le dessin ne touche pas le bord.
+    """
+    rgba = image.convert("RGBA")
+    alpha = rgba.getchannel("A")
+    if alpha.getextrema()[0] < 255:
+        contenu = alpha.point(lambda v: 255 if v > 16 else 0)
+    else:
+        r, g, b = rgba.getchannel("R"), rgba.getchannel("G"), rgba.getchannel("B")
+        plus_sombre = ImageChops.darker(ImageChops.darker(r, g), b)
+        contenu = plus_sombre.point(lambda v: 0 if v >= 245 else 255)
+    boite = contenu.getbbox()
+    if boite is None:  # image entièrement vide ou blanche : on ne touche à rien
+        return rgba
+    gauche, haut, droite, bas = boite
+    pas = max(2, round(max(droite - gauche, bas - haut) * marge))
+    boite = (max(0, gauche - pas), max(0, haut - pas), min(rgba.width, droite + pas), min(rgba.height, bas + pas))
+    return rgba.crop(boite)
+
+
 def enregistrer_logo(contenu: bytes, dossier: Path, retirer_fond_blanc: bool = False) -> str:
-    """Vérifie et enregistre un logo (PNG). Renvoie le nom du fichier créé."""
+    """Vérifie et enregistre un logo (PNG, marges vides coupées). Renvoie le nom du fichier créé."""
     image = ouvrir_image_verifiee(contenu)
     image = supprimer_fond_blanc(image) if retirer_fond_blanc else image.convert("RGBA")
+    image = rogner_marges(image)
     image.thumbnail((LOGO_COTE_MAX, LOGO_COTE_MAX))
     dossier.mkdir(parents=True, exist_ok=True)
     nom = f"logo-{uuid.uuid4().hex}.png"

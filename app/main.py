@@ -4,10 +4,14 @@ et les routers écrits dans les étapes précédentes en une seule application
 FastAPI exécutable.
 """
 
-from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 
-from app.database import Base, engine
+from fastapi import Depends, FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+from sqlalchemy.orm import Session
+
+from app.database import Base, engine, get_db
 from app.models import (  # noqa: F401 — l'import garantit que tous les modèles
     Organisation,          # sont enregistrés auprès de SQLAlchemy avant la
     Utilisateur,           # création des tables ci-dessous.
@@ -17,7 +21,7 @@ from app.models import (  # noqa: F401 — l'import garantit que tous les modèl
     SignalementPerte,
 )
 from app.migrations_runner import appliquer_migrations
-from app.routers import auth, objets, organisations, photos, restitutions, signalements, usagers, utilisateurs
+from app.routers import auth, objets, organisations, photos, portail, restitutions, signalements, usagers, utilisateurs
 
 # 1) Crée les tables qui n'existent pas encore (base neuve).
 Base.metadata.create_all(bind=engine)
@@ -31,7 +35,7 @@ app = FastAPI(
         "API du projet de mémoire de fin de cycle M2 Génie Logiciel — "
         "Institut Africain de Technologie (IAT), Niamey, Niger."
     ),
-    version="0.4.0",
+    version="0.5.0",
 )
 
 # Chaque router déclare lui-même son préfixe d'URL (ex. : /objets) ;
@@ -44,6 +48,7 @@ app.include_router(objets.router)
 app.include_router(signalements.router)
 app.include_router(restitutions.router)
 app.include_router(photos.router)
+app.include_router(portail.router)
 
 # Les photos d'OBJETS sont publiques : on expose leur dossier tel quel. Le
 # dossier des photos de propriétaires n'est volontairement PAS exposé ici.
@@ -59,6 +64,10 @@ app.mount(
     name="images_organisations",
 )
 
+# Pages de l'interface (portail public, puis interface agent et écran d'affichage).
+DOSSIER_STATIC = Path(__file__).resolve().parent / "static"
+app.mount("/static", StaticFiles(directory=DOSSIER_STATIC), name="static")
+
 
 @app.get("/", tags=["Racine"])
 def accueil():
@@ -67,3 +76,16 @@ def accueil():
         "message": "API Rendia — Système de gestion des objets perdus.",
         "documentation_interactive": "/docs",
     }
+
+
+# DOIT rester la dernière route : « /{identifiant} » capte toute adresse à un seul niveau
+# (ex. /iat). Les adresses réservées (/docs, /redoc, /openapi.json) sont déclarées plus tôt
+# par FastAPI et gardent donc la priorité ; les identifiants réservés de la liste
+# SLUGS_RESERVES empêchent qu'une organisation leur prenne leur nom.
+@app.get("/{slug}", include_in_schema=False)
+def page_portail(slug: str, db: Session = Depends(get_db)):
+    """Portail public d'une organisation : la même page pour toutes, habillée par le navigateur."""
+    existe = db.query(Organisation.id).filter(Organisation.slug == slug.strip().lower()).first()
+    if existe is None:
+        return FileResponse(DOSSIER_STATIC / "portail" / "introuvable.html", status_code=404)
+    return FileResponse(DOSSIER_STATIC / "portail" / "index.html")

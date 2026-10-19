@@ -71,3 +71,19 @@ class ObjetRead(ObjetBase):
     statut: StatutObjet
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ObjetPublicRead(BaseModel):
+    """
+    Ce que le portail public montre d'un objet trouvé : le strict nécessaire pour que
+    son propriétaire le reconnaisse. Volontairement absents : le détail caché
+    (preuve de propriété), le code QR, l'agent, le lieu précis et l'organisation.
+    """
+
+    id: uuid.UUID
+    categorie: str
+    photo_url: Optional[str] = None
+    date_heure_decouverte: datetime
+    type_emplacement: Optional[TypeEmplacement] = None
+
+    model_config = ConfigDict(from_attributes=True)

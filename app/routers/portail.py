@@ -1,0 +1,59 @@
+"""
+Points d'accès de l'API réservés au portail public (Étape 11).
+
+Le portail est la page que voit un usager SANS compte (par exemple /iat) : il
+déclare un objet perdu et, si l'organisation l'a autorisé, consulte les objets
+trouvés. Ces routes sont publiques ; elles sont donc écrites avec prudence :
+on n'y expose que ce qui est nécessaire, jamais le détail caché d'un objet.
+
+La déclaration de perte elle-même réutilise les routes existantes
+POST /usagers/ puis POST /signalements/ (Étape 6).
+"""
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.database import get_db
+from app.models.enums import StatutObjet
+from app.models.objet import Objet
+from app.models.organisation import Organisation
+from app.schemas.objet import ObjetPublicRead
+from app.services.categories import CATEGORIES
+
+router = APIRouter(prefix="/portail", tags=["Portail public"])
+
+# Plafond de sécurité : une page publique ne doit pas pouvoir tout aspirer d'un coup.
+LIMITE_OBJETS = 200
+
+
+@router.get("/categories", response_model=list[str])
+def lister_categories():
+    """Catégories proposées dans les formulaires (mêmes mots pour l'usager et pour l'agent)."""
+    return CATEGORIES
+
+
+@router.get("/{slug}/objets", response_model=list[ObjetPublicRead])
+def objets_exposes(slug: str, db: Session = Depends(get_db)):
+    """
+    Objets trouvés visibles par le public, pour l'organisation désignée par son identifiant court.
+
+    - 404 si l'identifiant n'existe pas ;
+    - 403 si l'organisation n'a pas activé la « consultation à distance » : la règle est
+      appliquée ICI, côté serveur, et non seulement en cachant un bouton dans la page ;
+    - seuls les objets « en attente » sont montrés (ni réclamés, ni restitués, ni archivés).
+    """
+    organisation = db.query(Organisation).filter(Organisation.slug == slug.strip().lower()).first()
+    if organisation is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organisation introuvable")
+    if not organisation.consultation_distance:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Cette organisation n'expose pas ses objets trouvés en ligne.",
+        )
+    return (
+        db.query(Objet)
+        .filter(Objet.organisation_id == organisation.id, Objet.statut == StatutObjet.EN_ATTENTE.value)
+        .order_by(Objet.date_heure_decouverte.desc())
+        .limit(LIMITE_OBJETS)
+        .all()
+    )

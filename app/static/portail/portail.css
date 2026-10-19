@@ -1,0 +1,423 @@
+/*
+  Portail public — Étape 11.
+  Une seule feuille de style pour toutes les organisations : les couleurs viennent du
+  « thème » calculé par le serveur (voir app/services/couleurs.py) et sont posées par
+  portail.js sur l'élément racine. Les valeurs ci-dessous sont celles de Rendia, utilisées
+  avant l'arrivée du thème ou si l'organisation n'a pas choisi ses couleurs.
+
+  Conçu d'abord pour un téléphone (une colonne, gros boutons, texte 17 px) puis élargi.
+  Polices du système uniquement : rien à télécharger, la page reste légère sur une
+  connexion lente et fonctionne sans accès à des services extérieurs.
+*/
+
+:root {
+  --principale: #1d4e89;
+  --accent: #d9730d;
+  --fond: #f7f8fa;
+  --sombre: #14365e;
+  --t-principale: #ffffff;
+  --t-accent: #111827;
+  --t-sombre: #ffffff;
+  --t-fond: #111827;
+
+  --encre: var(--t-fond);
+  --encre-douce: #4b5563;
+  --ligne: rgba(17, 24, 39, 0.2);
+  --teinte: #eef1f5;
+  --erreur: #b42318;
+  --rayon: 14px;
+
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+@supports (color: color-mix(in srgb, red 50%, blue)) {
+  :root {
+    --encre-douce: color-mix(in srgb, var(--t-fond) 70%, var(--fond));
+    --ligne: color-mix(in srgb, var(--t-fond) 24%, var(--fond));
+    --teinte: color-mix(in srgb, var(--principale) 9%, #ffffff);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--encre);
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+[hidden] { display: none !important; }
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Les titres reçoivent le focus par programme à chaque changement de page (lecteurs d'écran) :
+   ils ne sont pas cliquables, on n'y dessine donc pas de cadre. */
+[tabindex="-1"]:focus { outline: none; }
+
+h1, h2 { margin: 0; line-height: 1.08; letter-spacing: -0.02em; }
+p { margin: 0; }
+
+.chargement {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--encre-douce);
+}
+
+/* ---------- Boutons ---------- */
+
+.bouton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 0 24px;
+  border: 2px solid transparent;
+  border-radius: var(--rayon);
+  font: inherit;
+  font-weight: 700;
+  font-size: 1.0625rem;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.bouton:hover { filter: brightness(0.94); }
+.bouton:disabled { opacity: 0.6; cursor: progress; }
+.bouton--plein { width: 100%; }
+.bouton--accent { background: var(--accent); color: var(--t-accent); }
+.bouton--contour {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.85);
+  color: #ffffff;
+}
+.bouton--discret { background: transparent; border-color: var(--ligne); color: var(--encre); }
+
+/* ---------- Accueil : l'identité de l'organisation ---------- */
+
+.accueil {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 32px 20px calc(16px + env(safe-area-inset-bottom));
+  color: #ffffff;
+  background-color: var(--sombre);
+  background-image:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.85) 62%),
+    var(--fond-image, none);
+  background-size: cover;
+  background-position: var(--fond-position, center top);
+}
+
+@supports (color: color-mix(in srgb, red 50%, blue)) {
+  .accueil {
+    /* Le voile prend la teinte sombre de l'organisation, pas un noir neutre : */
+    background-image:
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--sombre) 28%, transparent) 0%,
+        color-mix(in srgb, var(--sombre) 90%, transparent) 62%),
+      var(--fond-image, none);
+  }
+}
+
+.accueil--sans-photo {
+  background-image: linear-gradient(160deg, var(--principale), var(--sombre));
+}
+
+.accueil__contenu { width: 100%; max-width: 560px; }
+
+.plaque {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+  margin-bottom: 20px;
+  padding: 10px 16px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+}
+.plaque img { display: block; max-height: 64px; max-width: min(240px, 60vw); width: auto; height: auto; }
+.plaque__initiales {
+  min-width: 44px;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-align: center;
+  color: var(--principale);
+}
+
+.accueil h1 {
+  font-size: clamp(2.1rem, 9vw, 3.4rem);
+  font-weight: 800;
+  text-wrap: balance;
+}
+.accueil__intro {
+  margin-top: 14px;
+  max-width: 34ch;
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.92);
+}
+.accueil__actions { display: grid; gap: 12px; margin-top: 28px; }
+.accueil__note {
+  margin-top: 16px;
+  max-width: 40ch;
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.signature { margin-top: 28px; font-size: 0.8125rem; }
+.signature--claire { color: rgba(255, 255, 255, 0.65); }
+.signature--discrete { text-align: center; padding: 0 20px 28px; color: var(--encre-douce); }
+
+/* ---------- Barre du haut (pages intérieures) ---------- */
+
+.barre {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
+  background: var(--principale);
+  color: var(--t-principale);
+}
+.barre__retour {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding-right: 8px;
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+}
+.barre__nom {
+  margin-left: auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
+.barre__logo {
+  display: inline-flex;
+  flex: none;
+  padding: 3px 8px;
+  background: #ffffff;
+  border-radius: 8px;
+}
+.barre__logo img { display: block; height: 32px; width: auto; }
+
+/* ---------- Pages intérieures ---------- */
+
+.contenu { max-width: 640px; margin: 0 auto; padding: 28px 20px 24px; }
+.contenu--large { max-width: 980px; }
+.contenu h2 { font-size: 1.85rem; font-weight: 800; }
+.chapeau { margin-top: 10px; color: var(--encre-douce); max-width: 60ch; }
+
+/* Formulaire */
+
+.champ { margin: 26px 0 0; padding: 0; border: 0; min-width: 0; }
+.champ > label, .champ > legend { display: block; padding: 0; margin-bottom: 8px; font-weight: 700; }
+.facultatif { font-weight: 400; color: var(--encre-douce); }
+.champ__aide { margin-top: 6px; font-size: 0.9375rem; color: var(--encre-douce); }
+.champ__erreur { margin-top: 8px; font-size: 0.9375rem; font-weight: 600; color: var(--erreur); }
+
+input[type="text"], input[type="tel"], input[type="date"], textarea {
+  display: block;
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 14px;
+  font: inherit;
+  color: var(--encre);
+  background: #ffffff;
+  border: 1.5px solid var(--ligne);
+  border-radius: 12px;
+}
+textarea { resize: vertical; }
+input:focus-visible, textarea:focus-visible {
+  outline: none;
+  border-color: var(--principale);
+  box-shadow: 0 0 0 3px var(--accent);
+}
+.invalide { border-color: var(--erreur) !important; }
+
+.puces { display: flex; flex-wrap: wrap; gap: 10px; }
+.puce { position: relative; }
+.puce input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.puce span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 18px;
+  background: #ffffff;
+  border: 1.5px solid var(--ligne);
+  border-radius: 999px;
+  font-weight: 600;
+}
+.puce input:checked + span {
+  background: var(--principale);
+  border-color: var(--principale);
+  color: var(--t-principale);
+}
+.puce input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.alerte {
+  margin-top: 22px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fdeceb;
+  color: #7a1b12;
+  font-weight: 600;
+}
+#formulaire .bouton { margin-top: 28px; }
+
+/* ---------- Talon de confirmation ---------- */
+
+.talon {
+  margin-top: 22px;
+  /* l'ombre suit les encoches découpées par les masques ci-dessous */
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.14));
+}
+.talon__haut, .talon__bas { background: #ffffff; --encoche: 13px; }
+
+.talon__haut {
+  border-radius: 18px 18px 0 0;
+  overflow: hidden;
+  -webkit-mask:
+    radial-gradient(circle var(--encoche) at 0 100%, #0000 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--encoche) at 100% 100%, #0000 98%, #000) right / 51% 100% no-repeat;
+          mask:
+    radial-gradient(circle var(--encoche) at 0 100%, #0000 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--encoche) at 100% 100%, #0000 98%, #000) right / 51% 100% no-repeat;
+}
+.talon__bas {
+  position: relative;
+  padding: 22px 22px 24px;
+  border-radius: 0 0 18px 18px;
+  -webkit-mask:
+    radial-gradient(circle var(--encoche) at 0 0, #0000 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--encoche) at 100% 0, #0000 98%, #000) right / 51% 100% no-repeat;
+          mask:
+    radial-gradient(circle var(--encoche) at 0 0, #0000 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--encoche) at 100% 0, #0000 98%, #000) right / 51% 100% no-repeat;
+}
+.talon__bas::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 22px;
+  right: 22px;
+  border-top: 2px dashed var(--ligne);
+}
+
+.talon__org {
+  padding: 16px 22px;
+  background: var(--principale);
+  color: var(--t-principale);
+  font-weight: 800;
+  font-size: 1.125rem;
+}
+.talon__infos { margin: 0; padding: 18px 22px 26px; display: grid; gap: 14px; }
+.talon__infos dt { font-size: 0.875rem; color: var(--encre-douce); }
+.talon__infos dd { margin: 0; font-weight: 700; font-size: 1.0625rem; overflow-wrap: anywhere; }
+
+.talon__etiquette { font-size: 0.875rem; color: var(--encre-douce); }
+.talon__reference {
+  margin-top: 4px;
+  font-size: clamp(2rem, 11vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  color: var(--principale);
+}
+
+.statut {
+  margin-top: 26px;
+  padding: 14px 16px;
+  border-left: 5px solid var(--accent);
+  background: #ffffff;
+  border-radius: 4px 12px 12px 4px;
+  font-weight: 600;
+}
+.actions-bas { display: grid; gap: 12px; margin-top: 26px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Le seul mouvement de la page : le talon sort de la fente quand la déclaration est reçue. */
+  .talon--neuf { animation: sortie 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  @keyframes sortie {
+    from { transform: translateY(-28px); opacity: 0; }
+    to   { transform: none; opacity: 1; }
+  }
+}
+
+/* ---------- Objets trouvés ---------- */
+
+.etat { margin-top: 24px; color: var(--encre-douce); }
+.etat strong { display: block; color: var(--encre); font-size: 1.125rem; margin-bottom: 4px; }
+
+.objets { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 22px; }
+.objet {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: #ffffff;
+  border: 1px solid var(--ligne);
+  border-radius: var(--rayon);
+  cursor: pointer;
+}
+.objet:hover { border-color: var(--principale); }
+.objet__image, .objet__vide { width: 100%; aspect-ratio: 4 / 3; }
+.objet__image { display: block; object-fit: cover; background: var(--teinte); }
+.objet__vide { display: grid; place-items: center; background: var(--teinte); color: var(--principale); }
+.objet__texte { padding: 10px 12px 14px; }
+.objet__texte strong { display: block; font-size: 1.0625rem; }
+.objet__texte span { display: block; font-size: 0.875rem; color: var(--encre-douce); }
+
+dialog {
+  width: calc(100% - 24px);
+  max-width: 520px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 20px;
+  color: var(--encre);
+  background: var(--fond);
+}
+dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
+.detail__image { display: block; width: 100%; max-height: 46vh; object-fit: cover; background: var(--teinte); }
+.detail__corps { padding: 20px 20px 22px; }
+.detail__corps h3 { margin: 0; font-size: 1.5rem; letter-spacing: -0.01em; }
+.detail__meta { margin-top: 4px; color: var(--encre-douce); }
+.detail__corps .statut { margin-top: 16px; }
+.detail__corps .bouton { margin-top: 18px; }
+
+/* ---------- Écrans plus larges ---------- */
+
+@media (min-width: 720px) {
+  .accueil { padding: 48px max(32px, 8vw) 24px; }
+  .objets { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .accueil__actions { grid-template-columns: auto auto; justify-content: start; }
+  .accueil__actions .bouton { min-width: 240px; }
+  .contenu { padding-top: 40px; }
+}
+@media (min-width: 1100px) {
+  .objets { grid-template-columns: repeat(4, 1fr); }
+}
