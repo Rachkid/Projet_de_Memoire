@@ -24,7 +24,7 @@ _MOTIF_SLUG = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 SLUGS_RESERVES = {
     "docs", "redoc", "openapi", "fichiers", "auth", "organisations", "utilisateurs", "usagers",
     "objets", "signalements", "restitutions", "photos", "admin", "api", "static", "assets",
-    "login", "portail", "affichage", "rendia",
+    "login", "portail", "affichage", "retrova",
 }
 
 

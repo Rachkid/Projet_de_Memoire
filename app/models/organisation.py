@@ -29,7 +29,7 @@ class Organisation(Base):
     delai_retention_jours: Mapped[int] = mapped_column(Integer, default=90)
 
     # Habillage (Étape 10) : ce qui fait reconnaître l'organisation au premier regard.
-    # Tout est facultatif : sans choix, l'interface utilise le thème par défaut de Rendia.
+    # Tout est facultatif : sans choix, l'interface utilise le thème par défaut de Retrova.
     # - slug : identifiant court utilisé dans l'adresse des pages (ex. : « iat » -> /iat)
     # - logo_url / fond_url : adresses publiques des images enregistrées sur le serveur
     # - couleurs au format #rrggbb

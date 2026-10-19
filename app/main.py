@@ -7,6 +7,7 @@ FastAPI exécutable.
 from pathlib import Path
 
 from fastapi import Depends, FastAPI
+from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
@@ -30,12 +31,13 @@ Base.metadata.create_all(bind=engine)
 appliquer_migrations()
 
 app = FastAPI(
-    title="Rendia — Système de gestion des objets perdus",
+    title="Retrova — Système de gestion des objets perdus",
     description=(
         "API du projet de mémoire de fin de cycle M2 Génie Logiciel — "
         "Institut Africain de Technologie (IAT), Niamey, Niger."
     ),
-    version="0.5.0",
+    version="0.5.1",
+    redoc_url=None,  # remplacée plus bas par une version figée (voir page_redoc)
 )
 
 # Chaque router déclare lui-même son préfixe d'URL (ex. : /objets) ;
@@ -69,11 +71,24 @@ DOSSIER_STATIC = Path(__file__).resolve().parent / "static"
 app.mount("/static", StaticFiles(directory=DOSSIER_STATIC), name="static")
 
 
+@app.get("/redoc", include_in_schema=False)
+def page_redoc():
+    """
+    Documentation ReDoc. FastAPI charge par défaut la version « next » du script (en préparation) qui
+    s'affichait en page blanche dans certains navigateurs : on fige ici une version stable.
+    """
+    return get_redoc_html(
+        openapi_url=app.openapi_url,
+        title=f"{app.title} - ReDoc",
+        redoc_js_url="https://cdn.jsdelivr.net/npm/redoc@2.1.5/bundles/redoc.standalone.js",
+    )
+
+
 @app.get("/", tags=["Racine"])
 def accueil():
     """Simple point de contrôle confirmant que l'API est en ligne."""
     return {
-        "message": "API Rendia — Système de gestion des objets perdus.",
+        "message": "API Retrova — Système de gestion des objets perdus.",
         "documentation_interactive": "/docs",
     }
 

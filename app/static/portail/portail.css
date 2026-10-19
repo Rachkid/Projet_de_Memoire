@@ -2,7 +2,7 @@
   Portail public — Étape 11.
   Une seule feuille de style pour toutes les organisations : les couleurs viennent du
   « thème » calculé par le serveur (voir app/services/couleurs.py) et sont posées par
-  portail.js sur l'élément racine. Les valeurs ci-dessous sont celles de Rendia, utilisées
+  portail.js sur l'élément racine. Les valeurs ci-dessous sont celles de Retrova, utilisées
   avant l'arrivée du thème ou si l'organisation n'a pas choisi ses couleurs.
 
   Conçu d'abord pour un téléphone (une colonne, gros boutons, texte 17 px) puis élargi.
