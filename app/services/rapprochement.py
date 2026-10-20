@@ -62,6 +62,23 @@ def objets_correspondants(db: Session, signalement: SignalementPerte) -> list[Ob
     return [o for o in candidats if correspond(signalement, o)]
 
 
+def signalements_correspondants(db: Session, objet: Objet) -> list[SignalementPerte]:
+    """
+    Sens inverse de objets_correspondants : les déclarations de perte encore ouvertes de la même
+    organisation qui correspondent à cet objet. Sert à l'agent qui remet l'objet : il voit qui
+    l'attend (nom, téléphone) au lieu de chercher dans toute la liste.
+    """
+    ouverts = (
+        db.query(SignalementPerte)
+        .filter(
+            SignalementPerte.organisation_id == objet.organisation_id,
+            SignalementPerte.statut != StatutSignalement.CLOTURE.value,
+        )
+        .all()
+    )
+    return [s for s in ouverts if correspond(s, objet)]
+
+
 def traiter_nouveau_signalement(db: Session, signalement: SignalementPerte) -> list[Objet]:
     """À appeler après création d'un signalement : cherche, marque, notifie."""
     trouves = objets_correspondants(db, signalement)

@@ -16,9 +16,10 @@ from app.database import get_db
 from app.models.objet import Objet
 from app.models.utilisateur import Utilisateur
 from app.models.enums import StatutObjet
-from app.schemas.objet import ObjetCreate, ObjetRead, ObjetUpdate
-from app.security import exiger_enregistrement, exiger_enregistrement_ou_administrateur
-from app.services.rapprochement import traiter_nouvel_objet
+from app.schemas.signalement_perte import SignalementPersonnelRead
+from app.schemas.objet import ObjetCreate, ObjetCreeRead, ObjetRead, ObjetUpdate
+from app.security import exiger_enregistrement, exiger_enregistrement_ou_administrateur, get_utilisateur_courant
+from app.services.rapprochement import signalements_correspondants, traiter_nouvel_objet
 
 router = APIRouter(prefix="/objets", tags=["Objets"])
 
@@ -34,7 +35,7 @@ def generer_code_qr() -> str:
     return f"OBJ-{uuid.uuid4().hex[:10].upper()}"
 
 
-@router.post("/", response_model=ObjetRead, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ObjetCreeRead, status_code=status.HTTP_201_CREATED)
 def enregistrer_objet(
     payload: ObjetCreate,
     db: Session = Depends(get_db),
@@ -58,33 +59,72 @@ def enregistrer_objet(
 
     # Rapprochement automatique : des usagers ont-ils déjà signalé la perte
     # d'un objet de ce type ? Si oui, ils sont marqués et prévenus.
-    traiter_nouvel_objet(db, objet)
-    return objet
+    nombre = traiter_nouvel_objet(db, objet)
+    # On renvoie l'objet créé, plus le nombre de personnes déjà en attente d'un objet de ce type :
+    # l'agent voit tout de suite que son enregistrement a servi.
+    return ObjetCreeRead.model_validate(objet).model_copy(update={"signalements_correspondants": nombre})
 
 
 @router.get("/", response_model=list[ObjetRead])
-def lister_objets(organisation_id: uuid.UUID | None = None, db: Session = Depends(get_db)):
+def lister_objets(
+    statut: StatutObjet | None = None,
+    db: Session = Depends(get_db),
+    personnel: Utilisateur = Depends(get_utilisateur_courant),
+):
     """
-    Liste les objets enregistrés. Le filtre organisation_id est essentiel :
-    c'est lui qui garantit, au niveau de l'API, qu'un usager consultant
-    l'écran d'affichage ou le portail d'une organisation ne voit jamais les
-    objets d'une autre organisation (isolation multi-tenant, chapitre 3,
-    section 3.1 ; maquettes, sections 3.4.2 et 3.4.3).
+    Liste les objets de l'organisation de la personne connectée (Étape 12).
+
+    Avant l'Étape 12 cette liste était publique et acceptait un filtre organisation_id : n'importe
+    qui pouvait donc la lire, y compris quand l'organisation avait désactivé la consultation à
+    distance. Elle est maintenant réservée au personnel connecté et limitée à SON organisation ;
+    le public passe par /portail/{identifiant}/objets, qui n'expose que le strict nécessaire.
+
+    Sans filtre, les objets archivés (saisie erronée, objet détruit...) sont retirés de la liste.
+    Avec ?statut=..., on obtient les objets de ce statut (y compris « archive »).
     """
-    # Les objets archivés (saisie erronée, objet détruit...) sont retirés des listes.
-    requete = db.query(Objet).filter(Objet.statut != StatutObjet.ARCHIVE.value)
-    if organisation_id is not None:
-        requete = requete.filter(Objet.organisation_id == organisation_id)
+    requete = db.query(Objet).filter(Objet.organisation_id == personnel.organisation_id)
+    if statut is not None:
+        requete = requete.filter(Objet.statut == statut.value)
+    else:
+        requete = requete.filter(Objet.statut != StatutObjet.ARCHIVE.value)
     return requete.order_by(Objet.date_heure_decouverte.desc()).all()
 
 
-@router.get("/{objet_id}", response_model=ObjetRead)
-def obtenir_objet(objet_id: uuid.UUID, db: Session = Depends(get_db)):
-    """Récupère un objet précis à partir de son identifiant."""
+def _objet_de_mon_organisation(db: Session, objet_id: uuid.UUID, personnel: Utilisateur) -> Objet:
+    """Un objet d'une autre organisation « n'existe pas » (404) : on ne révèle même pas son existence."""
     objet = db.get(Objet, objet_id)
-    if objet is None:
+    if objet is None or objet.organisation_id != personnel.organisation_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Objet introuvable")
     return objet
+
+
+@router.get("/{objet_id}", response_model=ObjetRead)
+def obtenir_objet(
+    objet_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    personnel: Utilisateur = Depends(get_utilisateur_courant),
+):
+    """Récupère un objet précis de l'organisation de la personne connectée."""
+    return _objet_de_mon_organisation(db, objet_id, personnel)
+
+
+@router.get("/{objet_id}/signalements", response_model=list[SignalementPersonnelRead])
+def signalements_de_cet_objet(
+    objet_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    personnel: Utilisateur = Depends(get_utilisateur_courant),
+):
+    """
+    Les personnes qui ont déclaré la perte d'un objet semblable à celui-ci (même catégorie, dates
+    compatibles), avec leur nom et leur téléphone : ce sont elles que l'agent attend au guichet.
+    """
+    objet = _objet_de_mon_organisation(db, objet_id, personnel)
+    return [
+        SignalementPersonnelRead.model_validate(s).model_copy(
+            update={"usager_nom": s.usager.nom, "usager_telephone": s.usager.telephone}
+        )
+        for s in signalements_correspondants(db, objet)
+    ]
 
 
 def _objet_modifiable(db: Session, objet_id: uuid.UUID, utilisateur: Utilisateur) -> Objet:
@@ -145,15 +185,17 @@ def archiver_objet(
 
 
 @router.get("/{objet_id}/qrcode")
-def obtenir_image_qrcode(objet_id: uuid.UUID, db: Session = Depends(get_db)):
+def obtenir_image_qrcode(
+    objet_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    personnel: Utilisateur = Depends(get_utilisateur_courant),
+):
     """
     Génère et renvoie l'image du code QR d'un objet, prête à être imprimée
     sur une étiquette. L'image est produite à la volée (jamais stockée sur
     le disque), à partir du code texte déjà enregistré pour cet objet.
     """
-    objet = db.get(Objet, objet_id)
-    if objet is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Objet introuvable")
+    objet = _objet_de_mon_organisation(db, objet_id, personnel)
 
     image = qrcode.make(objet.qr_code)
     tampon = BytesIO()

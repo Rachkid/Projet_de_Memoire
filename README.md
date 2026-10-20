@@ -51,6 +51,16 @@ une correspondance) et, si l'organisation a activé la consultation à distance,
 La page est conçue d'abord pour un téléphone et s'habille des couleurs, du logo et de la photo de
 l'organisation. Fichiers : `app/static/portail/` ; routes : `app/routers/portail.py`.
 
+## Interface des agents (Étape 12)
+
+Chaque organisation a aussi son espace de travail à `/{identifiant}/agent` (par exemple
+`http://localhost:8000/iat/agent`) : connexion, liste des objets, enregistrement d'un objet avec photo,
+fiche avec code QR à imprimer, remise à son propriétaire (contrôle du détail secret, pièce d'identité),
+déclarations de perte et changement de mot de passe. Les droits d'enregistrement et de restitution
+sont vérifiés par le serveur ; la page ne fait que masquer ce que la personne ne peut pas faire.
+Fichiers : `app/static/agent/` ; routes ajoutées : `GET /objets/{id}/signalements` et `GET /{identifiant}/agent`.
+`GET /objets/` et `GET /objets/{id}` sont désormais réservées au personnel connecté de l'organisation.
+
 Les évolutions de la base sont gérées par Alembic et appliquées automatiquement au démarrage :
 mettre l'application à jour ne fait perdre aucune donnée.
 

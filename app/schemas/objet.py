@@ -73,6 +73,12 @@ class ObjetRead(ObjetBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class ObjetCreeRead(ObjetRead):
+    """Réponse à l'enregistrement d'un objet : l'objet, plus le nombre de déclarations de perte qui lui correspondent."""
+
+    signalements_correspondants: int = 0
+
+
 class ObjetPublicRead(BaseModel):
     """
     Ce que le portail public montre d'un objet trouvé : le strict nécessaire pour que

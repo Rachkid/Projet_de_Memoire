@@ -36,7 +36,7 @@ app = FastAPI(
         "API du projet de mémoire de fin de cycle M2 Génie Logiciel — "
         "Institut Africain de Technologie (IAT), Niamey, Niger."
     ),
-    version="0.5.1",
+    version="0.6.0",
     redoc_url=None,  # remplacée plus bas par une version figée (voir page_redoc)
 )
 
@@ -91,6 +91,15 @@ def accueil():
         "message": "API Retrova — Système de gestion des objets perdus.",
         "documentation_interactive": "/docs",
     }
+
+
+@app.get("/{slug}/agent", include_in_schema=False)
+def page_agent(slug: str, db: Session = Depends(get_db)):
+    """Interface des agents d'une organisation (connexion, enregistrement, restitution) : une page pour toutes."""
+    existe = db.query(Organisation.id).filter(Organisation.slug == slug.strip().lower()).first()
+    if existe is None:
+        return FileResponse(DOSSIER_STATIC / "portail" / "introuvable.html", status_code=404)
+    return FileResponse(DOSSIER_STATIC / "agent" / "index.html")
 
 
 # DOIT rester la dernière route : « /{identifiant} » capte toute adresse à un seul niveau

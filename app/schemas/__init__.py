@@ -12,7 +12,7 @@ from app.schemas.utilisateur import (
     UtilisateurUpdate,
 )
 from app.schemas.usager import UsagerCreate, UsagerRead
-from app.schemas.objet import ObjetCreate, ObjetPublicRead, ObjetRead, ObjetUpdate
+from app.schemas.objet import ObjetCreate, ObjetCreeRead, ObjetPublicRead, ObjetRead, ObjetUpdate
 from app.schemas.restitution import RestitutionCreate, RestitutionRead
 from app.schemas.signalement_perte import SignalementPerteCreate, SignalementPerteRead
 
@@ -21,7 +21,7 @@ __all__ = [
     "UtilisateurCreate", "UtilisateurRead", "UtilisateurUpdate", "ChangementMotDePasse",
     "ReinitialisationMotDePasse",
     "UsagerCreate", "UsagerRead",
-    "ObjetCreate", "ObjetRead", "ObjetUpdate", "ObjetPublicRead",
+    "ObjetCreate", "ObjetRead", "ObjetUpdate", "ObjetPublicRead", "ObjetCreeRead",
     "RestitutionCreate", "RestitutionRead",
     "SignalementPerteCreate", "SignalementPerteRead",
 ]

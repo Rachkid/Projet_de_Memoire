@@ -21,7 +21,7 @@ from app.models.signalement_perte import SignalementPerte
 from app.models.usager import Usager
 from app.models.utilisateur import Utilisateur
 from app.schemas.objet import ObjetRead
-from app.schemas.signalement_perte import SignalementPerteCreate, SignalementPerteRead
+from app.schemas.signalement_perte import SignalementPerteCreate, SignalementPerteRead, SignalementPersonnelRead
 from app.security import get_utilisateur_courant
 from app.services.rapprochement import objets_correspondants, traiter_nouveau_signalement
 
@@ -46,13 +46,29 @@ def declarer_perte(payload: SignalementPerteCreate, db: Session = Depends(get_db
     return signalement
 
 
-@router.get("/", response_model=list[SignalementPerteRead])
+@router.get("/", response_model=list[SignalementPersonnelRead])
 def lister_signalements(
+    statut: StatutSignalement | None = None,
     db: Session = Depends(get_db),
     personnel: Utilisateur = Depends(get_utilisateur_courant),
 ):
-    """Liste les signalements de l'organisation de la personne connectée (jamais ceux d'une autre)."""
-    return db.query(SignalementPerte).filter(SignalementPerte.organisation_id == personnel.organisation_id).all()
+    """
+    Liste les signalements de l'organisation de la personne connectée (jamais ceux d'une autre),
+    avec le nom et le téléphone de leur auteur. Sans filtre, les signalements clôturés sont omis.
+    """
+    requete = db.query(SignalementPerte).filter(SignalementPerte.organisation_id == personnel.organisation_id)
+    if statut is not None:
+        requete = requete.filter(SignalementPerte.statut == statut.value)
+    else:
+        requete = requete.filter(SignalementPerte.statut != StatutSignalement.CLOTURE.value)
+    # Les correspondances d'abord : ce sont les personnes à prévenir ou à recevoir.
+    signalements = sorted(requete.all(), key=lambda s: s.statut != StatutSignalement.CORRESPONDANCE_TROUVEE.value)
+    return [
+        SignalementPersonnelRead.model_validate(s).model_copy(
+            update={"usager_nom": s.usager.nom, "usager_telephone": s.usager.telephone}
+        )
+        for s in signalements
+    ]
 
 
 @router.get("/{signalement_id}/correspondances", response_model=list[ObjetRead])

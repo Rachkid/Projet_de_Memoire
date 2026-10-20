@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <title>Espace agent</title>
+  <meta name="theme-color" content="#1d4e89">
+  <link rel="stylesheet" href="/static/portail/portail.css">
+  <link rel="stylesheet" href="/static/agent/agent.css">
+</head>
+<body>
+
+  <p class="chargement" id="chargement" role="status">Chargement…</p>
+
+  <!-- Barre du haut (après connexion) : marque, navigation, compte -->
+  <header class="haut" id="haut" hidden>
+    <div class="haut__marque">
+      <span class="barre__logo" id="haut-logo" hidden></span>
+      <span class="haut__org" id="haut-org"></span>
+    </div>
+    <nav class="onglets" id="onglets" aria-label="Navigation">
+      <a href="#objets" data-vue="objets"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8zM3 8l9 5 9-5M12 13v8"/></svg><span>Objets</span></a>
+      <a href="#nouveau" data-vue="nouveau" id="onglet-nouveau"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 8v8M8 12h8"/></svg><span>Enregistrer</span></a>
+      <a href="#pertes" data-vue="pertes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6l1 2h3a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h3l1-2zM9 12h6M9 16h4"/></svg><span>Déclarations</span></a>
+    </nav>
+    <a class="haut__compte" href="#compte" id="haut-compte" aria-label="Mon compte"></a>
+  </header>
+
+  <main id="app" hidden>
+
+    <!-- CONNEXION -->
+    <section class="vue connexion" id="vue-connexion" aria-labelledby="connexion-titre" hidden>
+      <div class="connexion__carte">
+        <div class="plaque" id="connexion-plaque"></div>
+        <h1 id="connexion-titre" tabindex="-1">Espace agent</h1>
+        <p class="chapeau" id="connexion-org"></p>
+        <form id="form-connexion" novalidate>
+          <div class="champ">
+            <label for="identifiant">Identifiant</label>
+            <input id="identifiant" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="50" required>
+          </div>
+          <div class="champ">
+            <label for="mot-de-passe">Mot de passe</label>
+            <input id="mot-de-passe" type="password" autocomplete="current-password" maxlength="72" required>
+          </div>
+          <p class="alerte" id="connexion-erreur" role="alert" hidden></p>
+          <button class="bouton bouton--accent bouton--plein" type="submit" id="connexion-envoyer">Se connecter</button>
+        </form>
+        <a class="lien-public" id="lien-public" href="/">Vous cherchez un objet perdu ? Aller au portail public</a>
+      </div>
+    </section>
+
+    <!-- OBJETS -->
+    <section class="vue contenu contenu--large" id="vue-objets" aria-labelledby="objets-titre" hidden>
+      <p class="salut" id="salut"></p>
+      <h2 id="objets-titre" tabindex="-1">Objets trouvés</h2>
+      <div class="outils">
+        <div class="puces puces--compactes" id="filtres-statut" role="group" aria-label="Filtrer par statut"></div>
+        <input id="recherche" type="search" placeholder="Rechercher (catégorie, lieu, code)…" aria-label="Rechercher un objet" autocomplete="off">
+      </div>
+      <div id="objets-etat" class="etat" role="status"></div>
+      <div class="grille" id="objets-liste"></div>
+    </section>
+
+    <!-- ENREGISTRER UN OBJET -->
+    <section class="vue contenu" id="vue-nouveau" aria-labelledby="nouveau-titre" hidden>
+      <h2 id="nouveau-titre" tabindex="-1">Enregistrer un objet trouvé</h2>
+      <form id="form-nouveau" class="panneau" novalidate>
+        <div class="champ">
+          <span class="champ__titre">Photo de l'objet <span class="facultatif">(facultatif)</span></span>
+          <div class="photo-zone" id="zone-photo-objet">
+            <input id="photo" type="file" accept="image/*" class="photo-zone__input">
+            <label for="photo" class="photo-zone__cible" id="photo-cible">
+              <span class="photo-zone__icone"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8a2 2 0 0 1 2-2h1.5l1.2-2h6.6l1.2 2H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8zM12 9.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z"/></svg></span>
+              <span class="photo-zone__titre">Prendre ou choisir une photo</span>
+              <span class="photo-zone__aide">Une photo nette aide son propriétaire à reconnaître l'objet.</span>
+            </label>
+            <div class="apercu" id="apercu" hidden>
+              <img id="apercu-img" alt="Aperçu de la photo">
+              <div class="apercu__actions">
+                <label for="photo" class="bouton bouton--discret">Changer</label>
+                <button type="button" class="bouton bouton--discret" id="photo-retirer">Retirer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <fieldset class="champ">
+          <legend>Catégorie</legend>
+          <div class="tuiles" id="puces"></div>
+          <p class="champ__erreur" id="erreur-categorie" role="alert" hidden></p>
+        </fieldset>
+
+        <fieldset class="champ" id="champ-emplacement">
+          <legend>Où l'a-t-on trouvé ?</legend>
+          <div class="puces" id="puces-emplacement"></div>
+        </fieldset>
+
+        <div class="champ">
+          <label for="lieu">Précision sur le lieu <span class="facultatif">(facultatif)</span></label>
+          <input id="lieu" type="text" maxlength="255" autocomplete="off">
+        </div>
+
+        <div class="champ">
+          <label for="quand">Date et heure de la découverte</label>
+          <input id="quand" type="datetime-local">
+          <p class="champ__erreur" id="erreur-quand" role="alert" hidden></p>
+        </div>
+
+        <div class="champ">
+          <label for="detail-cache">Détail secret <span class="facultatif">(facultatif)</span></label>
+          <input id="detail-cache" type="text" maxlength="255" autocomplete="off" placeholder="Fond d'écran, contenu, marque, rayure…">
+          <p class="champ__aide">Ne l'écrivez nulle part ailleurs : à la remise, le propriétaire doit le citer lui-même. Il n'est jamais montré au public.</p>
+        </div>
+
+        <p class="alerte" id="nouveau-erreur" role="alert" hidden></p>
+        <button class="bouton bouton--accent bouton--plein" type="submit" id="nouveau-envoyer">Enregistrer l'objet</button>
+      </form>
+    </section>
+
+    <!-- OBJET ENREGISTRÉ -->
+    <section class="vue contenu" id="vue-enregistre" aria-labelledby="enregistre-titre" hidden>
+      <h2 id="enregistre-titre" tabindex="-1">Objet enregistré</h2>
+      <p class="statut" id="enregistre-statut"></p>
+      <p class="chapeau">Code de l'objet : <strong id="enregistre-code"></strong></p>
+      <div class="actions-bas">
+        <a class="bouton bouton--accent bouton--plein" href="#nouveau">Enregistrer un autre objet</a>
+        <a class="bouton bouton--discret bouton--plein" id="enregistre-voir" href="#objets">Voir la fiche de l'objet</a>
+      </div>
+    </section>
+
+    <!-- FICHE OBJET -->
+    <section class="vue contenu" id="vue-fiche" aria-labelledby="fiche-titre" hidden>
+      <a class="retour" href="#objets">‹ Retour à la liste</a>
+      <div class="fiche">
+        <div class="fiche__photo" id="fiche-photo"></div>
+        <div class="fiche__texte">
+          <h2 id="fiche-titre" tabindex="-1"></h2>
+          <p><span class="badge" id="fiche-statut"></span></p>
+          <dl class="infos" id="fiche-infos"></dl>
+        </div>
+      </div>
+
+      <div class="actions-bas" id="fiche-actions"></div>
+
+      <h3 class="sous-titre">Personnes qui l'attendent peut-être</h3>
+      <p class="chapeau">Déclarations de perte d'un objet semblable (même catégorie, dates compatibles).</p>
+      <div class="liste liste--simple" id="fiche-attente"></div>
+
+      <h3 class="sous-titre">Étiquette</h3>
+      <div class="etiquette" id="etiquette">
+        <img id="etiquette-img" alt="Code QR de l'objet" width="160" height="160" hidden>
+        <p class="etiquette__code" id="etiquette-code"></p>
+      </div>
+      <div class="actions-bas"><button type="button" class="bouton bouton--discret bouton--plein" id="imprimer">Imprimer l'étiquette</button></div>
+    </section>
+
+    <!-- RESTITUTION -->
+    <section class="vue contenu" id="vue-restituer" aria-labelledby="restituer-titre" hidden>
+      <a class="retour" id="restituer-retour" href="#objets">‹ Retour à l'objet</a>
+      <h2 id="restituer-titre" tabindex="-1">Remettre l'objet</h2>
+      <p class="chapeau" id="restituer-objet"></p>
+
+      <form id="form-restituer" class="panneau" novalidate>
+        <div class="controle">
+          <p class="controle__titre">1. Vérifiez que l'objet est bien le sien</p>
+          <p>Demandez à la personne de décrire l'objet <strong>sans lui souffler la réponse</strong>, puis comparez avec le détail secret :</p>
+          <p class="controle__secret" id="secret"></p>
+          <label class="case"><input type="checkbox" id="detail-ok"><span>Sa description correspond au détail secret</span></label>
+          <p class="champ__aide">Si ce n'est pas le cas, ne remettez pas l'objet. Aucune restitution n'est enregistrée.</p>
+        </div>
+
+        <fieldset class="champ">
+          <legend>2. À qui remettez-vous l'objet ?</legend>
+          <div class="choix" id="candidats"></div>
+        </fieldset>
+
+        <div class="champ" id="bloc-autre" hidden>
+          <label for="autre-tel">Téléphone de la personne</label>
+          <input id="autre-tel" type="tel" inputmode="tel" autocomplete="off" maxlength="22" placeholder="96 12 34 56">
+          <label for="autre-nom" class="etiquette-suivante">Nom <span class="facultatif">(facultatif)</span></label>
+          <input id="autre-nom" type="text" maxlength="80" autocomplete="off">
+          <p class="champ__erreur" id="erreur-autre" role="alert" hidden></p>
+        </div>
+
+        <fieldset class="champ">
+          <legend>3. Pièce d'identité</legend>
+          <div class="puces" id="puces-piece"></div>
+          <label for="numero-piece" class="etiquette-suivante">Numéro de la pièce</label>
+          <input id="numero-piece" type="text" maxlength="50" autocomplete="off">
+          <p class="champ__erreur" id="erreur-piece" role="alert" hidden></p>
+        </fieldset>
+
+        <div class="champ">
+          <span class="champ__titre">Photo de la personne <span class="facultatif">(facultatif)</span></span>
+          <div class="photo-zone photo-zone--compacte">
+            <input id="photo-proprietaire" type="file" accept="image/*" class="photo-zone__input">
+            <label for="photo-proprietaire" class="photo-zone__cible" id="cible-proprietaire">
+              <span class="photo-zone__icone"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8a2 2 0 0 1 2-2h1.5l1.2-2h6.6l1.2 2H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8zM12 9.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z"/></svg></span>
+              <span class="photo-zone__titre" id="titre-proprietaire">Ajouter une photo</span>
+              <span class="photo-zone__aide">Conservée en privé, visible seulement par les agents de restitution de votre organisation.</span>
+            </label>
+          </div>
+        </div>
+
+        <p class="alerte" id="restituer-erreur" role="alert" hidden></p>
+        <button class="bouton bouton--accent bouton--plein" type="submit" id="restituer-envoyer">Valider la remise</button>
+      </form>
+    </section>
+
+    <!-- REMISE ENREGISTRÉE -->
+    <section class="vue contenu" id="vue-remis" aria-labelledby="remis-titre" hidden>
+      <h2 id="remis-titre" tabindex="-1">Remise enregistrée</h2>
+      <p class="statut" id="remis-statut"></p>
+      <div class="actions-bas">
+        <a class="bouton bouton--accent bouton--plein" href="#objets">Retour à la liste des objets</a>
+      </div>
+    </section>
+
+    <!-- DÉCLARATIONS DE PERTE -->
+    <section class="vue contenu contenu--large" id="vue-pertes" aria-labelledby="pertes-titre" hidden>
+      <h2 id="pertes-titre" tabindex="-1">Déclarations de perte</h2>
+      <p class="chapeau">Les personnes à prévenir en premier sont tout en haut : un objet correspondant a déjà été enregistré.</p>
+      <div id="pertes-etat" class="etat" role="status"></div>
+      <div class="liste" id="pertes-liste"></div>
+    </section>
+
+    <!-- MON COMPTE -->
+    <section class="vue contenu" id="vue-compte" aria-labelledby="compte-titre" hidden>
+      <h2 id="compte-titre" tabindex="-1">Mon compte</h2>
+      <dl class="infos" id="compte-infos"></dl>
+
+      <h3 class="sous-titre">Changer mon mot de passe</h3>
+      <form id="form-mdp" class="panneau" novalidate>
+        <div class="champ">
+          <label for="ancien-mdp">Mot de passe actuel</label>
+          <input id="ancien-mdp" type="password" autocomplete="current-password" maxlength="72">
+        </div>
+        <div class="champ">
+          <label for="nouveau-mdp">Nouveau mot de passe</label>
+          <input id="nouveau-mdp" type="password" autocomplete="new-password" maxlength="72">
+          <p class="champ__aide">8 caractères au minimum.</p>
+        </div>
+        <p class="alerte" id="mdp-erreur" role="alert" hidden></p>
+        <p class="statut" id="mdp-ok" role="status" hidden></p>
+        <button class="bouton bouton--accent bouton--plein" type="submit" id="mdp-envoyer">Changer le mot de passe</button>
+      </form>
+
+      <div class="actions-bas"><button type="button" class="bouton bouton--discret bouton--plein" id="deconnexion">Se déconnecter</button></div>
+    </section>
+  </main>
+
+  <dialog id="confirmer" aria-labelledby="confirmer-titre">
+    <div class="detail__corps">
+      <h3 id="confirmer-titre">Archiver cet objet ?</h3>
+      <p class="chapeau">Il disparaîtra des listes, sans être supprimé : la trace de son enregistrement est conservée.</p>
+      <div class="actions-bas">
+        <button type="button" class="bouton bouton--accent bouton--plein" id="confirmer-oui">Archiver</button>
+        <button type="button" class="bouton bouton--discret bouton--plein" id="confirmer-non">Annuler</button>
+      </div>
+    </div>
+  </dialog>
+
+  <noscript><p class="chargement">Cette page a besoin de JavaScript pour fonctionner.</p></noscript>
+  <script src="/static/agent/agent.js"></script>
+</body>
+</html>
