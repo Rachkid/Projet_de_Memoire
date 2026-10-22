@@ -61,6 +61,15 @@ sont vérifiés par le serveur ; la page ne fait que masquer ce que la personne 
 Fichiers : `app/static/agent/` ; routes ajoutées : `GET /objets/{id}/signalements` et `GET /{identifiant}/agent`.
 `GET /objets/` et `GET /objets/{id}` sont désormais réservées au personnel connecté de l'organisation.
 
+## Écran d'affichage du hall (Étape 13)
+
+`http://localhost:8000/iat/affichage` : une page plein écran à mettre sur une télévision à l'accueil.
+Elle montre les objets trouvés (6 à la fois, en défilement s'il y en a plus), l'heure, et un code QR pour
+déclarer une perte depuis son téléphone. Elle se met à jour toute seule chaque minute et n'expose que
+ce que le portail public expose déjà. Touche F : plein écran. Fichiers : `app/static/affichage/` ;
+route ajoutée : `GET /portail/{identifiant}/qrcode`. Une fois le site en ligne, renseigner
+`ADRESSE_PUBLIQUE` dans `.env` (voir `.env.example`) pour que le code QR pointe vers la bonne adresse.
+
 Les évolutions de la base sont gérées par Alembic et appliquées automatiquement au démarrage :
 mettre l'application à jour ne fait perdre aucune donnée.
 

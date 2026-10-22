@@ -1,0 +1,197 @@
+/*
+  Écran d'affichage du hall — Étape 13.
+  Une page faite pour être VUE DE LOIN, sur une télévision ou un écran fixé au mur : aucune
+  interaction, texte très grand, contrastes forts. Toutes les tailles sont exprimées en « vmin »
+  (1 % du plus petit côté de l'écran) : la page s'adapte donc seule à un écran large, à un écran
+  en portrait ou à une petite fenêtre, sans point de rupture.
+  Les couleurs viennent du thème de l'organisation (voir affichage.js).
+*/
+
+:root {
+  --principale: #1d4e89;
+  --accent: #d9730d;
+  --fond: #f7f8fa;
+  --sombre: #14365e;
+  --t-principale: #ffffff;
+  --t-accent: #111827;
+  --t-sombre: #ffffff;
+  --t-fond: #111827;
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(10px, 1.6vmin, 36px);
+  line-height: 1.3;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body { height: 100%; margin: 0; }
+body {
+  overflow: hidden;
+  color: var(--t-sombre);
+  background-color: var(--sombre);
+  background-image:
+    radial-gradient(120% 90% at 85% 0%, color-mix(in srgb, var(--principale) 70%, var(--sombre)) 0%, transparent 60%),
+    linear-gradient(180deg, var(--sombre), color-mix(in srgb, var(--sombre) 80%, #000));
+  cursor: none;
+}
+body.curseur { cursor: default; }
+h1, p { margin: 0; }
+
+.chargement { position: fixed; inset: 0; display: grid; place-items: center; font-size: 3rem; }
+
+.ecran {
+  position: relative;
+  height: 100vh;
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 2vmin;
+  padding: 2.4vmin 3vmin 2.2vmin;
+}
+
+/* ---------- En-tête ---------- */
+
+.entete { display: flex; align-items: center; gap: 2.4vmin; }
+.entete__logo {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding: 0.9vmin 1.6vmin;
+  background: #ffffff;
+  border-radius: 1.6vmin;
+  box-shadow: 0 1vmin 3vmin rgba(0, 0, 0, 0.3);
+}
+.entete__logo img { display: block; height: 6.4vmin; max-width: 22vmin; width: auto; object-fit: contain; }
+.entete__titres { min-width: 0; }
+.entete h1 { font-size: 3.6rem; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; text-wrap: balance; }
+.entete__titres p { margin-top: 0.2vmin; font-size: 1.7rem; font-weight: 600; opacity: 0.85; }
+.entete__heure { margin-left: auto; text-align: right; flex: none; }
+.heure { display: block; font-size: 4rem; font-weight: 800; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; line-height: 1; }
+.jour { display: block; margin-top: 0.4vmin; font-size: 1.5rem; font-weight: 600; opacity: 0.85; }
+
+/* ---------- Scène : la grille d'objets ---------- */
+
+.scene { position: relative; min-height: 0; }
+
+.grille {
+  height: 100%;
+  display: grid;
+  gap: 2.4vmin;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  transition: opacity 0.55s ease;
+}
+.grille.sort { opacity: 0; }
+.grille[data-n="1"] { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+.grille[data-n="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); }
+.grille[data-n="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); }
+.grille[data-n="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+
+@media (orientation: portrait) {
+  .grille, .grille[data-n="5"], .grille[data-n="6"] { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); }
+  .grille[data-n="1"] { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+  .grille[data-n="2"] { grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .grille[data-n="3"] { grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(3, minmax(0, 1fr)); }
+  .grille[data-n="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .entete h1 { font-size: 3.4rem; }
+  .heure { font-size: 3.6rem; }
+}
+
+.carte {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+  color: #111827;
+  background: #ffffff;
+  border-radius: 2vmin;
+  box-shadow: 0 1.2vmin 4vmin rgba(0, 0, 0, 0.35);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .grille:not(.sort) .carte { animation: monte 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  .grille:not(.sort) .carte:nth-child(2) { animation-delay: 0.08s; }
+  .grille:not(.sort) .carte:nth-child(3) { animation-delay: 0.16s; }
+  .grille:not(.sort) .carte:nth-child(4) { animation-delay: 0.24s; }
+  .grille:not(.sort) .carte:nth-child(5) { animation-delay: 0.32s; }
+  .grille:not(.sort) .carte:nth-child(6) { animation-delay: 0.4s; }
+  @keyframes monte { from { opacity: 0; transform: translateY(2vmin); } to { opacity: 1; transform: none; } }
+}
+.carte__photo {
+  position: relative;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  color: var(--principale);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--principale) 12%, #ffffff), #ffffff);
+}
+.carte__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.carte__photo svg { width: 38%; max-width: 22vmin; height: auto; opacity: 0.55; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.carte__texte { padding: 1.2vmin 2vmin 1.5vmin; }
+.carte__categorie { font-size: 2.5rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.carte__quand { margin-top: 0.3vmin; font-size: 1.65rem; font-weight: 700; color: var(--principale); }
+.carte__lieu { margin-top: 0.1vmin; font-size: 1.4rem; color: #4b5563; }
+.grille[data-n="1"] .carte__categorie { font-size: 4rem; }
+.grille[data-n="1"] .carte__quand { font-size: 2.4rem; }
+.grille[data-n="1"] .carte__lieu { font-size: 2rem; }
+.grille[data-n="2"] .carte__categorie, .grille[data-n="3"] .carte__categorie { font-size: 3rem; }
+
+/* ---------- Aucun objet / consultation désactivée ---------- */
+
+.accueil-vide { height: 100%; display: grid; align-content: center; justify-items: center; gap: 2vmin; text-align: center; padding: 0 6vmin; }
+.accueil-vide__titre { font-size: 5.4rem; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; text-wrap: balance; max-width: 22ch; }
+.accueil-vide__texte { font-size: 2.3rem; opacity: 0.9; max-width: 34ch; text-wrap: balance; }
+
+/* ---------- Pied : code QR, consigne, pages ---------- */
+
+.pied {
+  display: flex;
+  align-items: center;
+  gap: 2.4vmin;
+  padding: 1.1vmin 2vmin;
+  background: rgba(255, 255, 255, 0.1);
+  border: 0.2vmin solid rgba(255, 255, 255, 0.18);
+  border-radius: 2vmin;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.pied__qr { flex: none; padding: 0.7vmin; background: #ffffff; border-radius: 1.2vmin; }
+.pied__qr img { display: block; width: 11vmin; height: 11vmin; image-rendering: pixelated; }
+.pied__texte { min-width: 0; }
+.pied__titre { font-size: 2.3rem; font-weight: 800; line-height: 1.1; }
+.pied__aide { margin-top: 0.4vmin; font-size: 1.55rem; opacity: 0.92; max-width: 78ch; }
+.pied__droite { margin-left: auto; flex: none; display: grid; justify-items: end; gap: 1.2vmin; }
+.pied__signature { font-size: 1.2rem; opacity: 0.6; }
+
+.pastilles { display: flex; gap: 1vmin; }
+.pastille { width: 1.6vmin; height: 1.6vmin; border-radius: 50%; background: rgba(255, 255, 255, 0.3); transition: background 0.3s, transform 0.3s; }
+.pastille.active { background: var(--accent); transform: scale(1.35); }
+
+.indice {
+  position: absolute;
+  right: 3.6vmin;
+  bottom: 0.6vmin;
+  font-size: 1.3rem;
+  opacity: 0.55;
+  transition: opacity 1s;
+}
+.indice.cache { opacity: 0; }
+
+.hors-ligne {
+  position: absolute;
+  top: 1vmin;
+  right: 1.2vmin;
+  width: 1.2vmin;
+  height: 1.2vmin;
+  border-radius: 50%;
+  background: #ff6b5e;
+}
+
+@media (orientation: portrait) {
+  .pied { flex-wrap: wrap; }
+  .pied__droite { margin-left: 0; width: 100%; justify-items: start; grid-auto-flow: column; justify-content: space-between; }
+}
+
+@media (orientation: portrait) {
+  .pied__texte { flex: 1 1 0; }
+}

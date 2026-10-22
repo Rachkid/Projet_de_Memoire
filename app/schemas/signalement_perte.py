@@ -41,3 +41,16 @@ class SignalementPersonnelRead(SignalementPerteRead):
 
     usager_nom: Optional[str] = None
     usager_telephone: str
+
+    @classmethod
+    def depuis_signalement(cls, signalement) -> "SignalementPersonnelRead":
+        """
+        Construit la vue du personnel à partir d'un signalement de la base. Le nom et le téléphone
+        viennent de l'usager lié : ils n'existent pas sur le signalement lui-même, il faut donc les
+        ajouter à la main (valider directement l'objet de la base échouerait : champ manquant).
+        """
+        return cls(
+            **SignalementPerteRead.model_validate(signalement).model_dump(),
+            usager_nom=signalement.usager.nom,
+            usager_telephone=signalement.usager.telephone,
+        )

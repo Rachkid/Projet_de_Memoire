@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Objets trouvés</title>
+  <meta name="theme-color" content="#14365e">
+  <link rel="stylesheet" href="/static/affichage/affichage.css">
+</head>
+<body>
+  <div class="ecran" id="ecran" hidden>
+    <header class="entete">
+      <span class="entete__logo" id="logo" hidden></span>
+      <div class="entete__titres">
+        <h1 id="nom-org"></h1>
+        <p id="sous-titre">Objets trouvés</p>
+      </div>
+      <div class="entete__heure" aria-hidden="true">
+        <span class="heure" id="heure"></span>
+        <span class="jour" id="jour"></span>
+      </div>
+    </header>
+
+    <main class="scene" id="scene" aria-live="polite">
+      <div class="grille" id="grille" data-n="0"></div>
+      <div class="accueil-vide" id="accueil-vide" hidden>
+        <p class="accueil-vide__titre" id="vide-titre"></p>
+        <p class="accueil-vide__texte" id="vide-texte"></p>
+      </div>
+    </main>
+
+    <footer class="pied">
+      <div class="pied__qr" id="bloc-qr" hidden>
+        <img id="qr" alt="Code QR vers la page pour déclarer un objet perdu" width="160" height="160">
+      </div>
+      <div class="pied__texte">
+        <p class="pied__titre">Vous avez perdu un objet ?</p>
+        <p class="pied__aide" id="pied-aide"></p>
+      </div>
+      <div class="pied__droite">
+        <div class="pastilles" id="pastilles" aria-hidden="true"></div>
+        <p class="pied__signature">Propulsé par Retrova</p>
+      </div>
+    </footer>
+    <p class="indice" id="indice">Appuyez sur F pour le plein écran</p>
+    <span class="hors-ligne" id="hors-ligne" hidden title="Connexion perdue : les derniers objets reçus restent affichés"></span>
+  </div>
+  <p class="chargement" id="chargement" role="status">Chargement…</p>
+  <noscript><p class="chargement">Cette page a besoin de JavaScript pour fonctionner.</p></noscript>
+  <script src="/static/affichage/affichage.js"></script>
+</body>
+</html>

@@ -63,12 +63,7 @@ def lister_signalements(
         requete = requete.filter(SignalementPerte.statut != StatutSignalement.CLOTURE.value)
     # Les correspondances d'abord : ce sont les personnes à prévenir ou à recevoir.
     signalements = sorted(requete.all(), key=lambda s: s.statut != StatutSignalement.CORRESPONDANCE_TROUVEE.value)
-    return [
-        SignalementPersonnelRead.model_validate(s).model_copy(
-            update={"usager_nom": s.usager.nom, "usager_telephone": s.usager.telephone}
-        )
-        for s in signalements
-    ]
+    return [SignalementPersonnelRead.depuis_signalement(s) for s in signalements]
 
 
 @router.get("/{signalement_id}/correspondances", response_model=list[ObjetRead])

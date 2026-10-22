@@ -119,12 +119,7 @@ def signalements_de_cet_objet(
     compatibles), avec leur nom et leur téléphone : ce sont elles que l'agent attend au guichet.
     """
     objet = _objet_de_mon_organisation(db, objet_id, personnel)
-    return [
-        SignalementPersonnelRead.model_validate(s).model_copy(
-            update={"usager_nom": s.usager.nom, "usager_telephone": s.usager.telephone}
-        )
-        for s in signalements_correspondants(db, objet)
-    ]
+    return [SignalementPersonnelRead.depuis_signalement(s) for s in signalements_correspondants(db, objet)]
 
 
 def _objet_modifiable(db: Session, objet_id: uuid.UUID, utilisateur: Utilisateur) -> Objet:

@@ -10,9 +10,14 @@ La déclaration de perte elle-même réutilise les routes existantes
 POST /usagers/ puis POST /signalements/ (Étape 6).
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from io import BytesIO
+
+import qrcode
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.database import get_db
 from app.models.enums import StatutObjet
 from app.models.objet import Objet
@@ -57,3 +62,21 @@ def objets_exposes(slug: str, db: Session = Depends(get_db)):
         .limit(LIMITE_OBJETS)
         .all()
     )
+
+
+@router.get("/{slug}/qrcode")
+def qrcode_portail(slug: str, request: Request, db: Session = Depends(get_db)):
+    """
+    Image du code QR qui mène au portail public de l'organisation (Étape 13). Elle s'affiche en bas
+    de l'écran du hall : un visiteur la scanne avec son téléphone et déclare sa perte sans rien saisir.
+    L'image ne contient qu'une adresse publique ; elle est produite à la volée, jamais stockée.
+    """
+    organisation = db.query(Organisation).filter(Organisation.slug == slug.strip().lower()).first()
+    if organisation is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organisation introuvable")
+    racine = (settings.adresse_publique or str(request.base_url)).rstrip("/")
+    image = qrcode.make(f"{racine}/{organisation.slug}", box_size=12, border=2)
+    tampon = BytesIO()
+    image.save(tampon, format="PNG")
+    tampon.seek(0)
+    return StreamingResponse(tampon, media_type="image/png", headers={"Cache-Control": "public, max-age=3600"})

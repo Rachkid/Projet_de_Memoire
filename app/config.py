@@ -34,6 +34,11 @@ class Settings(BaseSettings):
     photo_max_octets: int = 5 * 1024 * 1024  # 5 Mo par photo reçue
     photo_max_cote: int = 1600  # la plus grande dimension est ramenée à 1600 px
 
+    # Adresse publique du site (ex. https://objets.iat.ne), facultative. Elle sert à fabriquer le code QR
+    # « déclarer une perte » de l'écran d'affichage. Si elle est vide, l'adresse utilisée par le
+    # navigateur est reprise telle quelle (suffisant en essai local ; à renseigner une fois en ligne).
+    adresse_publique: str = ""
+
     # Indique à Pydantic de lire les valeurs manquantes depuis le fichier .env
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
