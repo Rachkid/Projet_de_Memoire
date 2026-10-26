@@ -1,8 +1,8 @@
 /* العربية — arabe standard moderne (écriture de droite à gauche, chiffres occidentaux). */
 (function () {
   "use strict";
-  window.Retrova = window.Retrova || {};
-  window.Retrova.i18n.ajouter("ar", {
+  window.Tsintuwa = window.Tsintuwa || {};
+  window.Tsintuwa.i18n.ajouter("ar", {
   "langue.libelle": "اللغة",
   "chargement": "جارٍ التحميل…",
   "erreur.reseau": "تعذّر الاتصال. تحقّق من اتصالك بالإنترنت ثم أعد المحاولة.",
@@ -11,7 +11,7 @@
   "erreur.autre": "حدث خطأ (الرمز {code}). أعد المحاولة بعد قليل.",
   "erreur.org_inconnue": "هذا العنوان لا يطابق أي مؤسسة.",
   "portail.titre_page": "{org} — الأغراض المفقودة",
-  "signature": "بدعم من Retrova",
+  "signature": "بدعم من Tsintuwa",
   "retour.accueil.aria": "العودة إلى الصفحة الرئيسية",
   "nav.accueil": "الرئيسية",
   "facultatif": "(اختياري)",
@@ -93,7 +93,6 @@
   "cat.chapelet": "مسبحة",
   "cat.gourde": "قارورة ماء",
   "cat.sachet": "كيس",
-  "cat.carte_d'etudiant": "بطاقة الطالب",
   "cat.carte_d'identite": "بطاقة الهوية",
   "cat.passeport": "جواز السفر",
   "cat.cle_usb": "فلاش USB",
@@ -106,6 +105,12 @@
   "cat.thermos": "ترمس",
   "cat.tenue_scolaire": "زي مدرسي",
   "cat.billet_de_voyage": "تذكرة سفر",
+  "cat.carte_scolaire": "بطاقة مدرسية",
+  "cat.chaussures": "أحذية",
+  "cat.ensemble_geometrique": "أدوات هندسية",
+  "cat.bic": "قلم حبر جاف",
+  "cat.calculatrice": "آلة حاسبة",
+  "cat.kit_de_maintenance_et_robotique": "عدّة الصيانة والروبوتات",
   "hall.sous.transport": "أغراض تم العثور عليها في مركباتنا ومحطاتنا",
   "hall.sous.education": "أغراض تم العثور عليها داخل المؤسسة",
   "hall.aide.transport": "امسح الرمز للإبلاغ من هاتفك. لاسترجاع غرض، توجّه إلى الوكالة ومعك وثيقة هوية.",

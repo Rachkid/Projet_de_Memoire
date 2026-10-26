@@ -1,8 +1,8 @@
 /* Hausa. Traduction à FAIRE RELIRE par un locuteur avant une mise en service (voir le tableau de relecture). */
 (function () {
   "use strict";
-  window.Retrova = window.Retrova || {};
-  window.Retrova.i18n.ajouter("ha", {
+  window.Tsintuwa = window.Tsintuwa || {};
+  window.Tsintuwa.i18n.ajouter("ha", {
   "langue.libelle": "Harshe",
   "chargement": "Ana lodawa…",
   "erreur.reseau": "Ba a iya haɗawa ba. Ku duba intanet ɗinku, sannan ku sake gwadawa.",
@@ -11,7 +11,7 @@
   "erreur.autre": "An samu matsala (lamba {code}). Ku sake gwadawa nan da ɗan lokaci.",
   "erreur.org_inconnue": "Wannan adireshin bai dace da wata ƙungiya ba.",
   "portail.titre_page": "{org} — Kayan da suka ɓace",
-  "signature": "Retrova ne ya samar",
+  "signature": "Tsintuwa ne ya samar",
   "retour.accueil.aria": "Komawa shafin farko",
   "nav.accueil": "Shafin farko",
   "facultatif": "(ba dole ba)",
@@ -93,7 +93,6 @@
   "cat.chapelet": "Carbi",
   "cat.gourde": "Kwalbar ruwa",
   "cat.sachet": "Leda",
-  "cat.carte_d'etudiant": "Katin ɗalibi",
   "cat.carte_d'identite": "Katin shaida",
   "cat.passeport": "Fasfo",
   "cat.cle_usb": "Flash ɗin USB",
@@ -106,6 +105,12 @@
   "cat.thermos": "Tarmas",
   "cat.tenue_scolaire": "Kayan makaranta",
   "cat.billet_de_voyage": "Tikitin tafiya",
+  "cat.carte_scolaire": "Katin makaranta",
+  "cat.chaussures": "Takalma",
+  "cat.ensemble_geometrique": "Kayan aikin lissafi",
+  "cat.bic": "Biro",
+  "cat.calculatrice": "Kalkuleta",
+  "cat.kit_de_maintenance_et_robotique": "Kayan gyara da na robot",
   "hall.sous.transport": "Kayan da aka samu a motocinmu da tashoshinmu",
   "hall.sous.education": "Kayan da aka samu a cikin cibiyar",
   "hall.aide.transport": "Ku bincika lambar don bayar da rahoto daga wayarku. Don karɓar kaya, ku zo ofis da shaidar ɗan ƙasa.",

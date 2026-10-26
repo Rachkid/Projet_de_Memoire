@@ -19,7 +19,7 @@
   var $ = function (id) { return document.getElementById(id); };
 
   /* Traductions : voir /static/i18n/. « t » donne le texte d'une clé dans la langue choisie. */
-  var I18N = window.Retrova.i18n;
+  var I18N = window.Tsintuwa.i18n;
   var t = function (cle, variables) { return I18N.t(cle, variables); };
 
   /* ---------- Outils ---------- */
@@ -416,7 +416,7 @@
 
   function demarrer() {
     I18N.demarrer();
-    document.addEventListener("retrova:langue", actualiserLangue);
+    document.addEventListener("tsintuwa:langue", actualiserLangue);
     Promise.all([
       api("GET", "/organisations/par-slug/" + encodeURIComponent(slug)),
       api("GET", "/portail/" + encodeURIComponent(slug) + "/categories")

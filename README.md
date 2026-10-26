@@ -1,6 +1,6 @@
-# Retrova — Système de gestion des objets perdus
+# Tsintuwa — Système de gestion des objets perdus
 
-Retrova (de « retrouver » : retrouver l'objet pour le rendre à son propriétaire) est une plateforme de gestion des objets perdus et trouvés pour les établissements d'enseignement et les compagnies de transport. Projet réalisé dans le cadre d'un
+Tsintuwa (mot haoussa qui évoque le fait de trouver quelque chose, par hasard ; ici, l'objet que l'on retrouve pour le rendre à son propriétaire) est une plateforme de gestion des objets perdus et trouvés pour les établissements d'enseignement et les compagnies de transport. Projet réalisé dans le cadre d'un
 mémoire de fin de cycle Master 2 — Génie Logiciel, Institut Africain de
 Technologie (IAT), Niamey, Niger.
 
@@ -135,9 +135,9 @@ mettre l'application à jour ne fait perdre aucune donnée.
 - L'interface du personnel (agents, administrateurs) reste en français.
 - **Photos** : réduites à 1600 px (navigateur puis serveur) à l'envoi, et affichées ENTIÈRES dans les cartes (hall, portail,
   interface agent), le reste de la carte étant rempli par la même photo agrandie et floutée : ni rognage, ni débordement.
-- **Catégories d'objets** : une liste commune (30 catégories, dont tapis de prière, casquette, bonnet, chapelet,
-  gourde, carte d'étudiant, passeport, clé USB, argent…) plus une catégorie propre au secteur (« Tenue scolaire »
-  pour les écoles, « Billet de voyage » pour le transport) ; « Autre » reste en dernier. Elles sont définies dans
+- **Catégories d'objets** : une liste commune (31 catégories, dont tapis de prière, casquette, bonnet, chapelet,
+  gourde, carte scolaire, passeport, clé USB, argent, chaussures…) plus des catégories propres au secteur (écoles :
+  tenue scolaire, ensemble géométrique, bic, calculatrice, kit de maintenance et robotique ; transport : billet de voyage) ; « Autre » reste en dernier. Elles sont définies dans
   `app/services/categories.py` et servies par `GET /portail/{slug}/categories`.
 
 ## Documentation du projet

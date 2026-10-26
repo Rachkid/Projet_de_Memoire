@@ -37,7 +37,7 @@
      l'écran du hall, ajouter à l'adresse « ?langues=fr,en,ha,dje,ar » : la langue change quand tous les objets
      (toutes les pages) ont défilé dans la langue en cours.
      Le choix n'est jamais mémorisé : un écran de hall doit toujours redémarrer dans la même configuration. */
-  const I18N = window.Retrova.i18n;
+  const I18N = window.Tsintuwa.i18n;
   const t = I18N.t;
   const LANGUE_MS = 30000;   // sans défilement (0 ou 1 objet, ou page d'invitation) : changement toutes les 30 secondes
   const CODES = I18N.langues.map(function (l) { return l.code; });
@@ -93,7 +93,7 @@
     "gourde": "M10 2h4v3h-4zM8 5h8l1 4v11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9zM7 11h10",
     "sachet": "M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0",
     "tenue scolaire": "M9 3L3 6l2.2 4.2L8 9v12h8V9l2.8 1.2L21 6l-6-3a3 3 0 0 1-6 0zM12 12v5",
-    "carte d'etudiant": "M4.5 5h15A2.5 2.5 0 0 1 22 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 16.5v-9A2.5 2.5 0 0 1 4.5 5zM15 10h4M15 14h4M5.5 16.5c.5-2 5.5-2 6 0" + cercle(8.5, 10.5, 1.8),
+    "carte scolaire": "M4.5 5h15A2.5 2.5 0 0 1 22 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 16.5v-9A2.5 2.5 0 0 1 4.5 5zM15 10h4M15 14h4M5.5 16.5c.5-2 5.5-2 6 0" + cercle(8.5, 10.5, 1.8),
     "carte d'identite": "M4.5 5h15A2.5 2.5 0 0 1 22 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 16.5v-9A2.5 2.5 0 0 1 4.5 5zM15 10h4M15 14h4M5.5 16.5c.5-2 5.5-2 6 0" + cercle(8.5, 10.5, 1.8),
     "passeport": "M6 2h12a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM9 17h6" + cercle(12, 10, 3),
     "cle usb": "M9 2h6v6H9zM10 8v3M14 8v3M7 11h10v9a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z",
@@ -105,6 +105,11 @@
     "enveloppe": "M3 6h18v12H3zM3 7l9 7 9-7",
     "thermos": "M8 2h8v3H8zM7 5h10v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1zM7 10h10",
     "billet de voyage": "M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4zM14 7v10",
+    "chaussures": "M3 16V8l5 2 3 3h6a4 4 0 0 1 4 4v0H3zM3 19h18",
+    "ensemble geometrique": "M3 20L12 4l9 16zM8 20l4-8M3 20h18",
+    "bic": "M17 3l4 4L8 20l-5 1 1-5zM14 6l4 4",
+    "calculatrice": "M6 2h12a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18h.01M12 18h.01M16 18h.01",
+    "kit de maintenance et robotique": cercle(12, 12, 3) + "M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2",
     "autre": "M21 8l-9-5-9 5v8l9 5 9-5V8zM3 8l9 5 9-5M12 13v8"
   };
 
@@ -379,7 +384,7 @@
     }
   }
 
-  document.addEventListener("retrova:langue", function () {
+  document.addEventListener("tsintuwa:langue", function () {
     if (!org) return;
     textesFixes();
     majHorloge();

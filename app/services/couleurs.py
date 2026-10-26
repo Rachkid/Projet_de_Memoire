@@ -16,7 +16,7 @@ import re
 
 _MOTIF = re.compile(r"^#[0-9a-fA-F]{6}$")
 
-# Thème par défaut de Retrova, utilisé quand l'organisation n'a pas choisi ses couleurs.
+# Thème par défaut de Tsintuwa, utilisé quand l'organisation n'a pas choisi ses couleurs.
 PRINCIPALE_DEFAUT = "#1d4e89"
 ACCENT_DEFAUT = "#d9730d"
 FOND_DEFAUT = "#f7f8fa"
@@ -80,7 +80,7 @@ def teinte_claire(couleur: str) -> str:
 def calculer_theme(principale: str | None, accent: str | None, fond: str | None) -> dict:
     """
     Thème complet à partir des couleurs choisies (toutes facultatives).
-    Ce que l'organisation ne fournit pas est déduit ou remplacé par le thème Retrova.
+    Ce que l'organisation ne fournit pas est déduit ou remplacé par le thème Tsintuwa.
     """
     principale = principale or PRINCIPALE_DEFAUT
     accent = accent or (eclaircir(principale) if principale != PRINCIPALE_DEFAUT else ACCENT_DEFAUT)

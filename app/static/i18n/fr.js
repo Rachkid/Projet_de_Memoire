@@ -1,8 +1,8 @@
 /* Français (langue de référence : tous les textes de l'application y ont leur forme d'origine). */
 (function () {
   "use strict";
-  window.Retrova = window.Retrova || {};
-  window.Retrova.i18n.ajouter("fr", {
+  window.Tsintuwa = window.Tsintuwa || {};
+  window.Tsintuwa.i18n.ajouter("fr", {
   "langue.libelle": "Langue",
   "chargement": "Chargement…",
   "erreur.reseau": "Connexion impossible. Vérifiez votre connexion internet puis réessayez.",
@@ -11,7 +11,7 @@
   "erreur.autre": "Une erreur est survenue (code {code}). Réessayez dans un instant.",
   "erreur.org_inconnue": "Cette adresse ne correspond à aucune organisation.",
   "portail.titre_page": "{org} — Objets perdus",
-  "signature": "Propulsé par Retrova",
+  "signature": "Propulsé par Tsintuwa",
   "retour.accueil.aria": "Retour à l'accueil",
   "nav.accueil": "Accueil",
   "facultatif": "(facultatif)",
@@ -93,7 +93,6 @@
   "cat.chapelet": "Chapelet",
   "cat.gourde": "Gourde",
   "cat.sachet": "Sachet",
-  "cat.carte_d'etudiant": "Carte d'étudiant",
   "cat.carte_d'identite": "Carte d'identité",
   "cat.passeport": "Passeport",
   "cat.cle_usb": "Clé USB",
@@ -106,6 +105,12 @@
   "cat.thermos": "Thermos",
   "cat.tenue_scolaire": "Tenue scolaire",
   "cat.billet_de_voyage": "Billet de voyage",
+  "cat.carte_scolaire": "Carte scolaire",
+  "cat.chaussures": "Chaussures",
+  "cat.ensemble_geometrique": "Ensemble géométrique",
+  "cat.bic": "Bic",
+  "cat.calculatrice": "Calculatrice",
+  "cat.kit_de_maintenance_et_robotique": "Kit de maintenance et robotique",
   "hall.sous.transport": "Objets trouvés dans nos véhicules et nos gares",
   "hall.sous.education": "Objets trouvés dans l'établissement",
   "hall.aide.transport": "Scannez le code pour le déclarer depuis votre téléphone. Pour récupérer un objet, présentez-vous à l'agence avec une pièce d'identité.",

@@ -16,8 +16,8 @@
 (function () {
   "use strict";
 
-  var R = window.Retrova = window.Retrova || {};
-  var CLE_STOCKAGE = "retrova_langue";
+  var R = window.Tsintuwa = window.Tsintuwa || {};
+  var CLE_STOCKAGE = "tsintuwa_langue";
 
   var LANGUES = [
     { code: "fr", nom: "Français", dir: "ltr", locale: "fr-FR" },
@@ -152,7 +152,7 @@
     if (memoriser) ecrireStockage(l.code);
     appliquer(document);
     remplirSelecteurs();
-    document.dispatchEvent(new CustomEvent("retrova:langue", { detail: { code: l.code } }));
+    document.dispatchEvent(new CustomEvent("tsintuwa:langue", { detail: { code: l.code } }));
   }
 
   /* Démarrage : langue forcée (écran du hall) ou langue mémorisée / du navigateur. */

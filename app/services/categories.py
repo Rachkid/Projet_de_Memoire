@@ -33,7 +33,7 @@ CATEGORIES_COMMUNES: list[str] = [
     "Chapelet",
     "Gourde",
     "Sachet",
-    "Carte d'étudiant",
+    "Carte scolaire",
     "Carte d'identité",
     "Passeport",
     "Clé USB",
@@ -44,11 +44,12 @@ CATEGORIES_COMMUNES: list[str] = [
     "Bracelet",
     "Enveloppe",
     "Thermos",
+    "Chaussures",
 ]
 
 # Catégories propres à un secteur : insérées avant « Autre ».
 CATEGORIES_PAR_SECTEUR: dict[str, list[str]] = {
-    "education": ["Tenue scolaire"],
+    "education": ["Tenue scolaire", "Ensemble géométrique", "Bic", "Calculatrice", "Kit de maintenance et robotique"],
     "transport": ["Billet de voyage"],
 }
 

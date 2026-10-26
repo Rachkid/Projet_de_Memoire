@@ -16,7 +16,7 @@
   "use strict";
 
   const slug = (location.pathname.split("/").filter(Boolean)[0] || "").toLowerCase();
-  const CLE_JETON = "retrova_jeton_" + slug;
+  const CLE_JETON = "tsintuwa_jeton_" + slug;
   const CATEGORIES_SECOURS = ["Téléphone", "Portefeuille", "Clés", "Sac", "Documents", "Carte bancaire", "Vêtement",
     "Lunettes", "Ordinateur", "Écouteurs", "Montre", "Bijou", "Livre ou cahier", "Autre"];
   const STATUTS = { en_attente: "En attente", reclame: "Réclamé", restitue: "Restitué", archive: "Archivé" };
@@ -1373,7 +1373,7 @@
   let minuteurAlertes = null;
   let alertesCourantes = [];
 
-  function cleVues() { return "retrova_alertes_vues_" + slug + "_" + (moi ? moi.id : ""); }
+  function cleVues() { return "tsintuwa_alertes_vues_" + slug + "_" + (moi ? moi.id : ""); }
   function lireVues() { try { return JSON.parse(localStorage.getItem(cleVues()) || "{}") || {}; } catch (e) { return {}; } }
   function ecrireVues(v) { try { localStorage.setItem(cleVues(), JSON.stringify(v)); } catch (e) { /* stockage bloqué : tout sera simplement considéré comme nouveau */ } }
 

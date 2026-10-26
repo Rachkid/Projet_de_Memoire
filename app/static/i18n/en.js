@@ -1,8 +1,8 @@
 /* English. */
 (function () {
   "use strict";
-  window.Retrova = window.Retrova || {};
-  window.Retrova.i18n.ajouter("en", {
+  window.Tsintuwa = window.Tsintuwa || {};
+  window.Tsintuwa.i18n.ajouter("en", {
   "langue.libelle": "Language",
   "chargement": "Loading…",
   "erreur.reseau": "Unable to connect. Check your internet connection and try again.",
@@ -11,7 +11,7 @@
   "erreur.autre": "Something went wrong (code {code}). Please try again in a moment.",
   "erreur.org_inconnue": "This address does not match any organisation.",
   "portail.titre_page": "{org} — Lost items",
-  "signature": "Powered by Retrova",
+  "signature": "Powered by Tsintuwa",
   "retour.accueil.aria": "Back to home",
   "nav.accueil": "Home",
   "facultatif": "(optional)",
@@ -93,7 +93,6 @@
   "cat.chapelet": "Prayer beads",
   "cat.gourde": "Water bottle",
   "cat.sachet": "Plastic bag",
-  "cat.carte_d'etudiant": "Student card",
   "cat.carte_d'identite": "ID card",
   "cat.passeport": "Passport",
   "cat.cle_usb": "USB flash drive",
@@ -106,6 +105,12 @@
   "cat.thermos": "Thermos flask",
   "cat.tenue_scolaire": "School uniform",
   "cat.billet_de_voyage": "Travel ticket",
+  "cat.carte_scolaire": "School card",
+  "cat.chaussures": "Shoes",
+  "cat.ensemble_geometrique": "Geometry set",
+  "cat.bic": "Pen",
+  "cat.calculatrice": "Calculator",
+  "cat.kit_de_maintenance_et_robotique": "Maintenance and robotics kit",
   "hall.sous.transport": "Items found in our vehicles and stations",
   "hall.sous.education": "Items found on the premises",
   "hall.aide.transport": "Scan the code to report a loss from your phone. To collect an item, come to the agency with an ID document.",

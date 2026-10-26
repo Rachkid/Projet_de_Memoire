@@ -1,8 +1,8 @@
 /* Zarma (djerma). ÉBAUCHE : à FAIRE VALIDER par un locuteur zarma avant toute mise en service. Chaque texte peut être corrigé ici sans toucher au reste du code. */
 (function () {
   "use strict";
-  window.Retrova = window.Retrova || {};
-  window.Retrova.i18n.ajouter("dje", {
+  window.Tsintuwa = window.Tsintuwa || {};
+  window.Tsintuwa.i18n.ajouter("dje", {
   "langue.libelle": "Sanni",
   "chargement": "A go ga kaa…",
   "erreur.reseau": "A si hin ka haɗa. Ni internet ceeci, ka ye ka ceeci.",
@@ -11,7 +11,7 @@
   "erreur.autre": "Kuuru go (nimro {code}). Ye ka ceeci jirbi kayna banda.",
   "erreur.org_inconnue": "Adiresu wo si saba organisasiyon fo se.",
   "portail.titre_page": "{org} — Hayey kaŋ ɲaŋ",
-  "signature": "Retrova no k'a te",
+  "signature": "Tsintuwa no k'a te",
   "retour.accueil.aria": "Ye ka koy hugu",
   "nav.accueil": "Hugu",
   "facultatif": "(a si wajibu)",
@@ -93,7 +93,6 @@
   "cat.chapelet": "Tasbi",
   "cat.gourde": "Gurdu",
   "cat.sachet": "Sasi",
-  "cat.carte_d'etudiant": "Dalibi karta",
   "cat.carte_d'identite": "ID karta",
   "cat.passeport": "Pasapoor",
   "cat.cle_usb": "USB cle",
@@ -106,6 +105,12 @@
   "cat.thermos": "Termos",
   "cat.tenue_scolaire": "Sekoli bankaaray",
   "cat.billet_de_voyage": "Tike dirrayan",
+  "cat.carte_scolaire": "Sekoli karta",
+  "cat.chaussures": "Tamu",
+  "cat.ensemble_geometrique": "Ensemble géométrique",
+  "cat.bic": "Bik",
+  "cat.calculatrice": "Kalkilatoor",
+  "cat.kit_de_maintenance_et_robotique": "Kit maintenance nda robotik",
   "hall.sous.transport": "Hayey kaŋ i gar iri wasayan nda iri gareyan ra",
   "hall.sous.education": "Hayey kaŋ i gar sekoolu ra",
   "hall.aide.transport": "Ma kode wo ceeci zama ni ma rahotu samba ni telefon ra. Ni hay ye ta: ma kaa ajãsi ra nda ni takarda cebe.",

@@ -49,7 +49,7 @@ class Settings(BaseSettings):
     smtp_mot_de_passe: str = ""
     smtp_starttls: bool = False  # chiffrement STARTTLS (en général port 587)
     smtp_ssl: bool = False  # chiffrement SSL direct (en général port 465)
-    courriel_expediteur: str = "Retrova <ne-pas-repondre@retrova.local>"
+    courriel_expediteur: str = "Tsintuwa <ne-pas-repondre@tsintuwa.local>"
 
     # Indique à Pydantic de lire les valeurs manquantes depuis le fichier .env
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")

@@ -31,7 +31,7 @@ Base.metadata.create_all(bind=engine)
 appliquer_migrations()
 
 app = FastAPI(
-    title="Retrova — Système de gestion des objets perdus",
+    title="Tsintuwa — Système de gestion des objets perdus",
     description=(
         "API du projet de mémoire de fin de cycle M2 Génie Logiciel — "
         "Institut Africain de Technologie (IAT), Niamey, Niger."
@@ -107,7 +107,7 @@ def page_redoc():
 def accueil():
     """Simple point de contrôle confirmant que l'API est en ligne."""
     return {
-        "message": "API Retrova — Système de gestion des objets perdus.",
+        "message": "API Tsintuwa — Système de gestion des objets perdus.",
         "documentation_interactive": "/docs",
     }
 
