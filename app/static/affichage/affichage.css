@@ -65,7 +65,7 @@ h1, p { margin: 0; }
 .entete__titres { min-width: 0; }
 .entete h1 { font-size: 3.6rem; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; text-wrap: balance; }
 .entete__titres p { margin-top: 0.2vmin; font-size: 1.7rem; font-weight: 600; opacity: 0.85; }
-.entete__heure { margin-left: auto; text-align: right; flex: none; }
+.entete__heure { margin-inline-start: auto; text-align: end; flex: none; }
 .heure { display: block; font-size: 4rem; font-weight: 800; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; line-height: 1; }
 .jour { display: block; margin-top: 0.4vmin; font-size: 1.5rem; font-weight: 600; opacity: 0.85; }
 
@@ -109,7 +109,8 @@ h1, p { margin: 0; }
   box-shadow: 0 1.2vmin 4vmin rgba(0, 0, 0, 0.35);
 }
 @media (prefers-reduced-motion: no-preference) {
-  .grille:not(.sort) .carte { animation: monte 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  /* « backwards » : l'animation d'entrée ne garde pas la main après sa fin, sinon elle écraserait le zoom. */
+  .grille:not(.sort) .carte { animation: monte 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
   .grille:not(.sort) .carte:nth-child(2) { animation-delay: 0.08s; }
   .grille:not(.sort) .carte:nth-child(3) { animation-delay: 0.16s; }
   .grille:not(.sort) .carte:nth-child(4) { animation-delay: 0.24s; }
@@ -117,6 +118,20 @@ h1, p { margin: 0; }
   .grille:not(.sort) .carte:nth-child(6) { animation-delay: 0.4s; }
   @keyframes monte { from { opacity: 0; transform: translateY(2vmin); } to { opacity: 1; transform: none; } }
 }
+/* Zoom : l'objet mis en valeur grossit légèrement et passe devant ; les autres s'effacent un peu. */
+.carte { transition: transform 0.7s cubic-bezier(0.3, 0.7, 0.2, 1), opacity 0.7s ease, box-shadow 0.7s ease; }
+.carte--zoom {
+  position: relative;
+  z-index: 2;
+  transform: scale(1.09);
+  box-shadow: 0 3vmin 8vmin rgba(0, 0, 0, 0.6), 0 0 0 0.6vmin var(--accent);
+}
+.carte--attenuee { opacity: 0.62; transform: scale(0.97); }
+@media (prefers-reduced-motion: reduce) {
+  .carte { transition: none; }
+  .carte--zoom { transform: none; }
+}
+
 .carte__photo {
   position: relative;
   min-height: 0;
@@ -125,7 +140,7 @@ h1, p { margin: 0; }
   color: var(--principale);
   background: linear-gradient(145deg, color-mix(in srgb, var(--principale) 12%, #ffffff), #ffffff);
 }
-.carte__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.carte__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 .carte__photo svg { width: 38%; max-width: 22vmin; height: auto; opacity: 0.55; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .carte__texte { padding: 1.2vmin 2vmin 1.5vmin; }
 .carte__categorie { font-size: 2.5rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.01em; overflow-wrap: anywhere; }
@@ -160,7 +175,7 @@ h1, p { margin: 0; }
 .pied__texte { min-width: 0; }
 .pied__titre { font-size: 2.3rem; font-weight: 800; line-height: 1.1; }
 .pied__aide { margin-top: 0.4vmin; font-size: 1.55rem; opacity: 0.92; max-width: 78ch; }
-.pied__droite { margin-left: auto; flex: none; display: grid; justify-items: end; gap: 1.2vmin; }
+.pied__droite { margin-inline-start: auto; flex: none; display: grid; justify-items: end; gap: 1.2vmin; }
 .pied__signature { font-size: 1.2rem; opacity: 0.6; }
 
 .pastilles { display: flex; gap: 1vmin; }
@@ -169,7 +184,7 @@ h1, p { margin: 0; }
 
 .indice {
   position: absolute;
-  right: 3.6vmin;
+  inset-inline-end: 3.6vmin;
   bottom: 0.6vmin;
   font-size: 1.3rem;
   opacity: 0.55;
@@ -180,7 +195,7 @@ h1, p { margin: 0; }
 .hors-ligne {
   position: absolute;
   top: 1vmin;
-  right: 1.2vmin;
+  inset-inline-end: 1.2vmin;
   width: 1.2vmin;
   height: 1.2vmin;
   border-radius: 50%;
@@ -189,9 +204,24 @@ h1, p { margin: 0; }
 
 @media (orientation: portrait) {
   .pied { flex-wrap: wrap; }
-  .pied__droite { margin-left: 0; width: 100%; justify-items: start; grid-auto-flow: column; justify-content: space-between; }
+  .pied__droite { margin-inline-start: 0; width: 100%; justify-items: start; grid-auto-flow: column; justify-content: space-between; }
 }
 
 @media (orientation: portrait) {
   .pied__texte { flex: 1 1 0; }
 }
+
+/* ---------- Photos entières, sans rognage (étape 15 quinquies) ----------
+   Une photo n'a presque jamais la forme de sa carte. Au lieu de la couper (cover), on l'affiche ENTIÈRE
+   (contain) et on remplit le reste de la carte avec la même photo, agrandie et floutée : pas de bandes vides,
+   pas de débordement, et l'objet reste visible en entier. L'adresse de la photo est donnée par --photo. */
+.cadre-photo { position: relative; overflow: hidden; isolation: isolate; background: color-mix(in srgb, var(--principale) 12%, #ffffff); }
+.cadre-photo::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  z-index: -1;
+  background: var(--photo) center / cover no-repeat;
+  filter: blur(16px) saturate(1.15) brightness(.9);
+}
+.cadre-photo > img { display: block; }

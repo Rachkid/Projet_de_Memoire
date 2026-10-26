@@ -23,6 +23,7 @@ from app.models.utilisateur import Utilisateur
 from app.schemas.objet import ObjetRead
 from app.schemas.signalement_perte import SignalementPerteCreate, SignalementPerteRead, SignalementPersonnelRead
 from app.security import get_utilisateur_courant
+from app.services.notifications import notifier_declaration_enregistree
 from app.services.rapprochement import objets_correspondants, traiter_nouveau_signalement
 
 router = APIRouter(prefix="/signalements", tags=["Signalements de perte"])
@@ -41,8 +42,11 @@ def declarer_perte(payload: SignalementPerteCreate, db: Session = Depends(get_db
     db.commit()
     db.refresh(signalement)
 
-    traiter_nouveau_signalement(db, signalement)
+    trouves = traiter_nouveau_signalement(db, signalement)
     db.refresh(signalement)
+    # Si un objet correspond déjà, le courriel « objet trouvé » est parti : inutile d'y ajouter une confirmation.
+    if not trouves:
+        notifier_declaration_enregistree(db.get(Usager, signalement.usager_id), signalement)
     return signalement
 
 

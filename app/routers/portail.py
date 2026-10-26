@@ -23,7 +23,7 @@ from app.models.enums import StatutObjet
 from app.models.objet import Objet
 from app.models.organisation import Organisation
 from app.schemas.objet import ObjetPublicRead
-from app.services.categories import CATEGORIES
+from app.services.categories import CATEGORIES, categories_pour
 
 router = APIRouter(prefix="/portail", tags=["Portail public"])
 
@@ -35,6 +35,15 @@ LIMITE_OBJETS = 200
 def lister_categories():
     """Catégories proposées dans les formulaires (mêmes mots pour l'usager et pour l'agent)."""
     return CATEGORIES
+
+
+@router.get("/{slug}/categories", response_model=list[str])
+def lister_categories_organisation(slug: str, db: Session = Depends(get_db)):
+    """Catégories proposées par une organisation : communes + celles de son secteur (éducation ou transport)."""
+    organisation = db.query(Organisation).filter(Organisation.slug == slug.strip().lower()).first()
+    if organisation is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organisation introuvable")
+    return categories_pour(organisation.secteur)
 
 
 @router.get("/{slug}/objets", response_model=list[ObjetPublicRead])

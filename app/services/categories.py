@@ -12,7 +12,8 @@ pas une contrainte. Les objets déjà enregistrés avec une autre catégorie con
 de fonctionner.
 """
 
-CATEGORIES: list[str] = [
+# Catégories communes à tous les secteurs (« Autre » est toujours placée en dernier).
+CATEGORIES_COMMUNES: list[str] = [
     "Téléphone",
     "Portefeuille",
     "Clés",
@@ -26,5 +27,37 @@ CATEGORIES: list[str] = [
     "Montre",
     "Bijou",
     "Livre ou cahier",
-    "Autre",
+    "Tapis de prière",
+    "Casquette",
+    "Bonnet",
+    "Chapelet",
+    "Gourde",
+    "Sachet",
+    "Carte d'étudiant",
+    "Carte d'identité",
+    "Passeport",
+    "Clé USB",
+    "Disque dur",
+    "Chargeur",
+    "Argent",
+    "Pochette",
+    "Bracelet",
+    "Enveloppe",
+    "Thermos",
 ]
+
+# Catégories propres à un secteur : insérées avant « Autre ».
+CATEGORIES_PAR_SECTEUR: dict[str, list[str]] = {
+    "education": ["Tenue scolaire"],
+    "transport": ["Billet de voyage"],
+}
+
+
+def categories_pour(secteur: str | None) -> list[str]:
+    """Liste des catégories d'un secteur (éducation par défaut)."""
+    propres = CATEGORIES_PAR_SECTEUR.get((secteur or "").strip().lower(), CATEGORIES_PAR_SECTEUR["education"])
+    return [*CATEGORIES_COMMUNES, *propres, "Autre"]
+
+
+# Liste par défaut (route /portail/categories, sans organisation précisée).
+CATEGORIES: list[str] = categories_pour("education")

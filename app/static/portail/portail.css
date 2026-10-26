@@ -246,7 +246,7 @@ p { margin: 0; }
 .champ__aide { margin-top: 6px; font-size: 0.9375rem; color: var(--encre-douce); }
 .champ__erreur { margin-top: 8px; font-size: 0.9375rem; font-weight: 600; color: var(--erreur); }
 
-input[type="text"], input[type="tel"], input[type="date"], textarea {
+input[type="text"], input[type="tel"], input[type="email"], input[type="date"], textarea {
   display: block;
   width: 100%;
   min-height: 52px;
@@ -395,7 +395,7 @@ input:focus-visible, textarea:focus-visible {
 }
 .objet:hover { border-color: var(--principale); }
 .objet__image, .objet__vide { width: 100%; aspect-ratio: 4 / 3; }
-.objet__image { display: block; object-fit: cover; background: var(--teinte); }
+.objet__image { display: block; }
 .objet__vide { display: grid; place-items: center; background: var(--teinte); color: var(--principale); }
 .objet__texte { padding: 10px 12px 14px; }
 .objet__texte strong { display: block; font-size: 1.0625rem; }
@@ -412,7 +412,7 @@ dialog {
   background: var(--fond);
 }
 dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
-.detail__image { display: block; width: 100%; max-height: 46vh; object-fit: cover; background: var(--teinte); }
+.detail__image { display: block; width: 100%; aspect-ratio: 4 / 3; max-height: 46vh; }
 .detail__corps { padding: 20px 20px 22px; }
 .detail__corps h3 { margin: 0; font-size: 1.5rem; letter-spacing: -0.01em; }
 .detail__meta { margin-top: 4px; color: var(--encre-douce); }
@@ -433,3 +433,78 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 @media (min-width: 1100px) {
   .objets { grid-template-columns: repeat(4, 1fr); }
 }
+
+/* ======================================================================
+   Étape 15 ter : choix de la langue et écriture de droite à gauche (arabe)
+   ====================================================================== */
+
+/* Le sélecteur de langue : une pastille discrète, lisible sur la photo d'accueil et sur la barre colorée. */
+.langue {
+  appearance: none;
+  -webkit-appearance: none;
+  min-height: 40px;
+  max-width: 9.5rem;
+  padding: 0 34px 0 14px;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.18);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+.langue:hover { background-color: rgba(255, 255, 255, 0.28); }
+.langue:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.langue option { color: #111827; background: #ffffff; }
+.accueil__langue { position: absolute; top: calc(14px + env(safe-area-inset-top)); right: 16px; z-index: 3; }
+.barre .langue { margin-left: 8px; flex: none; }
+
+[dir="rtl"] .langue { padding: 0 14px 0 34px; background-position: left 12px center; }
+[dir="rtl"] .accueil__langue { right: auto; left: 16px; }
+[dir="rtl"] .barre .langue { margin-left: 0; margin-right: 8px; }
+[dir="rtl"] .barre__nom { margin-left: 0; margin-right: auto; }
+[dir="rtl"] .barre__retour { padding-right: 0; padding-left: 8px; }
+[dir="rtl"] .barre__retour svg { transform: scaleX(-1); }
+[dir="rtl"] .statut { border-left: 0; border-right: 5px solid var(--accent); }
+[dir="rtl"] .objet { text-align: right; }
+
+/* Numéros, adresses et dates restent écrits de gauche à droite, même dans une page en arabe. */
+[dir="rtl"] input[type="tel"], [dir="rtl"] input[type="email"], [dir="rtl"] input[type="date"] { direction: ltr; text-align: right; }
+[dir="rtl"] input[type="tel"]::placeholder, [dir="rtl"] input[type="email"]::placeholder { text-align: right; }
+[dir="rtl"] .talon__reference, [dir="rtl"] #talon-tel { direction: ltr; unicode-bidi: plaintext; text-align: right; }
+
+/* Écritures sans accents ni majuscules habituelles : un peu plus d'interligne pour l'arabe. */
+[lang="ar"] body, [lang="ar"] .champ__aide, [lang="ar"] .chapeau, [lang="ar"] .statut { line-height: 1.7; }
+[lang="ar"] .accueil__intro { line-height: 1.6; }
+[dir="rtl"] .statut { border-radius: 12px 4px 4px 12px; }
+
+/* Barre du haut : le sélecteur de langue prend moins de place pour laisser lire le nom de l'organisation. */
+.barre .langue { max-width: 6.8rem; padding-left: 10px; padding-right: 28px; background-position: right 9px center; }
+[dir="rtl"] .barre .langue { padding-left: 28px; padding-right: 10px; background-position: left 9px center; }
+.barre__nom { unicode-bidi: plaintext; }
+.barre__retour { white-space: nowrap; }
+@media (max-width: 460px) {
+  .barre--logo .barre__nom { display: none; }
+  .barre--logo .barre__logo { margin-left: auto; }
+  [dir="rtl"] .barre--logo .barre__logo { margin-left: 0; margin-right: auto; }
+}
+
+/* ---------- Photos entières, sans rognage (étape 15 quinquies) ----------
+   Une photo n'a presque jamais la forme de sa carte. Au lieu de la couper (cover), on l'affiche ENTIÈRE
+   (contain) et on remplit le reste de la carte avec la même photo, agrandie et floutée : pas de bandes vides,
+   pas de débordement, et l'objet reste visible en entier. L'adresse de la photo est donnée par --photo. */
+.cadre-photo { position: relative; overflow: hidden; isolation: isolate; background: var(--teinte, #e9eef5); }
+.cadre-photo::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  z-index: -1;
+  background: var(--photo) center / cover no-repeat;
+  filter: blur(16px) saturate(1.15) brightness(.9);
+}
+.cadre-photo > img { display: block; width: 100%; height: 100%; object-fit: contain; }

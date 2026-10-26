@@ -36,6 +36,12 @@ class SignalementPerte(Base):
     date_perte: Mapped[date] = mapped_column(Date, nullable=True)
     lieu_approximatif: Mapped[str] = mapped_column(String(255), nullable=True)
 
+    # Adresse e-mail facultative, donnée AVEC CETTE déclaration : les courriels de ce signalement
+    # (confirmation, objet correspondant) ne partent que vers elle. Elle n'est pas rattachée à la
+    # personne (Usager) : sinon, saisir le numéro de quelqu'un d'autre avec sa propre adresse
+    # suffirait à recevoir les messages destinés à cette personne.
+    email: Mapped[str] = mapped_column(String(254), nullable=True)
+
     statut: Mapped[str] = mapped_column(
         String(30), nullable=False, default=StatutSignalement.EN_ATTENTE.value
     )

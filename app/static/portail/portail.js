@@ -18,6 +18,10 @@
 
   var $ = function (id) { return document.getElementById(id); };
 
+  /* Traductions : voir /static/i18n/. « t » donne le texte d'une clé dans la langue choisie. */
+  var I18N = window.Retrova.i18n;
+  var t = function (cle, variables) { return I18N.t(cle, variables); };
+
   /* ---------- Outils ---------- */
 
   function el(tag, classe, texte) {
@@ -45,38 +49,37 @@
         return donnees;
       });
     }, function () {
-      var erreur = new Error("Connexion impossible. Vérifiez votre connexion internet puis réessayez.");
+      var erreur = new Error(t("erreur.reseau"));
       erreur.status = 0;
       throw erreur;
     });
   }
 
   function messageErreur(donnees, statut) {
-    if (statut >= 500) return "Le service est momentanément indisponible. Réessayez dans un instant.";
+    if (statut >= 500) return t("erreur.serveur");
     if (donnees && typeof donnees.detail === "string") return donnees.detail;
     if (donnees && Array.isArray(donnees.detail) && donnees.detail[0] && donnees.detail[0].msg) {
-      return "Une information n'est pas valable : " + donnees.detail[0].msg;
+      return t("erreur.champ", { msg: donnees.detail[0].msg });
     }
-    return "Une erreur est survenue (code " + statut + "). Réessayez dans un instant.";
+    return t("erreur.autre", { code: statut });
   }
 
   function estImage(url) {
     return typeof url === "string" && (url.charAt(0) === "/" || /^https?:\/\//i.test(url));
   }
 
-  var formatJour = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long" });
-  var formatJourAnnee = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-
-  function jourRelatif(iso) {
+  /* « court » : sans le mot « Trouvé » (ex. « hier »), pour la fiche détaillée. */
+  function jourRelatif(iso, court) {
     var d = new Date(iso);
     var auj = new Date();
     var j0 = new Date(auj.getFullYear(), auj.getMonth(), auj.getDate());
     var j1 = new Date(d.getFullYear(), d.getMonth(), d.getDate());
     var ecart = Math.round((j0 - j1) / 86400000);
-    if (ecart <= 0) return "Trouvé aujourd'hui";
-    if (ecart === 1) return "Trouvé hier";
-    if (ecart < 7) return "Trouvé il y a " + ecart + " jours";
-    return "Trouvé le " + formatJour.format(d);
+    var base = court ? "quand." : "trouve.";
+    if (ecart <= 0) return t(base + "auj");
+    if (ecart === 1) return t(base + "hier");
+    if (ecart < 7) return t(base + "jours", { n: ecart });
+    return t(base + "le", { date: I18N.formaterJour(d) });
   }
 
   /* Numéro du Niger : 8 chiffres (on ajoute +227). Numéro étranger : doit commencer par + ou 00. */
@@ -94,44 +97,21 @@
     return m ? "+227 " + m.slice(1).join(" ") : t;
   }
 
-  /* ---------- Textes selon le secteur ---------- */
-
-  function textes() {
-    if (org.secteur === "transport") {
-      return {
-        intro: "Un objet oublié ou perdu pendant votre voyage ? Déclarez-le en une minute : nous le comparons avec ce qui a été trouvé.",
-        chapeau: "Dites-nous ce que vous avez perdu. Nous cherchons dans les objets trouvés et nous vous contactons dès qu'un objet correspond.",
-        lieu: "Où l'avez-vous perdu ? ",
-        lieuExemple: "Trajet, gare, numéro du bus…",
-        accueil: "à l'agence ou à la gare",
-        dans: { vehicule: "Trouvé dans un véhicule", locaux: "Trouvé en gare ou en agence" }
-      };
-    }
-    return {
-      intro: "Un objet perdu dans l'établissement ? Déclarez-le en une minute : nous le comparons avec ce qui a été trouvé.",
-      chapeau: "Dites-nous ce que vous avez perdu. Nous cherchons dans les objets trouvés et nous vous contactons dès qu'un objet correspond.",
-      lieu: "Où l'avez-vous perdu ? ",
-      lieuExemple: "Salle, bâtiment, cour…",
-      accueil: "à l'accueil de l'établissement",
-      dans: { vehicule: "Trouvé dans un véhicule", locaux: "Trouvé dans l'établissement" }
-    };
-  }
-
   /* ---------- Habillage ---------- */
 
   function appliquerTheme() {
-    var t = org.theme, racine = document.documentElement.style;
-    racine.setProperty("--principale", t.principale);
-    racine.setProperty("--accent", t.accent);
-    racine.setProperty("--fond", t.fond);
-    racine.setProperty("--sombre", t.sombre);
-    racine.setProperty("--t-principale", t.texte_sur_principale);
-    racine.setProperty("--t-accent", t.texte_sur_accent);
-    racine.setProperty("--t-sombre", t.texte_sur_sombre);
-    racine.setProperty("--t-fond", t.texte_sur_fond);
+    var th = org.theme, racine = document.documentElement.style;
+    racine.setProperty("--principale", th.principale);
+    racine.setProperty("--accent", th.accent);
+    racine.setProperty("--fond", th.fond);
+    racine.setProperty("--sombre", th.sombre);
+    racine.setProperty("--t-principale", th.texte_sur_principale);
+    racine.setProperty("--t-accent", th.texte_sur_accent);
+    racine.setProperty("--t-sombre", th.texte_sur_sombre);
+    racine.setProperty("--t-fond", th.texte_sur_fond);
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", t.principale);
-    document.title = org.nom + " — Objets perdus";
+    if (meta) meta.setAttribute("content", th.principale);
+    document.title = t("portail.titre_page", { org: org.nom });
 
     var accueil = $("vue-accueil");
     if (estImage(org.fond_url)) {
@@ -145,7 +125,7 @@
     if (estImage(org.logo_url)) {
       var img = document.createElement("img");
       img.src = org.logo_url;
-      img.alt = "Logo de " + org.nom;
+      img.alt = t("hall.logo_alt", { org: org.nom });
       img.addEventListener("error", function () {
         conteneur.textContent = "";
         conteneur.appendChild(initiales());
@@ -163,9 +143,7 @@
   }
 
   function construireEntete() {
-    var t = textes();
     $("accueil-titre").textContent = org.nom;
-    $("accueil-intro").textContent = t.intro;
     logoOuInitiales($("plaque-logo"));
 
     $("barre-nom").textContent = org.nom;
@@ -175,21 +153,12 @@
       img.alt = "";
       $("barre-logo").appendChild(img);
       $("barre-logo").hidden = false;
+      $("barre").classList.add("barre--logo");
     }
 
-    $("declarer-chapeau").textContent = t.chapeau;
-    $("etiquette-lieu").textContent = t.lieu;
-    var facultatif = el("span", "facultatif", "(facultatif)");
-    $("etiquette-lieu").appendChild(facultatif);
-    $("lieu").placeholder = t.lieuExemple;
-
-    if (org.consultation_distance) {
-      $("lien-objets").hidden = false;
-    } else {
-      var note = $("note-objets");
-      note.textContent = "Pour protéger les propriétaires, les objets trouvés ne sont pas affichés en ligne. Déclarez votre perte : nous la comparons à chaque objet enregistré.";
-      note.hidden = false;
-    }
+    // Les textes (introduction, aide, note…) sont posés par les traductions : voir I18N.appliquer.
+    $("lien-objets").hidden = !org.consultation_distance;
+    $("note-objets").hidden = !!org.consultation_distance;
   }
 
   function construirePuces(categories) {
@@ -203,7 +172,9 @@
       radio.id = "cat-" + i;
       radio.addEventListener("change", function () { effacerErreur("categorie"); });
       etiquette.appendChild(radio);
-      etiquette.appendChild(el("span", "", nom));
+      var libelle = el("span", "puce__texte", I18N.categorie(nom));
+      libelle.setAttribute("data-categorie", nom);
+      etiquette.appendChild(libelle);
       zone.appendChild(etiquette);
     });
   }
@@ -236,7 +207,7 @@
     var p = $("erreur-" + champ);
     p.textContent = message;
     p.hidden = false;
-    var saisie = champ === "telephone" ? $("telephone") : null;
+    var saisie = champ === "telephone" ? $("telephone") : champ === "email" ? $("email") : null;
     if (saisie) saisie.classList.add("invalide");
   }
 
@@ -244,6 +215,7 @@
     var p = $("erreur-" + champ);
     if (p) { p.hidden = true; p.textContent = ""; }
     if (champ === "telephone") $("telephone").classList.remove("invalide");
+    if (champ === "email") $("email").classList.remove("invalide");
   }
 
   function lireFormulaire() {
@@ -254,7 +226,8 @@
       date: $("date").value,
       lieu: $("lieu").value.trim(),
       nom: $("nom").value.trim(),
-      telephone: normaliserTelephone($("telephone").value)
+      telephone: normaliserTelephone($("telephone").value),
+      email: $("email").value.trim().toLowerCase()
     };
   }
 
@@ -262,23 +235,28 @@
     evenement.preventDefault();
     effacerErreur("categorie");
     effacerErreur("telephone");
+    effacerErreur("email");
     $("erreur-general").hidden = true;
 
     var f = lireFormulaire();
     var invalide = null;
     if (!f.categorie) {
-      montrerErreur("categorie", "Choisissez ce que vous avez perdu.");
+      montrerErreur("categorie", t("erreur.categorie"));
       invalide = invalide || document.querySelector('input[name="categorie"]');
     }
     if (!f.telephone) {
-      montrerErreur("telephone", "Ce numéro n'est pas valable. Écrivez 8 chiffres (ex. 96 12 34 56) ou un numéro étranger commençant par +.");
+      montrerErreur("telephone", t("erreur.telephone"));
       invalide = invalide || $("telephone");
+    }
+    if (f.email && !/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(f.email)) {
+      montrerErreur("email", t("erreur.email"));
+      invalide = invalide || $("email");
     }
     if (invalide) { invalide.focus(); return; }
 
     var bouton = $("envoyer");
     bouton.disabled = true;
-    bouton.textContent = "Envoi en cours…";
+    bouton.textContent = t("declarer.envoi");
 
     api("POST", "/usagers/", { telephone: f.telephone, nom: f.nom || null })
       .then(function (usager) {
@@ -288,11 +266,12 @@
           categorie: f.categorie,
           description: f.description || null,
           date_perte: f.date || null,
-          lieu_approximatif: f.lieu || null
+          lieu_approximatif: f.lieu || null,
+          email: f.email || null
         });
       })
       .then(function (signalement) {
-        dernierRecu = { signalement: signalement, telephone: f.telephone, categorie: f.categorie };
+        dernierRecu = { signalement: signalement, telephone: f.telephone, categorie: f.categorie, email: f.email };
         $("formulaire").reset();
         location.hash = "#recu";
       })
@@ -303,15 +282,15 @@
       })
       .then(function () {
         bouton.disabled = false;
-        bouton.textContent = "Envoyer ma déclaration";
+        bouton.textContent = t("declarer.envoyer");
       });
   }
 
   function remplirTalon() {
-    var r = dernierRecu, t = textes();
+    var r = dernierRecu;
     $("talon-org").textContent = org.nom;
-    $("talon-objet").textContent = r.categorie;
-    $("talon-date").textContent = formatJourAnnee.format(new Date());
+    $("talon-objet").textContent = I18N.categorie(r.categorie);
+    $("talon-date").textContent = I18N.formaterJour(new Date(), true);
     $("talon-tel").textContent = afficherTelephone(r.telephone);
     $("talon-ref").textContent = r.signalement.id.replace(/-/g, "").slice(0, 8).toUpperCase();
 
@@ -320,11 +299,10 @@
     void talon.offsetWidth; // relance l'animation si on revient sur la page
     talon.classList.add("talon--neuf");
 
+    var tel = afficherTelephone(r.telephone);
     $("recu-statut").textContent = r.signalement.statut === "correspondance_trouvee"
-      ? "Bonne nouvelle : un objet enregistré semble correspondre à votre déclaration. Présentez-vous " + t.accueil +
-        " avec une pièce d'identité et la référence ci-dessus. On vous demandera de décrire l'objet pour vérifier qu'il est bien à vous."
-      : "Nous avons bien enregistré votre déclaration. Dès qu'un objet correspondant sera trouvé, nous vous contacterons au " +
-        afficherTelephone(r.telephone) + ".";
+      ? t("recu.statut.match", { lieu: t("lieu_accueil") })
+      : (r.email ? t("recu.statut.attente_email", { tel: tel, email: r.email }) : t("recu.statut.attente", { tel: tel }));
   }
 
   /* ---------- Objets trouvés ---------- */
@@ -335,16 +313,21 @@
 
   function vignette(objet, classeImage, classeVide) {
     if (estImage(objet.photo_url)) {
+      var cadre = el("div", "cadre-photo " + classeImage);
+      cadre.style.setProperty("--photo", urlCss(objet.photo_url));
       var img = document.createElement("img");
-      img.className = classeImage;
       img.src = objet.photo_url;
-      img.alt = "Photo : " + objet.categorie;
+      img.alt = t("objets.photo", { categorie: I18N.categorie(objet.categorie) });
       img.loading = "lazy";
-      img.addEventListener("error", function () { img.replaceWith(vide(classeVide)); });
-      return img;
+      img.addEventListener("error", function () { cadre.replaceWith(vide(classeVide)); });
+      cadre.appendChild(img);
+      return cadre;
     }
     return vide(classeVide);
   }
+
+  /* Adresse de photo à placer dans une variable CSS (neutralise les caractères qui sortiraient de url("…")). */
+  function urlCss(url) { return 'url("' + String(url).replace(/["'()\\\s]/g, function (c) { return "%" + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, "0"); }) + '")'; }
 
   function vide(classe) {
     var d = el("div", classe);
@@ -355,58 +338,60 @@
   function chargerObjets() {
     var etat = $("objets-etat"), liste = $("objets-liste");
     liste.textContent = "";
-    etat.textContent = "Chargement des objets…";
+    etat.textContent = t("objets.chargement");
     api("GET", "/portail/" + encodeURIComponent(slug) + "/objets")
       .then(function (objets) {
         etat.textContent = "";
         if (!objets.length) {
-          var titre = el("strong", "", "Aucun objet à montrer pour le moment");
+          var titre = el("strong", "", t("objets.vide_titre"));
           etat.appendChild(titre);
-          etat.appendChild(document.createTextNode("Déclarez votre perte : nous vous préviendrons dès qu'un objet correspondant sera enregistré."));
+          etat.appendChild(document.createTextNode(t("objets.vide_texte")));
           return;
         }
         objets.forEach(function (o) { liste.appendChild(carte(o)); });
       })
       .catch(function (erreur) {
         etat.textContent = "";
-        etat.appendChild(el("strong", "", "La liste n'a pas pu être chargée"));
+        etat.appendChild(el("strong", "", t("objets.erreur_titre")));
         etat.appendChild(document.createTextNode(erreur.message));
       });
   }
 
   function carte(objet) {
-    var t = textes();
     var bouton = el("button", "objet");
     bouton.type = "button";
     bouton.appendChild(vignette(objet, "objet__image", "objet__vide"));
     var texte = el("div", "objet__texte");
-    texte.appendChild(el("strong", "", objet.categorie));
+    texte.appendChild(el("strong", "", I18N.categorie(objet.categorie)));
     texte.appendChild(el("span", "", jourRelatif(objet.date_heure_decouverte)));
     bouton.appendChild(texte);
-    bouton.addEventListener("click", function () { ouvrirDetail(objet, t); });
+    bouton.addEventListener("click", function () { ouvrirDetail(objet); });
     return bouton;
   }
 
-  function ouvrirDetail(objet, t) {
+  function ouvrirDetail(objet) {
     var d = $("detail");
     d.textContent = "";
     if (estImage(objet.photo_url)) {
+      var cadre = el("div", "cadre-photo detail__image");
+      cadre.style.setProperty("--photo", urlCss(objet.photo_url));
       var img = document.createElement("img");
-      img.className = "detail__image";
       img.src = objet.photo_url;
-      img.alt = "Photo : " + objet.categorie;
-      d.appendChild(img);
+      img.alt = t("objets.photo", { categorie: I18N.categorie(objet.categorie) });
+      cadre.appendChild(img);
+      d.appendChild(cadre);
     }
     var corps = el("div", "detail__corps");
-    var titre = el("h3", "", objet.categorie);
+    var titre = el("h3", "", I18N.categorie(objet.categorie));
     titre.id = "detail-titre";
     corps.appendChild(titre);
     var meta = jourRelatif(objet.date_heure_decouverte);
-    if (objet.type_emplacement && t.dans[objet.type_emplacement]) meta = t.dans[objet.type_emplacement] + " · " + meta.replace("Trouvé ", "");
+    if (objet.type_emplacement === "vehicule" || objet.type_emplacement === "locaux") {
+      meta = t("emplacement." + objet.type_emplacement) + " · " + jourRelatif(objet.date_heure_decouverte, true);
+    }
     corps.appendChild(el("p", "detail__meta", meta));
-    corps.appendChild(el("p", "statut",
-      "C'est peut-être le vôtre ? Présentez-vous " + t.accueil + " avec une pièce d'identité. On vous demandera de décrire un détail de l'objet que seul son propriétaire connaît."));
-    var fermer = el("button", "bouton bouton--accent bouton--plein", "Fermer");
+    corps.appendChild(el("p", "statut", t("objets.detail_texte", { lieu: t("lieu_accueil") })));
+    var fermer = el("button", "bouton bouton--accent bouton--plein", t("objets.fermer"));
     fermer.type = "button";
     fermer.addEventListener("click", function () { d.close(); });
     corps.appendChild(fermer);
@@ -416,15 +401,32 @@
 
   /* ---------- Démarrage ---------- */
 
+  /* Quand la langue change : on réécrit tout ce que le JavaScript a construit lui-même. */
+  function actualiserLangue() {
+    if (!org) return;
+    document.title = t("portail.titre_page", { org: org.nom });
+    var libelles = document.querySelectorAll(".puce__texte");
+    for (var i = 0; i < libelles.length; i++) libelles[i].textContent = I18N.categorie(libelles[i].getAttribute("data-categorie"));
+    ["categorie", "telephone", "email"].forEach(effacerErreur);
+    $("erreur-general").hidden = true;
+    if ($("detail").open) $("detail").close();
+    if (!$("vue-recu").hidden) remplirTalon();
+    if (!$("vue-objets").hidden) chargerObjets();
+  }
+
   function demarrer() {
+    I18N.demarrer();
+    document.addEventListener("retrova:langue", actualiserLangue);
     Promise.all([
       api("GET", "/organisations/par-slug/" + encodeURIComponent(slug)),
-      api("GET", "/portail/categories")
+      api("GET", "/portail/" + encodeURIComponent(slug) + "/categories")
     ]).then(function (resultats) {
       org = resultats[0];
+      I18N.definirContexte({ secteur: org.secteur === "transport" ? "transport" : "education" });
       appliquerTheme();
       construireEntete();
       construirePuces(resultats[1]);
+      I18N.appliquer(document);
 
       var maintenant = new Date();
       var iso = maintenant.getFullYear() + "-" + String(maintenant.getMonth() + 1).padStart(2, "0") + "-" + String(maintenant.getDate()).padStart(2, "0");
@@ -440,7 +442,7 @@
       afficherVue();
     }).catch(function (erreur) {
       $("chargement").textContent = erreur.status === 404
-        ? "Cette adresse ne correspond à aucune organisation."
+        ? t("erreur.org_inconnue")
         : erreur.message;
     });
   }

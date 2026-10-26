@@ -20,11 +20,27 @@
       <span class="haut__org" id="haut-org"></span>
     </div>
     <nav class="onglets" id="onglets" aria-label="Navigation">
+      <a href="#bord" data-vue="bord" id="onglet-bord" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Tableau de bord</span></a>
       <a href="#objets" data-vue="objets"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8zM3 8l9 5 9-5M12 13v8"/></svg><span>Objets</span></a>
       <a href="#nouveau" data-vue="nouveau" id="onglet-nouveau"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 8v8M8 12h8"/></svg><span>Enregistrer</span></a>
       <a href="#pertes" data-vue="pertes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6l1 2h3a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h3l1-2zM9 12h6M9 16h4"/></svg><span>Déclarations</span></a>
+      <a href="#historique" data-vue="historique" id="onglet-historique" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/></svg><span>Historique</span></a>
     </nav>
-    <a class="haut__compte" href="#compte" id="haut-compte" aria-label="Mon compte"></a>
+    <div class="haut__outils">
+      <p class="haut__titre" id="haut-titre" aria-hidden="true"></p>
+      <div class="cloche">
+        <button type="button" class="cloche__bouton" id="cloche" aria-haspopup="true" aria-expanded="false" aria-controls="cloche-panneau" aria-label="Alertes">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8zM10.3 20a2 2 0 0 0 3.4 0"/></svg>
+          <span class="cloche__badge" id="cloche-badge" hidden></span>
+        </button>
+        <div class="cloche__panneau" id="cloche-panneau" role="region" aria-label="Alertes" hidden>
+          <p class="cloche__titre">Alertes</p>
+          <ul class="cloche__liste" id="cloche-liste"></ul>
+          <p class="cloche__vide" id="cloche-vide">Rien à signaler pour le moment.</p>
+        </div>
+      </div>
+      <a class="haut__compte" href="#compte" id="haut-compte" aria-label="Mon compte"></a>
+    </div>
   </header>
 
   <main id="app" hidden>
@@ -80,7 +96,7 @@
               <img id="apercu-img" alt="Aperçu de la photo">
               <div class="apercu__actions">
                 <label for="photo" class="bouton bouton--discret">Changer</label>
-                <button type="button" class="bouton bouton--discret" id="photo-retirer">Retirer</button>
+                <button type="button" class="bouton bouton--danger-doux" id="photo-retirer"><svg class="bouton__icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Retirer</button>
               </div>
             </div>
           </div>
@@ -148,12 +164,17 @@
       <p class="chapeau">Déclarations de perte d'un objet semblable (même catégorie, dates compatibles).</p>
       <div class="liste liste--simple" id="fiche-attente"></div>
 
+      <div id="bloc-frise" hidden>
+        <h3 class="sous-titre">Parcours de l'objet</h3>
+        <ol class="frise" id="fiche-frise"></ol>
+      </div>
+
       <h3 class="sous-titre">Étiquette</h3>
       <div class="etiquette" id="etiquette">
         <img id="etiquette-img" alt="Code QR de l'objet" width="160" height="160" hidden>
         <p class="etiquette__code" id="etiquette-code"></p>
       </div>
-      <div class="actions-bas"><button type="button" class="bouton bouton--discret bouton--plein" id="imprimer">Imprimer l'étiquette</button></div>
+      <div class="actions-bas"><button type="button" class="bouton bouton--doux bouton--plein" id="imprimer"><svg class="bouton__icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z"/></svg>Imprimer l'étiquette</button></div>
     </section>
 
     <!-- RESTITUTION -->
@@ -218,6 +239,73 @@
       </div>
     </section>
 
+    <!-- TABLEAU DE BORD (administrateurs) -->
+    <section class="vue contenu contenu--large" id="vue-bord" aria-labelledby="bord-titre" hidden>
+      <h2 id="bord-titre" tabindex="-1">Tableau de bord</h2>
+      <p class="salut" id="bord-horloge"></p>
+      <p class="chapeau" id="bord-chapeau">Les chiffres de votre organisation, mis à jour à chaque ouverture de la page.</p>
+      <div class="filtres" id="bord-choix" hidden>
+        <label for="bord-org">Organisation affichée</label>
+        <select id="bord-org"></select>
+      </div>
+      <div id="bord-etat" class="etat" role="status"></div>
+      <div id="bord-contenu" hidden>
+        <div class="kpis" id="kpis"></div>
+        <div class="bord-rangee">
+        <div class="bloc-graphe">
+          <h3 class="sous-titre">Les 30 derniers jours</h3>
+          <div class="legende"><span class="legende__a">Objets trouvés</span><span class="legende__b">Objets remis</span></div>
+          <div id="graph-jours"></div>
+          <p class="chapeau" id="graph-jours-texte"></p>
+        </div>
+        <div class="bloc-graphe">
+          <h3 class="sous-titre">Catégories les plus nombreuses</h3>
+          <p class="chapeau">Objets en attente.</p>
+          <div id="graph-categories"></div>
+        </div>
+        </div>
+        <div class="bloc-graphe" id="bloc-comparaison" hidden>
+          <h3 class="sous-titre">Comparaison des organisations</h3>
+          <div class="tableau-defile"><table class="tableau" id="tab-comparaison"></table></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTORIQUE (administrateurs) -->
+    <section class="vue contenu contenu--large" id="vue-historique" aria-labelledby="historique-titre" hidden>
+      <h2 id="historique-titre" tabindex="-1">Historique</h2>
+      <p class="chapeau">Qui a remis quoi, à qui et quand. Ces informations sont réservées aux administrateurs.</p>
+      <div class="segments" role="group" aria-label="Type d'historique">
+        <button type="button" id="seg-journal" aria-pressed="true">Journal des remises</button>
+        <button type="button" id="seg-personne" aria-pressed="false">Une personne</button>
+      </div>
+
+      <div id="panneau-journal">
+        <form class="filtres filtres--grille" id="form-journal" novalidate>
+          <div><label for="jr-du">Du</label><input type="date" id="jr-du"></div>
+          <div><label for="jr-au">Au</label><input type="date" id="jr-au"></div>
+          <div><label for="jr-agent">Agent</label><select id="jr-agent"><option value="">Tous les agents</option></select></div>
+          <div><label for="jr-q">Recherche</label><input type="search" id="jr-q" placeholder="Objet, nom ou téléphone" maxlength="100" autocomplete="off"></div>
+          <div class="filtres__actions">
+            <button type="submit" class="bouton bouton--accent"><svg class="bouton__icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>Filtrer</button>
+            <button type="button" class="bouton bouton--doux" id="jr-export"><svg class="bouton__icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg>Exporter (Excel)</button>
+          </div>
+        </form>
+        <div id="journal-etat" class="etat" role="status"></div>
+        <div class="liste liste--simple" id="journal-liste"></div>
+      </div>
+
+      <div id="panneau-personne" hidden>
+        <form class="filtres filtres--ligne" id="form-personne" novalidate>
+          <div><label for="pe-tel">Numéro de téléphone</label><input type="tel" id="pe-tel" placeholder="Ex. : 90 12 34 56" autocomplete="off"></div>
+          <div class="filtres__actions"><button type="submit" class="bouton bouton--accent"><svg class="bouton__icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-5-5"/></svg>Rechercher</button></div>
+        </form>
+        <p class="champ__erreur" id="pe-erreur" role="alert" hidden></p>
+        <div id="personne-etat" class="etat" role="status"></div>
+        <div id="personne-contenu"></div>
+      </div>
+    </section>
+
     <!-- DÉCLARATIONS DE PERTE -->
     <section class="vue contenu contenu--large" id="vue-pertes" aria-labelledby="pertes-titre" hidden>
       <h2 id="pertes-titre" tabindex="-1">Déclarations de perte</h2>
@@ -247,7 +335,7 @@
         <button class="bouton bouton--accent bouton--plein" type="submit" id="mdp-envoyer">Changer le mot de passe</button>
       </form>
 
-      <div class="actions-bas"><button type="button" class="bouton bouton--discret bouton--plein" id="deconnexion">Se déconnecter</button></div>
+      <div class="actions-bas"><button type="button" class="bouton bouton--danger-doux bouton--plein" id="deconnexion"><svg class="bouton__icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4M16 8l4 4-4 4M20 12H9"/></svg>Se déconnecter</button></div>
     </section>
   </main>
 
@@ -257,7 +345,7 @@
       <p class="chapeau">Il disparaîtra des listes, sans être supprimé : la trace de son enregistrement est conservée.</p>
       <div class="actions-bas">
         <button type="button" class="bouton bouton--accent bouton--plein" id="confirmer-oui">Archiver</button>
-        <button type="button" class="bouton bouton--discret bouton--plein" id="confirmer-non">Annuler</button>
+        <button type="button" class="bouton bouton--doux bouton--plein" id="confirmer-non">Annuler</button>
       </div>
     </div>
   </dialog>

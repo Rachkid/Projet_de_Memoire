@@ -39,6 +39,18 @@ class Settings(BaseSettings):
     # navigateur est reprise telle quelle (suffisant en essai local ; à renseigner une fois en ligne).
     adresse_publique: str = ""
 
+    # Envoi de courriels (étape 15). Si smtp_host est vide, AUCUN courriel n'est envoyé : le message
+    # est seulement écrit dans les journaux. En essai local, docker-compose démarre MailHog (smtp_host=mailhog,
+    # port 1025) : les courriels y sont captés et lisibles sur http://localhost:8025, sans rien envoyer
+    # dehors. En production : renseigner le serveur SMTP du client (voir .env.example).
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_utilisateur: str = ""
+    smtp_mot_de_passe: str = ""
+    smtp_starttls: bool = False  # chiffrement STARTTLS (en général port 587)
+    smtp_ssl: bool = False  # chiffrement SSL direct (en général port 465)
+    courriel_expediteur: str = "Retrova <ne-pas-repondre@retrova.local>"
+
     # Indique à Pydantic de lire les valeurs manquantes depuis le fichier .env
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

@@ -4,8 +4,9 @@
   dans l'adresse (/iat/affichage), reprend ses couleurs, puis affiche en boucle les objets trouvés.
 
   Ce qu'elle fait toute seule :
-  - recharge la liste toutes les minutes (un objet rendu disparaît, un objet nouveau apparaît) ;
-  - fait défiler les objets par groupes de 6 quand il y en a davantage ;
+  - recharge la liste toutes les 30 secondes (un objet rendu disparaît, un objet nouveau apparaît) ;
+  - met en valeur un objet à la fois (zoom pendant 5 secondes), puis le suivant : une page de 6 objets dure donc
+    30 secondes, après quoi l'on passe aux 6 suivants s'il y en a davantage ;
   - continue d'afficher les derniers objets reçus si la connexion est coupée (un petit point rouge l'indique) ;
   - se recharge entièrement toutes les 6 heures, pour reprendre un changement de couleurs ou de logo.
 
@@ -18,8 +19,8 @@
 
   const slug = (location.pathname.split("/").filter(Boolean)[0] || "").toLowerCase();
   const PAR_PAGE = 6;
-  const DUREE_PAGE_MS = 15000;
-  const RAFRAICHIR_MS = 60000;
+  const DUREE_ZOOM_MS = 5000;   // un objet mis en valeur pendant 5 secondes
+  const RAFRAICHIR_MS = 30000;
   const RECHARGER_PAGE_MS = 6 * 60 * 60 * 1000;
 
   let org = null;
@@ -27,9 +28,28 @@
   let signature = "";
   let consultationOuverte = true;
   let page = 0;
+  let zoom = 0;          // position (dans la page) de l'objet mis en valeur
   let minuteur = null;
 
   const $ = (id) => document.getElementById(id);
+
+  /* Langues (étape 15 ter). Par défaut : français seul, comme avant. Pour alterner plusieurs langues sur
+     l'écran du hall, ajouter à l'adresse « ?langues=fr,en,ha,dje,ar » : la langue change quand tous les objets
+     (toutes les pages) ont défilé dans la langue en cours.
+     Le choix n'est jamais mémorisé : un écran de hall doit toujours redémarrer dans la même configuration. */
+  const I18N = window.Retrova.i18n;
+  const t = I18N.t;
+  const LANGUE_MS = 30000;   // sans défilement (0 ou 1 objet, ou page d'invitation) : changement toutes les 30 secondes
+  const CODES = I18N.langues.map(function (l) { return l.code; });
+  let langues = ["fr"];
+  try {
+    const demandees = (new URLSearchParams(location.search).get("langues") || "").toLowerCase().split(",")
+      .map(function (c) { return c.trim(); }).filter(function (c, i, a) { return CODES.indexOf(c) !== -1 && a.indexOf(c) === i; });
+    if (demandees.length) langues = demandees;
+  } catch (e) { /* adresse illisible : français seul */ }
+  I18N.demarrer(langues[0]);
+  let rang = 0;                 // position de la langue en cours dans la liste
+  let langueEnAttente = null;   // prochaine langue, appliquée pendant le fondu
 
   function el(tag, classe, texte) {
     const n = document.createElement(tag);
@@ -66,6 +86,25 @@
     "montre": "M10 2.5h4l1 4M14 21.5h-4l-1-4M10 6.5h4a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3v-5a3 3 0 0 1 3-3zM12 10v2.2l1.5 1",
     "bijou": "M6 3h12l4 6-10 12L2 9l4-6zM2 9h20M9 3L7 9l5 12 5-12-2-6",
     "livre ou cahier": "M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5zM4 19a2 2 0 0 0 2 2h13M8 7h7",
+    "tapis de priere": "M6 3h12v18H6zM9 21V10a3 3 0 0 1 6 0v11",
+    "casquette": "M5 15a7 7 0 0 1 14 0zM19 15h3M12 8V6",
+    "bonnet": "M5 16a7 7 0 0 1 14 0zM4 16h16v3H4zM12 9V6",
+    "chapelet": cercle(12, 5, 2) + cercle(6.5, 10, 2) + cercle(17.5, 10, 2) + cercle(8, 17, 2) + cercle(16, 17, 2),
+    "gourde": "M10 2h4v3h-4zM8 5h8l1 4v11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9zM7 11h10",
+    "sachet": "M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0",
+    "tenue scolaire": "M9 3L3 6l2.2 4.2L8 9v12h8V9l2.8 1.2L21 6l-6-3a3 3 0 0 1-6 0zM12 12v5",
+    "carte d'etudiant": "M4.5 5h15A2.5 2.5 0 0 1 22 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 16.5v-9A2.5 2.5 0 0 1 4.5 5zM15 10h4M15 14h4M5.5 16.5c.5-2 5.5-2 6 0" + cercle(8.5, 10.5, 1.8),
+    "carte d'identite": "M4.5 5h15A2.5 2.5 0 0 1 22 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 16.5v-9A2.5 2.5 0 0 1 4.5 5zM15 10h4M15 14h4M5.5 16.5c.5-2 5.5-2 6 0" + cercle(8.5, 10.5, 1.8),
+    "passeport": "M6 2h12a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM9 17h6" + cercle(12, 10, 3),
+    "cle usb": "M9 2h6v6H9zM10 8v3M14 8v3M7 11h10v9a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z",
+    "disque dur": "M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM7 14h.01M11 14h6",
+    "chargeur": "M9 2v5M15 2v5M6 7h12v4a6 6 0 0 1-12 0zM12 17v5",
+    "argent": "M2 6h20v12H2zM5.5 12h.01M18.5 12h.01" + cercle(12, 12, 3),
+    "pochette": "M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 11h18M10 11v2h4v-2",
+    "bracelet": cercle(12, 12, 8) + cercle(12, 12, 5),
+    "enveloppe": "M3 6h18v12H3zM3 7l9 7 9-7",
+    "thermos": "M8 2h8v3H8zM7 5h10v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1zM7 10h10",
+    "billet de voyage": "M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4zM14 7v10",
     "autre": "M21 8l-9-5-9 5v8l9 5 9-5V8zM3 8l9 5 9-5M12 13v8"
   };
 
@@ -84,29 +123,26 @@
   /* ---------- Textes selon le secteur ---------- */
 
   function textes() {
-    if (org.secteur === "transport") {
-      return {
-        sous: "Objets trouvés dans nos véhicules et nos gares",
-        aide: "Scannez le code pour le déclarer depuis votre téléphone. Pour récupérer un objet, présentez-vous à l'agence avec une pièce d'identité.",
-        videTitre: "Aucun objet à réclamer pour le moment",
-        videTexte: "Un objet oublié pendant un voyage ? Déclarez-le : nous vous préviendrons dès qu'il sera retrouvé.",
-        fermeTitre: "Un objet oublié pendant votre voyage ?",
-        fermeTexte: "Déclarez-le avec le code ci-dessous, ou adressez-vous à l'agence : nous le comparerons aux objets retrouvés.",
-        dans: { vehicule: "Trouvé dans un véhicule", locaux: "Trouvé en gare ou en agence" }
-      };
-    }
     return {
-      sous: "Objets trouvés dans l'établissement",
-      aide: "Scannez le code pour le déclarer depuis votre téléphone. Pour récupérer un objet, présentez-vous à l'accueil avec une pièce d'identité.",
-      videTitre: "Aucun objet à réclamer pour le moment",
-      videTexte: "Vous avez perdu quelque chose ? Déclarez-le : nous vous préviendrons dès qu'il sera retrouvé.",
-      fermeTitre: "Un objet perdu dans l'établissement ?",
-      fermeTexte: "Déclarez-le avec le code ci-dessous, ou adressez-vous à l'accueil : nous le comparerons aux objets retrouvés.",
-      dans: { vehicule: "Trouvé dans un véhicule", locaux: "Trouvé dans l'établissement" }
+      sous: t("hall.sous"),
+      aide: t("hall.aide"),
+      videTitre: t("hall.vide_titre"),
+      videTexte: t("hall.vide_texte"),
+      fermeTitre: t("hall.ferme_titre"),
+      fermeTexte: t("hall.ferme_texte")
     };
   }
 
   /* ---------- Habillage ---------- */
+
+  /* Les textes qui dépendent de la langue et de l'organisation (relancé à chaque changement de langue). */
+  function textesFixes() {
+    document.title = t("hall.titre_page", { org: org.nom });
+    $("sous-titre").textContent = textes().sous;
+    $("pied-aide").textContent = textes().aide;
+    const img = $("logo").querySelector("img");
+    if (img) img.alt = t("hall.logo_alt", { org: org.nom });
+  }
 
   function appliquerTheme() {
     const t = org.theme, racine = document.documentElement.style;
@@ -120,15 +156,11 @@
     racine.setProperty("--t-fond", t.texte_sur_fond);
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute("content", t.sombre);
-    document.title = org.nom + " — Objets trouvés";
-
     $("nom-org").textContent = org.nom;
-    $("sous-titre").textContent = textes().sous;
-    $("pied-aide").textContent = textes().aide;
+    textesFixes();
 
     if (estImage(org.logo_url)) {
       const img = el("img");
-      img.alt = "Logo de " + org.nom;
       img.src = org.logo_url;
       vider($("logo")).appendChild(img);
       $("logo").hidden = false;
@@ -142,12 +174,10 @@
 
   /* ---------- Horloge ---------- */
 
-  const formatHeure = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" });
-  const formatJour = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" });
   function majHorloge() {
     const maintenant = new Date();
-    $("heure").textContent = formatHeure.format(maintenant);
-    const jour = formatJour.format(maintenant);
+    $("heure").textContent = I18N.formaterHeureSecondes(maintenant);
+    const jour = I18N.formaterJourComplet(maintenant);
     $("jour").textContent = jour.charAt(0).toUpperCase() + jour.slice(1);
   }
 
@@ -156,35 +186,48 @@
   function quand(iso) {
     const d = new Date(iso), auj = new Date();
     const ecart = Math.round((new Date(auj.getFullYear(), auj.getMonth(), auj.getDate()) - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 86400000);
-    if (ecart <= 0) return "Trouvé aujourd'hui";
-    if (ecart === 1) return "Trouvé hier";
-    if (ecart < 7) return "Trouvé il y a " + ecart + " jours";
-    return "Trouvé le " + new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long" }).format(d);
+    if (ecart <= 0) return t("trouve.auj");
+    if (ecart === 1) return t("trouve.hier");
+    if (ecart < 7) return t("trouve.jours", { n: ecart });
+    return t("trouve.le", { date: I18N.formaterJour(d) });
   }
 
   function carte(objet) {
     const c = el("article", "carte");
     const photo = el("div", "carte__photo");
     if (estImage(objet.photo_url)) {
+      photo.classList.add("cadre-photo");
+      photo.style.setProperty("--photo", 'url("' + String(objet.photo_url).replace(/["'()\\\s]/g, function (c) { return "%" + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, "0"); }) + '")');
       const img = el("img");
       img.alt = "";
       img.src = objet.photo_url;
-      img.addEventListener("error", function () { img.remove(); photo.appendChild(icone(objet.categorie)); });
+      img.addEventListener("error", function () { img.remove(); photo.classList.remove("cadre-photo"); photo.appendChild(icone(objet.categorie)); });
       photo.appendChild(img);
     } else {
       photo.appendChild(icone(objet.categorie));
     }
     c.appendChild(photo);
     const texte = el("div", "carte__texte");
-    texte.appendChild(el("p", "carte__categorie", objet.categorie));
+    texte.appendChild(el("p", "carte__categorie", I18N.categorie(objet.categorie)));
     texte.appendChild(el("p", "carte__quand", quand(objet.date_heure_decouverte)));
-    const lieu = textes().dans[objet.type_emplacement];
-    if (lieu) texte.appendChild(el("p", "carte__lieu", lieu));
+    if (objet.type_emplacement === "vehicule" || objet.type_emplacement === "locaux") {
+      texte.appendChild(el("p", "carte__lieu", t("emplacement." + objet.type_emplacement)));
+    }
     c.appendChild(texte);
     return c;
   }
 
   function nombrePages() { return Math.max(1, Math.ceil(objets.length / PAR_PAGE)); }
+
+  /* Met en valeur l'objet « zoom » et atténue légèrement les autres. Avec un seul objet, rien à faire. */
+  function appliquerZoom() {
+    const cartes = $("grille").children;
+    for (let i = 0; i < cartes.length; i++) {
+      const actif = cartes.length > 1 && i === zoom;
+      cartes[i].classList.toggle("carte--zoom", actif);
+      cartes[i].classList.toggle("carte--attenuee", cartes.length > 1 && !actif);
+    }
+  }
 
   function dessinerPastilles() {
     const zone = vider($("pastilles"));
@@ -210,6 +253,8 @@
     vider(grille);
     grille.setAttribute("data-n", String(visibles.length));
     visibles.forEach(function (o) { grille.appendChild(carte(o)); });
+    if (zoom >= visibles.length) zoom = 0;
+    appliquerZoom();
     dessinerPastilles();
   }
 
@@ -218,18 +263,36 @@
     const grille = $("grille");
     if (!avecFondu) { remplirScene(); return; }
     grille.classList.add("sort");
-    setTimeout(function () { remplirScene(); grille.classList.remove("sort"); }, 560);
+    setTimeout(function () {
+      if (langueEnAttente) { const code = langueEnAttente; langueEnAttente = null; I18N.choisir(code, false); } // redessine via l'événement
+      else remplirScene();
+      grille.classList.remove("sort");
+    }, 560);
+  }
+
+  /* Toutes les 5 secondes : objet suivant. Quand on a fait le tour de la page, on passe à la page suivante
+     (s'il y en a une) : 6 objets x 5 secondes = 30 secondes par page. */
+  function avancer() {
+    const surLaPage = Math.min(PAR_PAGE, objets.length - page * PAR_PAGE);
+    zoom += 1;
+    if (zoom >= surLaPage) {
+      zoom = 0;
+      const dernierePage = page >= nombrePages() - 1;
+      if (nombrePages() > 1) page = (page + 1) % nombrePages();
+      // Tous les objets ont défilé : on passe à la langue suivante.
+      if (dernierePage && langues.length > 1) { rang = (rang + 1) % langues.length; langueEnAttente = langues[rang]; }
+      if (nombrePages() > 1 || langueEnAttente) {
+        afficherPage(true);
+        return;
+      }
+    }
+    appliquerZoom();
   }
 
   function planifier() {
     clearInterval(minuteur);
     minuteur = null;
-    if (nombrePages() > 1 && consultationOuverte) {
-      minuteur = setInterval(function () {
-        page = (page + 1) % nombrePages();
-        afficherPage(true);
-      }, DUREE_PAGE_MS);
-    }
+    if (consultationOuverte && objets.length > 1) minuteur = setInterval(avancer, DUREE_ZOOM_MS);
   }
 
   async function rafraichir() {
@@ -242,6 +305,7 @@
         signature = nouvelle;
         objets = recus;
         if (page >= nombrePages()) page = 0;
+        zoom = 0;
         afficherPage(!!$("ecran").dataset.pret);
         planifier();
       }
@@ -288,21 +352,39 @@
     try {
       org = await lireJson("/organisations/par-slug/" + encodeURIComponent(slug));
     } catch (e) {
-      $("chargement").textContent = e.status === 404 ? "Cette adresse ne correspond à aucune organisation." : "Connexion impossible. Nouvelle tentative dans un instant…";
+      $("chargement").textContent = e.status === 404 ? t("erreur.org_inconnue") : t("erreur.reseau");
       if (e.status !== 404) setTimeout(demarrer, 10000);
       return;
     }
+    I18N.definirContexte({ secteur: org.secteur === "transport" ? "transport" : "education" });
     appliquerTheme();
     $("chargement").hidden = true;
     $("ecran").hidden = false;
     majHorloge();
-    setInterval(majHorloge, 20000);
+    setInterval(majHorloge, 1000);
     await rafraichir();
     setInterval(rafraichir, RAFRAICHIR_MS);
     setTimeout(function () { $("indice").classList.add("cache"); }, 12000);
     setTimeout(function () { location.reload(); }, RECHARGER_PAGE_MS);
     garderEcranAllume();
+
+    // Alternance des langues, au rythme du défilement (seulement si plusieurs ont été demandées dans l'adresse).
+    if (langues.length > 1) {
+      setInterval(function () {
+        if (objets.length > 1 && consultationOuverte) return; // le défilement décide lui-même
+        rang = (rang + 1) % langues.length;
+        langueEnAttente = langues[rang];
+        afficherPage(true);
+      }, LANGUE_MS);
+    }
   }
+
+  document.addEventListener("retrova:langue", function () {
+    if (!org) return;
+    textesFixes();
+    majHorloge();
+    remplirScene();
+  });
 
   demarrer();
 })();

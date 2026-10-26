@@ -35,6 +35,7 @@
   let photoObjetUrl = null;    // URL déjà envoyée au serveur (évite de renvoyer la photo si on réessaie)
   let objetCourant = null;     // objet affiché dans la fiche ou la restitution
   let candidats = [];
+  let lignesJournal = [];      // dernier journal des remises affiché (pour l'export)
 
   const $ = (id) => document.getElementById(id);
 
@@ -188,6 +189,10 @@
   }
 
   /* Vignette d'une photo ; sans photo (ou photo introuvable), l'icône de la catégorie prend sa place. */
+  /* Adresse de photo à placer dans une variable CSS (l'adresse vient de notre serveur ; on neutralise quand même
+     les caractères qui pourraient sortir de url("…")). */
+  function urlCss(url) { return 'url("' + String(url).replace(/["'()\\\s]/g, function (c) { return "%" + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, "0"); }) + '")'; }
+
   function vignette(url, classeImage, categorie) {
     const cle = cleIcone(categorie);
     function remplacant() {
@@ -196,12 +201,15 @@
       return v;
     }
     if (estImage(url)) {
-      const img = el("img", classeImage);
+      const cadre = el("div", "cadre-photo" + (classeImage ? " " + classeImage : ""));
+      cadre.style.setProperty("--photo", urlCss(url));
+      const img = el("img");
       img.alt = "";
       img.loading = "lazy";
       img.src = url;
-      img.addEventListener("error", function () { if (img.parentNode) img.parentNode.replaceChild(remplacant(), img); });
-      return img;
+      img.addEventListener("error", function () { if (cadre.parentNode) cadre.parentNode.replaceChild(remplacant(), cadre); });
+      cadre.appendChild(img);
+      return cadre;
     }
     return remplacant();
   }
@@ -210,11 +218,13 @@
     const zone = el("div", "objet-carte__photo");
     const cle = cleIcone(categorie);
     if (estImage(url)) {
+      zone.classList.add("cadre-photo");
+      zone.style.setProperty("--photo", urlCss(url));
       const img = el("img");
       img.alt = "";
       img.loading = "lazy";
       img.src = url;
-      img.addEventListener("error", function () { img.remove(); zone.appendChild(icone(cle)); });
+      img.addEventListener("error", function () { img.remove(); zone.classList.remove("cadre-photo"); zone.appendChild(icone(cle)); });
       zone.appendChild(img);
     } else {
       zone.appendChild(icone(cle));
@@ -335,7 +345,7 @@
 
   /* ---------- Affichage des vues ---------- */
 
-  const VUES = ["connexion", "objets", "nouveau", "enregistre", "fiche", "restituer", "remis", "pertes", "compte"];
+  const VUES = ["connexion", "objets", "nouveau", "enregistre", "fiche", "restituer", "remis", "pertes", "bord", "historique", "compte"];
 
   function afficherVue(nom, titreId) {
     VUES.forEach(function (v) { $("vue-" + v).hidden = (v !== nom); });
@@ -343,14 +353,18 @@
     $("haut").hidden = !connecte;
     $("onglets").hidden = !connecte;
     document.body.classList.toggle("hors-session", !connecte);
-    const cible = { objets: "objets", nouveau: "nouveau", enregistre: "nouveau", fiche: "objets", restituer: "objets", remis: "objets", pertes: "pertes" }[nom];
+    const cible = { objets: "objets", nouveau: "nouveau", enregistre: "nouveau", fiche: "objets", restituer: "objets", remis: "objets", pertes: "pertes", bord: "bord", historique: "historique" }[nom];
     document.querySelectorAll("#onglets a").forEach(function (a) {
       if (a.getAttribute("data-vue") === cible) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
+    $("haut-titre").textContent = { objets: "Objets trouvés", nouveau: "Enregistrer un objet", pertes: "Déclarations", bord: "Tableau de bord", historique: "Historique", compte: "Mon compte" }[cible || (nom === "compte" ? "compte" : "")] || "";
     window.scrollTo(0, 0);
     const titre = $(titreId);
     if (titre) titre.focus({ preventScroll: true });
   }
+
+  /* Première page après la connexion : le tableau de bord pour un administrateur, la liste des objets sinon. */
+  function pageAccueil() { return estAdmin() ? "#bord" : "#objets"; }
 
   function aller(hash) {
     if (location.hash === hash) router(); else location.hash = hash;
@@ -364,7 +378,7 @@
 
     if (!moi) { montrerConnexion(); return; }
 
-    if (page === "" || page === "connexion") { aller("#objets"); return; }
+    if (page === "" || page === "connexion") { aller(pageAccueil()); return; }
     if (page === "objets") return pageObjets();
     if (page === "nouveau") return pageNouveau();
     if (page === "enregistre") return dernierObjet ? pageEnregistre() : aller("#objets");
@@ -372,6 +386,8 @@
     if (page === "restituer" && morceaux[1]) return pageRestituer(morceaux[1]);
     if (page === "remis") return derniereRemise ? pageRemis() : aller("#objets");
     if (page === "pertes") return pagePertes();
+    if (page === "bord") return estAdmin() ? pageBord() : aller("#objets");
+    if (page === "historique") return estAdmin() ? pageHistorique(morceaux[1], morceaux[2]) : aller("#objets");
     if (page === "compte") return pageCompte();
     aller("#objets");
   }
@@ -385,9 +401,10 @@
   }
 
   function deconnecter(message) {
+    arreterAlertes();
     jeton = null; moi = null;
     ecrireJeton(null);
-    dernierObjet = null; derniereRemise = null; objetsCharges = []; objetCourant = null;
+    dernierObjet = null; derniereRemise = null; objetsCharges = []; objetCourant = null; lignesJournal = [];
     montrerConnexion(message);
     if (location.hash !== "#connexion") history.replaceState(null, "", "#connexion");
   }
@@ -406,6 +423,9 @@
     compte.appendChild(el("span", "avatar", initiales));
     compte.appendChild(el("span", "haut__nom", moi.nom));
     $("onglet-nouveau").hidden = !aDroit("droit_enregistrement");
+    $("onglet-bord").hidden = !estAdmin();
+    $("onglet-historique").hidden = !estAdmin();
+    demarrerAlertes();
   }
 
   $("form-connexion").addEventListener("submit", async function (e) {
@@ -421,7 +441,7 @@
       const r = await api("POST", "/auth/login", corps, { sansDeconnexion: true });
       await ouvrirSession(r.access_token);
       $("mot-de-passe").value = "";
-      if (location.hash === "#connexion" || !location.hash) aller("#objets"); else router();
+      if (location.hash === "#connexion" || !location.hash) aller(pageAccueil()); else router();
     } catch (err) {
       montrerErreur("connexion-erreur", err.message);
     } finally {
@@ -446,10 +466,27 @@
     });
   }
 
+  /* Date complète et heure avec secondes, mises à jour chaque seconde (tableau de bord et liste des objets). */
+  let salutPrenom = "";
+  const formatDateComplete = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const formatHeureSecondes = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  function dateEtHeure() {
+    const maintenant = new Date();
+    const jour = formatDateComplete.format(maintenant);
+    return jour.charAt(0).toUpperCase() + jour.slice(1) + " · " + formatHeureSecondes.format(maintenant);
+  }
+  function majHorloges() {
+    const salut = $("salut"), bord = $("bord-horloge");
+    if (salut && !salut.closest("[hidden]")) salut.textContent = "Bonjour" + (salutPrenom ? ", " + salutPrenom : "") + " · " + dateEtHeure();
+    if (bord && !bord.closest("[hidden]")) bord.textContent = dateEtHeure();
+  }
+  setInterval(majHorloges, 1000);
+
   async function pageObjets() {
     afficherVue("objets", "objets-titre");
     const prenom = (moi.nom || "").split(" ")[0];
-    $("salut").textContent = "Bonjour" + (prenom ? ", " + prenom : "") + " · " + new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(new Date());
+    salutPrenom = prenom;
+    majHorloges();
     construireFiltres();
     await chargerObjets();
   }
@@ -509,7 +546,7 @@
   async function chargerCategories() {
     if (categories) return categories;
     try {
-      const r = await api("GET", "/portail/categories", undefined, { sansDeconnexion: true });
+      const r = await api("GET", "/portail/" + encodeURIComponent(slug) + "/categories", undefined, { sansDeconnexion: true });
       categories = Array.isArray(r) && r.length ? r : CATEGORIES_SECOURS;
     } catch (e) {
       categories = CATEGORIES_SECOURS;
@@ -679,19 +716,48 @@
 
     const actions = $("fiche-actions");
     if (objet.statut === "en_attente" && aDroit("droit_restitution")) {
-      const a = el("a", "bouton bouton--accent bouton--plein", "Remettre à son propriétaire");
+      const a = boutonIcone("a", "bouton bouton--accent bouton--plein", "Remettre à son propriétaire", "M5 12h14M13 6l6 6-6 6");
       a.href = "#restituer/" + objet.id;
       actions.appendChild(a);
     }
     if ((aDroit("droit_enregistrement") || estAdmin()) && objet.statut !== "restitue" && objet.statut !== "archive") {
-      const b = el("button", "bouton bouton--discret bouton--plein", "Archiver cet objet");
+      const b = boutonIcone("button", "bouton bouton--danger-doux bouton--plein", "Archiver cet objet", "M3 4h18v4H3zM5 8v12h14V8M10 12h4");
       b.type = "button";
       b.addEventListener("click", function () { $("confirmer").showModal(); });
       actions.appendChild(b);
     }
 
     chargerAttente(objet);
+    chargerFrise(objet);
     chargerQr(objet);
+  }
+
+  async function chargerFrise(objet) {
+    const bloc = $("bloc-frise");
+    const liste = vider($("fiche-frise"));
+    bloc.hidden = true;
+    if (!estAdmin()) return;
+    let donnees;
+    try { donnees = await api("GET", "/historique/objets/" + encodeURIComponent(objet.id)); } catch (err) { return; }
+    if (!objetCourant || objetCourant.id !== objet.id) return;
+    donnees.etapes.forEach(function (e) {
+      const li = el("li", "frise__etape frise__etape--" + e.type);
+      li.appendChild(el("strong", null, e.titre));
+      li.appendChild(el("span", "frise__date", dateHeure(e.date_heure)));
+      if (e.acteur) li.appendChild(el("span", null, "Par " + e.acteur));
+      if (e.detail) li.appendChild(el("span", null, e.detail));
+      liste.appendChild(li);
+    });
+    if (donnees.statut === "en_attente") {
+      const li = el("li", "frise__etape frise__etape--attente");
+      li.appendChild(el("strong", null, "En attente de son propriétaire"));
+      liste.appendChild(li);
+    } else if (donnees.statut === "archive") {
+      const li = el("li", "frise__etape frise__etape--archive");
+      li.appendChild(el("strong", null, "Archivé"));
+      liste.appendChild(li);
+    }
+    bloc.hidden = false;
   }
 
   async function chargerAttente(objet) {
@@ -919,7 +985,7 @@
     corps.appendChild(zone);
     const actions = el("div", "actions-bas");
     if (trouve) {
-      const voir = el("button", "bouton bouton--discret bouton--plein", "Voir les objets qui correspondent");
+      const voir = boutonIcone("button", "bouton bouton--accent bouton--plein", "Voir les objets qui correspondent", "M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-5-5");
       voir.type = "button";
       voir.addEventListener("click", async function () {
         voir.disabled = true;
@@ -942,7 +1008,7 @@
       });
       actions.appendChild(voir);
     }
-    const clore = el("button", "bouton bouton--discret bouton--plein", "Clôturer cette déclaration");
+    const clore = boutonIcone("button", "bouton bouton--doux bouton--plein", "Clôturer cette déclaration", "M5 12l5 5 9-10");
     clore.type = "button";
     clore.addEventListener("click", async function () {
       clore.disabled = true;
@@ -954,6 +1020,458 @@
     actions.appendChild(clore);
     corps.appendChild(actions);
     return c;
+  }
+
+  /* ---------- Tableau de bord (administrateurs) ---------- */
+
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  function svg(tag, attrs, texte) {
+    const n = document.createElementNS(SVG_NS, tag);
+    Object.keys(attrs || {}).forEach(function (k) { n.setAttribute(k, attrs[k]); });
+    if (texte !== undefined) n.textContent = texte;
+    return n;
+  }
+
+  function formaterNombre(n) { return Number(n).toLocaleString("fr-FR"); }
+
+  function formaterDelai(heures) {
+    if (heures === null || heures === undefined) return "—";
+    if (heures < 1) return "< 1 h";
+    if (heures < 48) return Math.round(heures) + " h";
+    return (Math.round(heures / 2.4) / 10).toLocaleString("fr-FR") + " j";
+  }
+
+  /* Bouton avec une petite icône au trait devant le texte. */
+  function boutonIcone(balise, classe, texte, chemin) {
+    const b = el(balise, classe);
+    const dessin = svg("svg", { viewBox: "0 0 24 24", "aria-hidden": "true", class: "bouton__icone" });
+    dessin.appendChild(svg("path", { d: chemin }));
+    b.appendChild(dessin);
+    b.appendChild(el("span", null, texte));
+    return b;
+  }
+
+  function tuileChiffre(valeur, libelle, aide, vif, decor) {
+    const t = el("div", "kpi" + (vif ? " kpi--vif" : ""));
+    t.appendChild(el("span", "kpi__valeur", valeur));
+    t.appendChild(el("span", "kpi__libelle", libelle));
+    if (aide) t.appendChild(el("span", "kpi__aide", aide));
+    if (decor) t.appendChild(decor);
+    return t;
+  }
+
+  /* Petite courbe sans axes, dans une tuile : la tendance sur 30 jours d'un coup d'œil. */
+  function miniCourbe(valeurs, description) {
+    const L = 100, H = 30, maxi = Math.max(1, ...valeurs);
+    const pts = valeurs.map(function (v, i) { return [valeurs.length > 1 ? (L * i) / (valeurs.length - 1) : 0, H - 2 - (v / maxi) * (H - 6)]; });
+    const ligne = pts.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" ");
+    const racine = svg("svg", { viewBox: "0 0 " + L + " " + H, preserveAspectRatio: "none", class: "kpi__courbe", role: "img", "aria-label": description });
+    racine.appendChild(svg("path", { d: ligne + " L" + L + " " + H + " L0 " + H + " Z", class: "zone" }));
+    racine.appendChild(svg("path", { d: ligne, class: "trait" }));
+    return racine;
+  }
+
+  /* Anneau de pourcentage (taux de remise). */
+  function anneau(pourcent) {
+    const R = 21, C = 2 * Math.PI * R;
+    const racine = svg("svg", { viewBox: "0 0 52 52", class: "kpi__anneau", "aria-hidden": "true" });
+    racine.appendChild(svg("circle", { cx: 26, cy: 26, r: R, class: "piste" }));
+    racine.appendChild(svg("circle", { cx: 26, cy: 26, r: R, class: "plein", "stroke-dasharray": (C * Math.max(0, Math.min(100, pourcent)) / 100).toFixed(1) + " " + C.toFixed(1) }));
+    return racine;
+  }
+
+  function graphiqueJours(serie) {
+    const L = 640, H = 230, gauche = 34, bas = 26, haut = 10, droite = 8;
+    const maxi = Math.max(4, ...serie.map(function (j) { return Math.max(j.trouves, j.restitues); }));
+    const pas = maxi <= 8 ? 2 : Math.ceil(maxi / 4);
+    const sommet = Math.ceil(maxi / pas) * pas;
+    const zoneL = L - gauche - droite, zoneH = H - haut - bas;
+    const x = function (i) { return gauche + (zoneL / serie.length) * (i + 0.5); };
+    const y = function (v) { return haut + zoneH - (v / sommet) * zoneH; };
+    const racine = svg("svg", { viewBox: "0 0 " + L + " " + H, role: "img", "aria-label": "Objets trouvés et objets remis par jour sur 30 jours", class: "graphe" });
+    for (let v = 0; v <= sommet; v += pas) {
+      racine.appendChild(svg("line", { x1: gauche, x2: L - droite, y1: y(v), y2: y(v), class: "graphe__grille" }));
+      racine.appendChild(svg("text", { x: gauche - 6, y: y(v) + 4, "text-anchor": "end", class: "graphe__texte" }, String(v)));
+    }
+    const largeur = Math.max(4, (zoneL / serie.length) * 0.62);
+    serie.forEach(function (j, i) {
+      if (j.trouves > 0) {
+        const b = svg("rect", { x: x(i) - largeur / 2, y: y(j.trouves), width: largeur, height: y(0) - y(j.trouves), rx: 2, class: "graphe__barre" });
+        b.appendChild(svg("title", {}, j.date.split("-").reverse().join("/") + " : " + j.trouves + " trouvé(s)"));
+        racine.appendChild(b);
+      }
+      if (i % 5 === 0 || i === serie.length - 1) {
+        const [, m, d] = j.date.split("-");
+        racine.appendChild(svg("text", { x: x(i), y: H - 7, "text-anchor": "middle", class: "graphe__texte" }, d + "/" + m));
+      }
+    });
+    const points = serie.map(function (j, i) { return x(i) + "," + y(j.restitues); }).join(" ");
+    racine.appendChild(svg("polyline", { points: points, class: "graphe__ligne" }));
+    serie.forEach(function (j, i) {
+      if (j.restitues > 0) {
+        const c = svg("circle", { cx: x(i), cy: y(j.restitues), r: 4.5, class: "graphe__point" });
+        c.appendChild(svg("title", {}, j.date.split("-").reverse().join("/") + " : " + j.restitues + " remis"));
+        racine.appendChild(c);
+      }
+    });
+    return racine;
+  }
+
+  function graphiqueCategories(liste) {
+    const zone = el("div", "barres");
+    if (!liste.length) { zone.appendChild(vide("Aucun objet en attente.", "objets")); return zone; }
+    const maxi = Math.max.apply(null, liste.map(function (c) { return c.nombre; }));
+    liste.forEach(function (c, i) {
+      const ligne = el("div", "barres__ligne");
+      ligne.appendChild(el("span", "barres__rang" + (i < 3 ? " barres__rang--haut" : ""), String(i + 1)));
+      ligne.appendChild(el("span", "barres__nom", c.categorie));
+      const piste = el("span", "barres__piste");
+      const rempli = el("span", "barres__rempli");
+      rempli.style.width = Math.max(4, Math.round(100 * c.nombre / maxi)) + "%";
+      piste.appendChild(rempli);
+      ligne.appendChild(piste);
+      ligne.appendChild(el("span", "barres__nombre", formaterNombre(c.nombre)));
+      zone.appendChild(ligne);
+    });
+    return zone;
+  }
+
+  function tableauComparaison(lignes) {
+    const t = vider($("tab-comparaison"));
+    const tete = el("thead"), tr = el("tr");
+    ["Organisation", "En attente", "Remis ce mois", "Déclarations", "Taux de remise", "Délai moyen", "À traiter"].forEach(function (n, i) {
+      const th = el("th", i ? "num" : null, n); th.scope = "col"; tr.appendChild(th);
+    });
+    tete.appendChild(tr); t.appendChild(tete);
+    const corps = el("tbody");
+    lignes.forEach(function (l) {
+      const ligne = el("tr");
+      const premiere = el("th"); premiere.scope = "row";
+      const lien = el("button", "lien", l.organisation_nom); lien.type = "button";
+      lien.addEventListener("click", function () { $("bord-org").value = l.organisation_id; chargerBord(l.organisation_id); window.scrollTo(0, 0); });
+      premiere.appendChild(lien); ligne.appendChild(premiere);
+      [formaterNombre(l.objets_en_attente), formaterNombre(l.restitues_ce_mois), formaterNombre(l.declarations_en_cours),
+        l.taux_restitution === null ? "—" : l.taux_restitution + " %", formaterDelai(l.delai_moyen_heures), formaterNombre(l.proches_fin_retention)
+      ].forEach(function (v) { ligne.appendChild(el("td", "num", v)); });
+      corps.appendChild(ligne);
+    });
+    t.appendChild(corps);
+  }
+
+  async function pageBord() {
+    afficherVue("bord", "bord-titre");
+    const etat = $("bord-etat");
+    const super_ = moi.role === "super_administrateur";
+    $("bord-choix").hidden = !super_;
+    $("bloc-comparaison").hidden = true;
+    $("bord-contenu").hidden = true;
+    majHorloges();
+    etat.textContent = "Chargement…";
+    if (super_) {
+      try {
+        const orgs = await api("GET", "/organisations/");
+        const choix = vider($("bord-org"));
+        orgs.forEach(function (o) {
+          const opt = el("option", null, o.nom); opt.value = o.id; if (o.id === moi.organisation_id) opt.selected = true;
+          choix.appendChild(opt);
+        });
+      } catch (err) { etat.textContent = err.message; return; }
+    }
+    await chargerBord(super_ ? $("bord-org").value : null);
+    if (super_) {
+      try { tableauComparaison(await api("GET", "/statistiques/comparaison")); $("bloc-comparaison").hidden = false; } catch (err) { /* la comparaison est facultative */ }
+    }
+  }
+
+  $("bord-org").addEventListener("change", function () { chargerBord($("bord-org").value); });
+
+  async function chargerBord(organisationId) {
+    const etat = $("bord-etat");
+    let s;
+    try {
+      s = await api("GET", "/statistiques/" + (organisationId ? "?organisation_id=" + encodeURIComponent(organisationId) : ""));
+    } catch (err) { etat.textContent = err.message; $("bord-contenu").hidden = true; return; }
+    etat.textContent = "";
+    $("bord-contenu").hidden = false;
+    $("bord-chapeau").textContent = s.organisation_nom + " — les chiffres sont recalculés à chaque ouverture de la page.";
+
+    const trouvesJour = s.serie_30_jours.map(function (j) { return j.trouves; });
+    const remisJour = s.serie_30_jours.map(function (j) { return j.restitues; });
+    const somme = function (t) { return t.reduce(function (a, v) { return a + v; }, 0); };
+    const kpis = vider($("kpis"));
+    kpis.appendChild(tuileChiffre(formaterNombre(s.objets_en_attente), "Objets en attente", "À rendre à leur propriétaire", true));
+    kpis.appendChild(tuileChiffre(formaterNombre(somme(trouvesJour)), "Trouvés en 30 jours", "Objets enregistrés", false,
+      miniCourbe(trouvesJour, "Objets trouvés par jour sur 30 jours")));
+    kpis.appendChild(tuileChiffre(formaterNombre(s.restitues_ce_mois), "Remis ce mois-ci", formaterNombre(s.objets_restitues) + " au total", false,
+      miniCourbe(remisJour, "Objets remis par jour sur 30 jours")));
+    kpis.appendChild(tuileChiffre(s.taux_restitution === null ? "—" : s.taux_restitution + " %", "Taux de remise", "Objets remis parmi ceux reçus", false,
+      s.taux_restitution === null ? null : anneau(s.taux_restitution)));
+    kpis.appendChild(tuileChiffre(formaterNombre(s.declarations_en_cours), "Déclarations en cours", "Personnes qui cherchent un objet"));
+    kpis.appendChild(tuileChiffre(formaterDelai(s.delai_moyen_heures), "Délai moyen de remise", "Entre la découverte et la remise"));
+    kpis.appendChild(tuileChiffre(formaterNombre(s.proches_fin_retention), "Bientôt à traiter",
+      "Gardés depuis presque " + s.delai_retention_jours + " jours", s.proches_fin_retention > 0));
+    kpis.appendChild(tuileChiffre(formaterNombre(s.objets_archives), "Objets archivés", "Retirés de la liste (erreur, délai dépassé)"));
+
+    const g = vider($("graph-jours"));
+    g.appendChild(graphiqueJours(s.serie_30_jours));
+    const trouves = s.serie_30_jours.reduce(function (a, j) { return a + j.trouves; }, 0);
+    const remis = s.serie_30_jours.reduce(function (a, j) { return a + j.restitues; }, 0);
+    $("graph-jours-texte").textContent = "Sur 30 jours : " + formaterNombre(trouves) + " objet(s) trouvé(s) et " + formaterNombre(remis) + " remis.";
+    vider($("graph-categories")).appendChild(graphiqueCategories(s.par_categorie));
+  }
+
+  /* ---------- Historique (administrateurs) ---------- */
+
+  function choisirSegment(nom) {
+    const journal = nom !== "personne";
+    $("seg-journal").setAttribute("aria-pressed", String(journal));
+    $("seg-personne").setAttribute("aria-pressed", String(!journal));
+    $("panneau-journal").hidden = !journal;
+    $("panneau-personne").hidden = journal;
+  }
+  $("seg-journal").addEventListener("click", function () { aller("#historique"); });
+  $("seg-personne").addEventListener("click", function () { aller("#historique/personne"); });
+
+  async function pageHistorique(mode, telephone) {
+    afficherVue("historique", "historique-titre");
+    if (mode === "personne") {
+      choisirSegment("personne");
+      $("pe-tel").value = telephone ? afficherTelephone(decodeURIComponent(telephone)) : "";
+      montrerErreur("pe-erreur", "");
+      vider($("personne-contenu")); $("personne-etat").textContent = "";
+      if (telephone) chercherPersonne(decodeURIComponent(telephone));
+      return;
+    }
+    choisirSegment("journal");
+    const choixAgent = $("jr-agent");
+    if (choixAgent.options.length <= 1) {
+      try {
+        (await api("GET", "/historique/agents")).forEach(function (a) { const o = el("option", null, a.nom); o.value = a.id; choixAgent.appendChild(o); });
+      } catch (err) { /* le filtre par agent reste simplement vide */ }
+    }
+    chargerJournal();
+  }
+
+  function carteRemise(l) {
+    const c = el("div", "carte carte--bloc remise");
+    const corps = el("div", "carte__corps");
+    const entete = el("a", "remise__objet", l.categorie);
+    entete.href = "#objet/" + l.objet_id;
+    corps.appendChild(entete);
+    corps.appendChild(el("span", "remise__date", dateHeure(l.date_heure)));
+    const qui = el("span");
+    qui.appendChild(document.createTextNode("Remis à "));
+    if (l.usager_telephone) {
+      const a = el("a", null, (l.usager_nom ? l.usager_nom + " — " : "") + afficherTelephone(l.usager_telephone));
+      a.href = "#historique/personne/" + encodeURIComponent(l.usager_telephone);
+      qui.appendChild(a);
+    } else qui.appendChild(document.createTextNode(l.usager_nom || "personne non renseignée"));
+    corps.appendChild(qui);
+    corps.appendChild(el("span", null, "Par " + l.agent_nom));
+    corps.appendChild(el("span", null, (l.type_piece || "Pièce") + (l.numero_piece_masque ? " n° " + l.numero_piece_masque : "")));
+    c.appendChild(corps);
+    return c;
+  }
+
+  async function chargerJournal() {
+    const etat = $("journal-etat");
+    const liste = vider($("journal-liste"));
+    etat.textContent = "Chargement…";
+    const params = new URLSearchParams();
+    if ($("jr-du").value) params.set("du", $("jr-du").value);
+    if ($("jr-au").value) params.set("au", $("jr-au").value);
+    if ($("jr-agent").value) params.set("agent_id", $("jr-agent").value);
+    if ($("jr-q").value.trim()) params.set("q", $("jr-q").value.trim());
+    let lignes;
+    try { lignes = await api("GET", "/historique/remises" + (params.toString() ? "?" + params.toString() : "")); }
+    catch (err) { etat.textContent = err.message; return; }
+    lignesJournal = lignes;
+    $("jr-export").disabled = !lignes.length;
+    if (!lignes.length) { etat.textContent = ""; liste.appendChild(vide("Aucune remise ne correspond à ces critères.", "documents")); return; }
+    etat.textContent = lignes.length + (lignes.length > 1 ? " remises" : " remise") + (lignes.length >= 500 ? " (les 500 plus récentes)" : "");
+    lignes.forEach(function (l) { liste.appendChild(carteRemise(l)); });
+  }
+
+  $("form-journal").addEventListener("submit", function (e) { e.preventDefault(); chargerJournal(); });
+
+  /* Export tableur : séparateur « ; » et BOM pour qu'Excel (version française) lise bien les accents.
+     Une cellule qui commence par = + - @ serait prise pour une formule : on la neutralise. */
+  function celluleCsv(v) {
+    let t = v === null || v === undefined ? "" : String(v);
+    if (/^[=+\-@\t\r]/.test(t) && !/^[+\-]?\d[\d ]*$/.test(t)) t = "'" + t;   // un numéro (+227 96 12 34 56) reste lisible
+    return '"' + t.replace(/"/g, '""') + '"';
+  }
+
+  $("jr-export").addEventListener("click", function () {
+    if (!lignesJournal.length) return;
+    const entete = ["Date", "Objet", "Remis à", "Téléphone", "Agent", "Pièce", "Numéro de pièce (masqué)"];
+    const lignes = lignesJournal.map(function (l) {
+      return [dateHeure(l.date_heure), l.categorie, l.usager_nom, l.usager_telephone, l.agent_nom, l.type_piece, l.numero_piece_masque].map(celluleCsv).join(";");
+    });
+    const texte = "﻿" + [entete.map(celluleCsv).join(";")].concat(lignes).join("\r\n");
+    const url = URL.createObjectURL(new Blob([texte], { type: "text/csv;charset=utf-8" }));
+    const a = el("a"); a.href = url; a.download = "remises_" + slug + "_" + new Date().toISOString().slice(0, 10) + ".csv";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  });
+
+  $("form-personne").addEventListener("submit", function (e) {
+    e.preventDefault();
+    montrerErreur("pe-erreur", "");
+    const tel = normaliserTelephone($("pe-tel").value);
+    if (!tel) { montrerErreur("pe-erreur", "Entrez un numéro valide, par exemple 90 12 34 56."); return; }
+    aller("#historique/personne/" + encodeURIComponent(tel));
+  });
+
+  async function chercherPersonne(tel) {
+    const etat = $("personne-etat");
+    const zone = vider($("personne-contenu"));
+    etat.textContent = "Recherche…";
+    let r;
+    try { r = await api("GET", "/historique/personnes?telephone=" + encodeURIComponent(tel)); }
+    catch (err) { etat.textContent = err.message; return; }
+    if (!r.trouve || (!r.declarations.length && !r.remises.length)) {
+      etat.textContent = "";
+      zone.appendChild(vide(r.trouve ? "Cette personne n'a aucune activité dans votre organisation." : "Aucune personne enregistrée avec ce numéro.", "documents"));
+      return;
+    }
+    etat.textContent = "";
+    const entete = el("div", "carte carte--bloc");
+    const corps = el("div", "carte__corps");
+    corps.appendChild(el("strong", null, r.personne.nom || "Nom non renseigné"));
+    corps.appendChild(lienTel(r.personne.telephone));
+    entete.appendChild(corps);
+    zone.appendChild(entete);
+
+    zone.appendChild(el("h3", "sous-titre", "Déclarations de perte (" + r.declarations.length + ")"));
+    const dec = el("div", "liste liste--simple");
+    if (!r.declarations.length) dec.appendChild(vide("Aucune déclaration."));
+    r.declarations.forEach(function (d) {
+      const c = el("div", "carte carte--bloc"), k = el("div", "carte__corps");
+      k.appendChild(el("strong", null, d.categorie));
+      k.appendChild(el("span", null, ({ en_attente: "En attente", correspondance_trouvee: "Un objet correspond", cloture: "Clôturée" })[d.statut] || d.statut));
+      if (d.date_perte) k.appendChild(el("span", null, "Perdu le " + formatJour.format(new Date(d.date_perte + "T12:00:00"))));
+      if (d.lieu_approximatif) k.appendChild(el("span", null, d.lieu_approximatif));
+      if (d.description) k.appendChild(el("span", null, d.description));
+      c.appendChild(k); dec.appendChild(c);
+    });
+    zone.appendChild(dec);
+
+    zone.appendChild(el("h3", "sous-titre", "Objets remis à cette personne (" + r.remises.length + ")"));
+    const rem = el("div", "liste liste--simple");
+    if (!r.remises.length) rem.appendChild(vide("Aucun objet remis."));
+    r.remises.forEach(function (l) { rem.appendChild(carteRemise(l)); });
+    zone.appendChild(rem);
+  }
+
+  /* ---------- Cloche d'alertes ---------- */
+
+  const ICONE_ALERTE = {
+    correspondances: "M9 4h6l1 2h3a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h3l1-2zM9 13l2 2 4-4",
+    fin_retention: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2"
+  };
+  let minuteurAlertes = null;
+  let alertesCourantes = [];
+
+  function cleVues() { return "retrova_alertes_vues_" + slug + "_" + (moi ? moi.id : ""); }
+  function lireVues() { try { return JSON.parse(localStorage.getItem(cleVues()) || "{}") || {}; } catch (e) { return {}; } }
+  function ecrireVues(v) { try { localStorage.setItem(cleVues(), JSON.stringify(v)); } catch (e) { /* stockage bloqué : tout sera simplement considéré comme nouveau */ } }
+
+  /* Ce que la personne n'a pas encore vu : pour chaque type d'alerte, la hausse depuis sa dernière lecture. */
+  function nouveautes(alertes, vues) {
+    const resultat = {};
+    alertes.forEach(function (a) { resultat[a.type] = Math.max(a.nombre - (vues[a.type] || 0), 0); });
+    return resultat;
+  }
+
+  function dessinerCloche(nouveau) {
+    const total = alertesCourantes.reduce(function (a, x) { return a + (nouveau[x.type] || 0); }, 0);
+    const badge = $("cloche-badge");
+    badge.hidden = total === 0;
+    badge.textContent = total > 99 ? "99+" : String(total);
+    $("cloche").setAttribute("aria-label", total ? "Alertes : " + total + " nouvelle(s)" : "Alertes");
+  }
+
+  async function chargerAlertes() {
+    if (!moi) return;
+    let r;
+    try { r = await api("GET", "/alertes/"); } catch (err) { return; /* la cloche est un confort : pas d'erreur affichée */ }
+    if (!moi) return;
+    alertesCourantes = r.alertes || [];
+    // Si une alerte a diminué (traitée), on baisse la référence : la prochaine hausse comptera comme nouvelle.
+    const vues = lireVues();
+    let change = false;
+    alertesCourantes.forEach(function (a) { if ((vues[a.type] || 0) > a.nombre) { vues[a.type] = a.nombre; change = true; } });
+    Object.keys(vues).forEach(function (t) { if (!alertesCourantes.some(function (a) { return a.type === t; })) { delete vues[t]; change = true; } });
+    if (change) ecrireVues(vues);
+    dessinerCloche(nouveautes(alertesCourantes, vues));
+    if (!$("cloche-panneau").hidden) remplirPanneau(nouveautes(alertesCourantes, vues));
+  }
+
+  function remplirPanneau(nouveau) {
+    const liste = vider($("cloche-liste"));
+    $("cloche-vide").hidden = alertesCourantes.length > 0;
+    alertesCourantes.forEach(function (a) {
+      const li = el("li");
+      const lien = el("a", "alerte--" + (a.niveau === "attention" ? "attention" : "info"));
+      lien.href = a.lien;
+      const icone = el("span", "cloche__icone");
+      const dessin = svg("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" });
+      dessin.appendChild(svg("path", { d: ICONE_ALERTE[a.type] || ICONE_ALERTE.fin_retention }));
+      icone.appendChild(dessin);
+      lien.appendChild(icone);
+      const texte = el("span", "cloche__texte");
+      texte.appendChild(el("strong", null, a.titre));
+      texte.appendChild(el("span", null, a.detail));
+      lien.appendChild(texte);
+      if (nouveau[a.type]) lien.appendChild(el("span", "cloche__nouveau"));
+      lien.addEventListener("click", fermerCloche);
+      li.appendChild(lien);
+      liste.appendChild(li);
+    });
+  }
+
+  function ouvrirCloche() {
+    const nouveau = nouveautes(alertesCourantes, lireVues());
+    remplirPanneau(nouveau);
+    $("cloche-panneau").hidden = false;
+    $("cloche").setAttribute("aria-expanded", "true");
+    // Ouvrir la cloche = avoir vu : le badge repart à zéro, les pastilles rouges restent dans la liste ouverte.
+    const vues = {};
+    alertesCourantes.forEach(function (a) { vues[a.type] = a.nombre; });
+    ecrireVues(vues);
+    dessinerCloche({});
+  }
+
+  function fermerCloche() {
+    $("cloche-panneau").hidden = true;
+    $("cloche").setAttribute("aria-expanded", "false");
+  }
+
+  $("cloche").addEventListener("click", function (e) {
+    e.stopPropagation();
+    if ($("cloche-panneau").hidden) ouvrirCloche(); else fermerCloche();
+  });
+  document.addEventListener("click", function (e) {
+    if (!$("cloche-panneau").hidden && !$("cloche-panneau").contains(e.target)) fermerCloche();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !$("cloche-panneau").hidden) { fermerCloche(); $("cloche").focus(); }
+  });
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) chargerAlertes(); });
+
+  function demarrerAlertes() {
+    arreterAlertes();
+    chargerAlertes();
+    minuteurAlertes = setInterval(function () { if (!document.hidden) chargerAlertes(); }, 60000);
+  }
+
+  function arreterAlertes() {
+    if (minuteurAlertes) clearInterval(minuteurAlertes);
+    minuteurAlertes = null;
+    alertesCourantes = [];
+    fermerCloche();
+    $("cloche-badge").hidden = true;
   }
 
   /* ---------- Mon compte ---------- */

@@ -9,123 +9,138 @@
 </head>
 <body>
 
-  <p class="chargement" id="chargement" role="status">Chargement…</p>
+  <p class="chargement" id="chargement" role="status" data-i18n="chargement">Chargement…</p>
 
   <!-- Barre du haut : visible sur toutes les pages sauf l'accueil -->
   <header class="barre" id="barre" hidden>
-    <a class="barre__retour" href="#" aria-label="Retour à l'accueil">
+    <a class="barre__retour" href="#" aria-label="Retour à l'accueil" data-i18n-aria="retour.accueil.aria">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-      Accueil
+      <span data-i18n="nav.accueil">Accueil</span>
     </a>
     <span class="barre__nom" id="barre-nom"></span>
     <span class="barre__logo" id="barre-logo" hidden></span>
+    <select class="langue" data-langue aria-label="Langue"></select>
   </header>
 
   <main id="app" hidden>
 
     <!-- ACCUEIL : l'identité de l'organisation, dès le premier regard -->
     <section class="vue accueil" id="vue-accueil" aria-labelledby="accueil-titre">
+      <div class="accueil__langue"><select class="langue" data-langue aria-label="Langue"></select></div>
       <div class="accueil__contenu">
         <div class="plaque" id="plaque-logo"></div>
         <h1 id="accueil-titre" tabindex="-1"></h1>
-        <p class="accueil__intro" id="accueil-intro"></p>
+        <p class="accueil__intro" id="accueil-intro" data-i18n="accueil.intro"></p>
         <div class="accueil__actions">
-          <a class="bouton bouton--accent" href="#declarer">Déclarer un objet perdu</a>
-          <a class="bouton bouton--contour" href="#objets" id="lien-objets" hidden>Voir les objets trouvés</a>
+          <a class="bouton bouton--accent" href="#declarer" data-i18n="accueil.declarer">Déclarer un objet perdu</a>
+          <a class="bouton bouton--contour" href="#objets" id="lien-objets" data-i18n="accueil.voir" hidden>Voir les objets trouvés</a>
         </div>
-        <p class="accueil__note" id="note-objets" hidden></p>
+        <p class="accueil__note" id="note-objets" data-i18n="accueil.note_privee" hidden></p>
       </div>
-      <p class="signature signature--claire">Propulsé par Retrova</p>
+      <p class="signature signature--claire" data-i18n="signature">Propulsé par Retrova</p>
     </section>
 
     <!-- DÉCLARATION DE PERTE -->
     <section class="vue contenu" id="vue-declarer" aria-labelledby="declarer-titre" hidden>
-      <h2 id="declarer-titre" tabindex="-1">Déclarer un objet perdu</h2>
-      <p class="chapeau" id="declarer-chapeau"></p>
+      <h2 id="declarer-titre" tabindex="-1" data-i18n="declarer.titre">Déclarer un objet perdu</h2>
+      <p class="chapeau" id="declarer-chapeau" data-i18n="declarer.chapeau"></p>
 
       <form id="formulaire" novalidate>
         <fieldset class="champ">
-          <legend>Qu'avez-vous perdu ?</legend>
+          <legend data-i18n="declarer.perdu">Qu'avez-vous perdu ?</legend>
           <div class="puces" id="puces"></div>
           <p class="champ__erreur" id="erreur-categorie" role="alert" hidden></p>
         </fieldset>
 
         <div class="champ">
-          <label for="description">Décrivez-le <span class="facultatif">(facultatif)</span></label>
-          <textarea id="description" rows="3" maxlength="500" placeholder="Marque, couleur, signe particulier…"></textarea>
-          <p class="champ__aide">Gardez un détail pour vous : l'accueil vous le demandera pour vérifier que l'objet est bien le vôtre.</p>
+          <label for="description"><span data-i18n="declarer.description">Décrivez-le</span> <span class="facultatif" data-i18n="facultatif">(facultatif)</span></label>
+          <textarea id="description" rows="3" maxlength="500" placeholder="Marque, couleur, signe particulier…" data-i18n-ph="declarer.description_ph"></textarea>
+          <p class="champ__aide" data-i18n="declarer.description_aide">Gardez un détail pour vous : l'accueil vous le demandera pour vérifier que l'objet est bien le vôtre.</p>
         </div>
 
         <div class="champ">
-          <label for="date">Quand l'avez-vous perdu ? <span class="facultatif">(facultatif)</span></label>
+          <label for="date"><span data-i18n="declarer.date">Quand l'avez-vous perdu ?</span> <span class="facultatif" data-i18n="facultatif">(facultatif)</span></label>
           <input id="date" type="date">
         </div>
 
         <div class="champ">
-          <label for="lieu" id="etiquette-lieu">Où l'avez-vous perdu ? <span class="facultatif">(facultatif)</span></label>
-          <input id="lieu" type="text" maxlength="120" autocomplete="off">
+          <label for="lieu" id="etiquette-lieu"><span data-i18n="declarer.lieu">Où l'avez-vous perdu ?</span> <span class="facultatif" data-i18n="facultatif">(facultatif)</span></label>
+          <input id="lieu" type="text" maxlength="120" autocomplete="off" data-i18n-ph="declarer.lieu_ph">
         </div>
 
         <div class="champ">
-          <label for="nom">Votre nom <span class="facultatif">(facultatif)</span></label>
+          <label for="nom"><span data-i18n="declarer.nom">Votre nom</span> <span class="facultatif" data-i18n="facultatif">(facultatif)</span></label>
           <input id="nom" type="text" maxlength="80" autocomplete="name">
         </div>
 
         <div class="champ">
-          <label for="telephone">Votre numéro de téléphone</label>
+          <label for="telephone" data-i18n="declarer.telephone">Votre numéro de téléphone</label>
           <input id="telephone" type="tel" inputmode="tel" autocomplete="tel" maxlength="22" placeholder="96 12 34 56" aria-describedby="aide-telephone erreur-telephone" required>
-          <p class="champ__aide" id="aide-telephone">Pour vous prévenir dès qu'un objet correspond. Numéro du Niger à 8 chiffres, ou numéro étranger commençant par +.</p>
+          <p class="champ__aide" id="aide-telephone" data-i18n="declarer.telephone_aide">Pour vous prévenir dès qu'un objet correspond. Numéro du Niger à 8 chiffres, ou numéro étranger commençant par +.</p>
           <p class="champ__erreur" id="erreur-telephone" role="alert" hidden></p>
+        </div>
+
+        <div class="champ">
+          <label for="email"><span data-i18n="declarer.email">Votre adresse e-mail</span> <span class="facultatif" data-i18n="facultatif">(facultatif)</span></label>
+          <input id="email" type="email" inputmode="email" autocomplete="email" maxlength="254" placeholder="nom@exemple.com" aria-describedby="aide-email erreur-email">
+          <p class="champ__aide" id="aide-email" data-i18n="declarer.email_aide">Pour recevoir une confirmation et être prévenu par courriel. Utilisée uniquement pour cette déclaration.</p>
+          <p class="champ__erreur" id="erreur-email" role="alert" hidden></p>
         </div>
 
         <p class="alerte" id="erreur-general" role="alert" hidden></p>
 
-        <button class="bouton bouton--accent bouton--plein" type="submit" id="envoyer">Envoyer ma déclaration</button>
+        <button class="bouton bouton--accent bouton--plein" type="submit" id="envoyer" data-i18n="declarer.envoyer">Envoyer ma déclaration</button>
       </form>
     </section>
 
     <!-- TALON : confirmation de la déclaration -->
     <section class="vue contenu" id="vue-recu" aria-labelledby="recu-titre" hidden>
-      <h2 id="recu-titre" tabindex="-1">Déclaration enregistrée</h2>
+      <h2 id="recu-titre" tabindex="-1" data-i18n="recu.titre">Déclaration enregistrée</h2>
 
       <div class="talon" id="talon">
         <div class="talon__haut">
           <p class="talon__org" id="talon-org"></p>
           <dl class="talon__infos">
-            <div><dt>Objet perdu</dt><dd id="talon-objet"></dd></div>
-            <div><dt>Déclaré le</dt><dd id="talon-date"></dd></div>
-            <div><dt>Téléphone</dt><dd id="talon-tel"></dd></div>
+            <div><dt data-i18n="recu.objet">Objet perdu</dt><dd id="talon-objet"></dd></div>
+            <div><dt data-i18n="recu.date">Déclaré le</dt><dd id="talon-date"></dd></div>
+            <div><dt data-i18n="recu.tel">Téléphone</dt><dd id="talon-tel"></dd></div>
           </dl>
         </div>
         <div class="talon__bas">
-          <p class="talon__etiquette">Référence à donner à l'accueil</p>
+          <p class="talon__etiquette" data-i18n="recu.ref">Référence à donner à l'accueil</p>
           <p class="talon__reference" id="talon-ref"></p>
         </div>
       </div>
 
       <p class="statut" id="recu-statut"></p>
-      <p class="chapeau">Conseil : faites une capture d'écran de ce talon pour le garder sur votre téléphone.</p>
+      <p class="chapeau" data-i18n="recu.conseil">Conseil : faites une capture d'écran de ce talon pour le garder sur votre téléphone.</p>
 
       <div class="actions-bas">
-        <a class="bouton bouton--accent bouton--plein" href="#declarer" id="autre-declaration">Déclarer un autre objet</a>
-        <a class="bouton bouton--discret bouton--plein" href="#">Retour à l'accueil</a>
+        <a class="bouton bouton--accent bouton--plein" href="#declarer" id="autre-declaration" data-i18n="recu.autre">Déclarer un autre objet</a>
+        <a class="bouton bouton--discret bouton--plein" href="#" data-i18n="recu.accueil">Retour à l'accueil</a>
       </div>
     </section>
 
     <!-- OBJETS TROUVÉS (si l'organisation a activé la consultation à distance) -->
     <section class="vue contenu contenu--large" id="vue-objets" aria-labelledby="objets-titre" hidden>
-      <h2 id="objets-titre" tabindex="-1">Objets trouvés</h2>
-      <p class="chapeau" id="objets-chapeau">Reconnaissez-vous un de vos objets ? Touchez-le pour savoir comment le récupérer.</p>
+      <h2 id="objets-titre" tabindex="-1" data-i18n="objets.titre">Objets trouvés</h2>
+      <p class="chapeau" id="objets-chapeau" data-i18n="objets.chapeau">Reconnaissez-vous un de vos objets ? Touchez-le pour savoir comment le récupérer.</p>
       <div id="objets-etat" class="etat" role="status"></div>
       <div class="objets" id="objets-liste"></div>
     </section>
 
-    <p class="signature signature--discrete" id="signature-bas" hidden>Propulsé par Retrova</p>
+    <p class="signature signature--discrete" id="signature-bas" data-i18n="signature" hidden>Propulsé par Retrova</p>
   </main>
 
   <dialog id="detail" aria-labelledby="detail-titre"></dialog>
 
   <noscript><p class="chargement">Cette page a besoin de JavaScript pour fonctionner.</p></noscript>
+  <script src="/static/i18n/i18n.js"></script>
+  <script src="/static/i18n/fr.js"></script>
+  <script src="/static/i18n/en.js"></script>
+  <script src="/static/i18n/ha.js"></script>
+  <script src="/static/i18n/dje.js"></script>
+  <script src="/static/i18n/ar.js"></script>
   <script src="/static/portail/portail.js"></script>
 </body>
 </html>

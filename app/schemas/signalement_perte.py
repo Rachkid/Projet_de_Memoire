@@ -2,11 +2,12 @@
 Schémas Pydantic pour la ressource SignalementPerte.
 """
 
+import re
 import uuid
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from app.models.enums import StatutSignalement
 
@@ -18,9 +19,29 @@ class SignalementPerteBase(BaseModel):
     lieu_approximatif: Optional[str] = None
 
 
+# Forme simple d'une adresse e-mail : « quelque chose @ domaine . extension », sans espace.
+# (Pas de bibliothèque de validation en plus : le but est d'écarter les fautes de frappe évidentes ;
+# la vraie preuve qu'une adresse existe, c'est le courriel de confirmation qui y arrive.)
+MOTIF_EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$")
+
+
 class SignalementPerteCreate(SignalementPerteBase):
     organisation_id: uuid.UUID
     usager_id: uuid.UUID
+    # Facultatif. Jamais renvoyé par l'API (voir SignalementPerteRead).
+    email: Optional[str] = None
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def verifier_email(cls, valeur):
+        if valeur is None:
+            return None
+        valeur = str(valeur).strip().lower()
+        if valeur == "":
+            return None
+        if len(valeur) > 254 or not MOTIF_EMAIL.match(valeur):
+            raise ValueError("Adresse e-mail invalide")
+        return valeur
 
 
 class SignalementPerteRead(SignalementPerteBase):

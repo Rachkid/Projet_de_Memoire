@@ -32,22 +32,28 @@
 
     <footer class="pied">
       <div class="pied__qr" id="bloc-qr" hidden>
-        <img id="qr" alt="Code QR vers la page pour déclarer un objet perdu" width="160" height="160">
+        <img id="qr" alt="Code QR vers la page pour déclarer un objet perdu" data-i18n-alt="hall.qr_alt" width="160" height="160">
       </div>
       <div class="pied__texte">
-        <p class="pied__titre">Vous avez perdu un objet ?</p>
+        <p class="pied__titre" data-i18n="hall.pied_titre">Vous avez perdu un objet ?</p>
         <p class="pied__aide" id="pied-aide"></p>
       </div>
       <div class="pied__droite">
         <div class="pastilles" id="pastilles" aria-hidden="true"></div>
-        <p class="pied__signature">Propulsé par Retrova</p>
+        <p class="pied__signature" data-i18n="signature">Propulsé par Retrova</p>
       </div>
     </footer>
-    <p class="indice" id="indice">Appuyez sur F pour le plein écran</p>
-    <span class="hors-ligne" id="hors-ligne" hidden title="Connexion perdue : les derniers objets reçus restent affichés"></span>
+    <p class="indice" id="indice" data-i18n="hall.indice">Appuyez sur F pour le plein écran</p>
+    <span class="hors-ligne" id="hors-ligne" hidden title="Connexion perdue : les derniers objets reçus restent affichés" data-i18n-title="hall.hors_ligne"></span>
   </div>
-  <p class="chargement" id="chargement" role="status">Chargement…</p>
+  <p class="chargement" id="chargement" role="status" data-i18n="chargement">Chargement…</p>
   <noscript><p class="chargement">Cette page a besoin de JavaScript pour fonctionner.</p></noscript>
+  <script src="/static/i18n/i18n.js"></script>
+  <script src="/static/i18n/fr.js"></script>
+  <script src="/static/i18n/en.js"></script>
+  <script src="/static/i18n/ha.js"></script>
+  <script src="/static/i18n/dje.js"></script>
+  <script src="/static/i18n/ar.js"></script>
   <script src="/static/affichage/affichage.js"></script>
 </body>
 </html>

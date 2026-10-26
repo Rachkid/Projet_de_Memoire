@@ -19,7 +19,7 @@ body { padding-bottom: calc(104px + env(safe-area-inset-bottom)); }
 body.hors-session { padding-bottom: 0; }
 
 svg { flex: none; }
-.onglets svg, .photo-zone__icone svg, .vide__icone svg, .tuile__icone svg, .objet-carte__photo svg, .carte__vide svg, .fiche__photo svg {
+.onglets svg, .cloche__bouton svg, .cloche__icone svg, .photo-zone__icone svg, .vide__icone svg, .tuile__icone svg, .objet-carte__photo svg, .carte__vide svg, .fiche__photo svg {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.7;
@@ -64,8 +64,17 @@ h3.sous-titre { margin: 38px 0 0; font-size: 1.25rem; font-weight: 800; letter-s
 .bouton { border-radius: 16px; transition: transform 0.12s, filter 0.15s, box-shadow 0.15s; }
 .bouton:active { transform: scale(0.98); }
 .bouton--accent { box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 38%, transparent); }
-.bouton--discret { background: #ffffff; border-color: rgba(17, 24, 39, 0.12); box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05); }
-.bouton--discret:hover { border-color: var(--principale); filter: none; }
+.bouton { gap: 10px; }
+.bouton span { min-width: 0; }
+.bouton__icone { flex: none; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Trois niveaux de boutons : l'action principale (couleur d'accent), l'action secondaire (teinte douce de
+   l'organisation) et l'action à éviter par erreur (rouge doux : archiver, retirer, se déconnecter). */
+.bouton--doux, .bouton--discret { background: var(--teinte); color: var(--principale); border-color: transparent; box-shadow: none; }
+.bouton--doux:hover, .bouton--discret:hover { background: color-mix(in srgb, var(--principale) 16%, #ffffff); filter: none; }
+.bouton--danger-doux { background: #fef3f2; color: #b42318; border-color: transparent; box-shadow: none; }
+.bouton--danger-doux:hover { background: #fee4e2; filter: none; }
+.bouton:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
 /* ---------- Barre du haut ---------- */
 
@@ -196,7 +205,7 @@ h3.sous-titre { margin: 38px 0 0; font-size: 1.25rem; font-weight: 800; letter-s
 
 /* ---------- Pages ---------- */
 
-.salut { margin: 0 0 6px; font-size: 0.9375rem; font-weight: 600; color: var(--encre-douce); }
+.salut { margin: 0 0 6px; font-size: 0.9375rem; font-weight: 600; color: var(--encre-douce); font-variant-numeric: tabular-nums; }
 .contenu h2 { letter-spacing: -0.025em; }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -233,7 +242,7 @@ h3.sous-titre { margin: 38px 0 0; font-size: 1.25rem; font-weight: 800; letter-s
   color: var(--principale);
   background: linear-gradient(145deg, var(--teinte), #ffffff);
 }
-.objet-carte__photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.objet-carte__photo img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .objet-carte__photo svg { width: 42%; max-width: 64px; height: auto; opacity: 0.6; }
 .objet-carte__statut { position: absolute; top: 10px; left: 10px; }
 .objet-carte__corps { padding: 12px 14px 15px; }
@@ -259,7 +268,7 @@ h3.sous-titre { margin: 38px 0 0; font-size: 1.25rem; font-weight: 800; letter-s
   transition: transform 0.15s, box-shadow 0.15s;
 }
 a.carte:hover { transform: translateY(-2px); box-shadow: var(--ombre-forte); }
-.carte__vignette, .carte__vide { flex: none; width: 84px; height: 84px; border-radius: 14px; object-fit: cover; background: var(--teinte); }
+.carte__vignette, .carte__vide { flex: none; width: 84px; height: 84px; border-radius: 14px; background: var(--teinte); }
 .carte__vide { display: grid; place-items: center; color: var(--principale); }
 .carte__vide svg { width: 44%; height: auto; max-width: 56px; opacity: 0.7; }
 .carte__corps { min-width: 0; flex: 1; align-self: center; }
@@ -359,7 +368,7 @@ a.carte:hover { transform: translateY(-2px); box-shadow: var(--ombre-forte); }
 .photo-zone--ajoutee .photo-zone__cible { box-shadow: inset 0 0 0 2px var(--principale); }
 
 .apercu { display: grid; gap: 12px; }
-.apercu img { display: block; width: 100%; max-height: 300px; object-fit: cover; border-radius: 20px; box-shadow: var(--ombre); }
+.apercu img { display: block; width: 100%; max-height: 300px; object-fit: contain; border-radius: 20px; box-shadow: var(--ombre); background: var(--teinte); }
 .apercu__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .apercu__actions .bouton { min-height: 48px; font-size: 1rem; cursor: pointer; }
 
@@ -399,7 +408,7 @@ a.carte:hover { transform: translateY(-2px); box-shadow: var(--ombre-forte); }
 
 .retour { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; color: var(--principale); text-decoration: none; }
 .fiche { display: grid; gap: 20px; margin-top: 8px; }
-.fiche__photo img { display: block; width: 100%; max-height: 52vh; object-fit: cover; border-radius: 22px; box-shadow: var(--ombre); background: var(--teinte); }
+.fiche__photo .cadre-photo { width: 100%; aspect-ratio: 4 / 3; max-height: 52vh; border-radius: 22px; box-shadow: var(--ombre); }
 .fiche__photo .carte__vide { width: 100%; height: 200px; border-radius: 22px; background: linear-gradient(145deg, var(--teinte), #ffffff); }
 .fiche__photo .carte__vide svg { max-width: 84px; }
 .fiche__texte h2 { font-size: 1.9rem; font-weight: 800; margin-bottom: 10px; }
@@ -522,3 +531,312 @@ a.tel { color: var(--principale); font-weight: 700; }
   .grille { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .tuiles { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
+
+/* ======================================================================
+   Étape 14 : tableau de bord et historique (administrateurs)
+   ====================================================================== */
+
+.onglets a span { text-align: center; line-height: 1.15; }
+.onglets { max-width: 620px; }
+@media (max-width: 420px) { .onglets a { font-size: 0.6875rem; padding-left: 2px; padding-right: 2px; } }
+
+.filtres { margin-top: 22px; }
+.filtres label { display: block; margin-bottom: 8px; font-weight: 700; }
+.filtres input[type="date"], .filtres input[type="search"], .filtres input[type="tel"], .filtres select {
+  display: block; width: 100%; min-height: 50px; padding: 10px 14px; font: inherit; color: var(--encre);
+  background: #ffffff; border: 1.5px solid rgba(17, 24, 39, 0.12); border-radius: 14px; box-shadow: var(--ombre);
+}
+.filtres select:focus-visible, .filtres input:focus-visible { outline: none; border-color: var(--principale); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 45%, transparent); }
+.filtres--grille, .filtres--ligne { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: end; }
+.filtres--grille > div:nth-child(4), .filtres--ligne > div:first-child { grid-column: 1 / -1; }
+.filtres__actions { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.filtres--ligne .filtres__actions { grid-template-columns: 1fr; }
+.filtres__actions .bouton { margin-top: 0; width: 100%; }
+.filtres__actions .bouton:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.segments { display: inline-flex; gap: 4px; margin-top: 18px; padding: 4px; background: #ffffff; border-radius: 999px; box-shadow: var(--ombre); }
+.segments button {
+  min-height: 44px; padding: 0 20px; font: inherit; font-weight: 700; color: #5b6472;
+  background: transparent; border: 0; border-radius: 999px; cursor: pointer;
+}
+.segments button[aria-pressed="true"] { background: var(--principale); color: var(--t-principale); }
+.segments button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* Chiffres clés */
+.kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 24px; }
+.kpi { display: flex; flex-direction: column; gap: 4px; padding: 16px 18px; background: #ffffff; border-radius: 18px; box-shadow: var(--ombre); }
+.kpi__valeur { font-size: 2.1rem; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; color: var(--principale); font-variant-numeric: tabular-nums; }
+.kpi__libelle { font-weight: 700; }
+.kpi__aide { font-size: 0.8125rem; color: var(--encre-douce); }
+.kpi--vif { background: var(--accent); color: var(--t-accent); }
+.kpi--vif .kpi__valeur, .kpi--vif .kpi__aide { color: inherit; }
+
+/* Graphiques */
+.bloc-graphe { margin-top: 12px; padding: 4px 18px 20px; background: #ffffff; border-radius: 18px; box-shadow: var(--ombre); }
+.bloc-graphe .sous-titre { margin-top: 18px; font-size: 1.125rem; }
+.bloc-graphe .chapeau { margin: 8px 0 0; }
+.legende { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 8px; font-size: 0.875rem; color: var(--encre-douce); }
+.legende span::before { content: ""; display: inline-block; width: 12px; height: 12px; margin-right: 7px; border-radius: 3px; vertical-align: -1px; }
+.legende__a::before { background: var(--principale); }
+.legende__b::before { background: var(--accent); border-radius: 50%; }
+.graphe { display: block; width: 100%; height: auto; margin-top: 10px; overflow: visible; }
+.graphe__grille { stroke: rgba(17, 24, 39, 0.1); stroke-width: 1; }
+.graphe__texte { fill: #5b6472; font-size: 11px; font-family: inherit; }
+.graphe__barre { fill: var(--principale); opacity: 0.88; }
+.graphe__ligne { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.graphe__point { fill: var(--accent); stroke: #ffffff; stroke-width: 2; }
+
+.barres { display: grid; gap: 10px; margin-top: 14px; }
+.barres__ligne { display: grid; grid-template-columns: minmax(92px, 28%) 1fr 36px; gap: 10px; align-items: center; }
+.barres__nom { font-weight: 600; overflow-wrap: anywhere; }
+.barres__piste { height: 14px; background: var(--teinte); border-radius: 999px; overflow: hidden; }
+.barres__rempli { display: block; height: 100%; background: var(--principale); border-radius: 999px; }
+.barres__nombre { text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+.tableau-defile { margin-top: 12px; overflow-x: auto; }
+.tableau { width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
+.tableau th, .tableau td { padding: 12px 10px; text-align: left; border-bottom: 1px solid rgba(17, 24, 39, 0.08); white-space: nowrap; }
+.tableau thead th { font-size: 0.8125rem; color: var(--encre-douce); font-weight: 700; }
+.tableau .num { text-align: right; font-variant-numeric: tabular-nums; }
+.lien { padding: 0; font: inherit; font-weight: 700; color: var(--principale); background: none; border: 0; text-decoration: underline; cursor: pointer; }
+
+/* Journal des remises */
+.remise__objet { font-size: 1.0625rem; font-weight: 800; color: var(--principale); text-decoration: none; }
+.remise__objet:hover { text-decoration: underline; }
+.remise__date { font-weight: 600; }
+.remise a:not(.remise__objet) { color: var(--principale); font-weight: 600; }
+
+/* Frise (parcours d'un objet) */
+.frise { list-style: none; margin: 14px 0 0; padding: 0 0 0 4px; }
+.frise__etape { position: relative; display: grid; gap: 2px; padding: 0 0 20px 30px; }
+.frise__etape::before { content: ""; position: absolute; left: 7px; top: 18px; bottom: -2px; width: 2px; background: rgba(17, 24, 39, 0.14); }
+.frise__etape:last-child { padding-bottom: 0; }
+.frise__etape:last-child::before { display: none; }
+.frise__etape::after { content: ""; position: absolute; left: 0; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: var(--principale); box-shadow: 0 0 0 4px var(--teinte); }
+.frise__etape--restitue::after { background: #1a7f4b; box-shadow: 0 0 0 4px #dcf3e6; }
+.frise__etape--attente::after { background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 28%, #ffffff); }
+.frise__etape--archive::after { background: #6b7280; box-shadow: 0 0 0 4px #e5e7eb; }
+.frise__date { font-size: 0.875rem; color: var(--encre-douce); }
+.frise__etape span { overflow-wrap: anywhere; }
+
+@media (min-width: 720px) {
+  .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .bloc-graphe { padding: 6px 26px 26px; }
+  .filtres--grille { grid-template-columns: 1fr 1fr 1fr; }
+  .filtres--grille > div:nth-child(4) { grid-column: 1 / -1; }
+  .filtres--ligne { grid-template-columns: 2fr auto; }
+  .filtres--ligne > div:first-child { grid-column: auto; }
+  .filtres--ligne .filtres__actions { grid-column: auto; }
+  .filtres__actions { grid-template-columns: auto auto; justify-content: start; }
+  .filtres__actions .bouton { width: auto; min-width: 180px; }
+}
+@media (min-width: 900px) {
+  .kpis { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .kpi__valeur { font-size: 1.8rem; }
+  .filtres--grille { grid-template-columns: 1fr 1fr 1.2fr 1.6fr auto; }
+  .filtres--grille > div:nth-child(4) { grid-column: auto; }
+  .filtres--grille .filtres__actions { grid-column: 1 / -1; }
+}
+@media print { .onglets, .filtres, .segments { display: none; } }
+
+/* ======================================================================
+   Étape 15 bis : habillage commun à tous les profils, cloche d'alertes,
+   tableau de bord enrichi.
+   Téléphone : barre colorée en haut (marque, cloche, compte) + navigation flottante en bas.
+   Ordinateur : menu latéral sombre à gauche (couleurs de l'organisation) + barre blanche en haut.
+   ====================================================================== */
+
+.haut__outils { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.haut__titre { display: none; margin: 0; }
+.haut__compte { margin-left: 0; }
+
+/* La cloche */
+.cloche { position: relative; }
+.cloche__bouton {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cloche__bouton:hover, .cloche__bouton[aria-expanded="true"] { background: rgba(255, 255, 255, 0.16); }
+.cloche__bouton svg { width: 24px; height: 24px; }
+.cloche__badge {
+  position: absolute;
+  top: 3px;
+  right: 2px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #e5484d;
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  line-height: 20px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--principale);
+  font-variant-numeric: tabular-nums;
+}
+.cloche__badge[hidden] { display: none; }
+.cloche__panneau {
+  position: fixed;
+  z-index: 40;
+  top: calc(64px + env(safe-area-inset-top));
+  left: 12px;
+  right: 12px;
+  max-width: 400px;
+  margin-left: auto;
+  padding: 8px;
+  background: #ffffff;
+  color: var(--encre);
+  border-radius: 18px;
+  box-shadow: var(--ombre-forte), 0 0 0 1px rgba(16, 24, 40, 0.06);
+}
+.cloche__panneau[hidden] { display: none; }
+.cloche__titre { margin: 8px 10px 6px; font-weight: 800; font-size: 1.0625rem; }
+.cloche__liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.cloche__liste a {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 10px;
+  border-radius: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+.cloche__liste a:hover { background: var(--teinte); }
+.cloche__icone { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--teinte); color: var(--principale); }
+.cloche__icone svg { width: 20px; height: 20px; }
+.cloche__liste .alerte--attention .cloche__icone { background: color-mix(in srgb, var(--accent) 22%, #ffffff); color: #8a4b00; }
+.cloche__texte strong { display: block; line-height: 1.25; }
+.cloche__texte span { display: block; margin-top: 2px; font-size: 0.875rem; color: var(--encre-douce); }
+.cloche__nouveau { margin-left: auto; flex: none; align-self: center; width: 10px; height: 10px; border-radius: 50%; background: #e5484d; }
+.cloche__vide { margin: 6px 10px 12px; color: var(--encre-douce); }
+.cloche__vide[hidden] { display: none; }
+
+@media (min-width: 900px) {
+  body { --lateral: 264px; --barre: 72px; }
+
+  /* Le menu latéral */
+  .haut {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--lateral);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 20px 14px;
+    overflow-y: auto;
+    background: var(--sombre);
+    box-shadow: none;
+  }
+  .haut__marque { padding: 4px 10px 20px; margin-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
+  .haut__org { white-space: normal; line-height: 1.2; font-size: 1.0625rem; }
+  .onglets { flex-direction: column; margin: 0; gap: 4px; }
+  .onglets a { width: 100%; min-height: 48px; padding: 0 16px; border-radius: 12px; justify-content: flex-start; opacity: 0.9; }
+  .onglets a span { text-align: left; }
+  .onglets a:hover { background: rgba(255, 255, 255, 0.1); }
+  .onglets a[aria-current="page"] { background: var(--accent); color: var(--t-accent); font-weight: 800; }
+
+  /* La barre blanche en haut, à droite du menu */
+  .haut__outils {
+    position: fixed;
+    z-index: 19;
+    top: 0;
+    left: var(--lateral);
+    right: 0;
+    height: var(--barre);
+    margin: 0;
+    padding: 0 max(24px, 3vw);
+    gap: 10px;
+    background: #ffffff;
+    color: var(--encre);
+    box-shadow: 0 1px 0 rgba(16, 24, 40, 0.08), 0 4px 16px rgba(16, 24, 40, 0.04);
+  }
+  .haut__titre { display: block; margin-right: auto; font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; }
+  .haut__outils .cloche__bouton:hover, .haut__outils .cloche__bouton[aria-expanded="true"] { background: var(--teinte); }
+  .cloche__badge { box-shadow: 0 0 0 2px #ffffff; }
+  .haut__compte { padding: 4px 6px 4px 4px; border-radius: 999px; }
+  .haut__compte:hover { background: var(--teinte); }
+  .haut__outils .avatar { background: var(--principale); color: var(--t-principale); box-shadow: none; }
+  .cloche__panneau { top: calc(var(--barre) - 4px); right: max(24px, 3vw); left: auto; width: 400px; margin: 0; }
+
+  /* Le contenu se place à droite du menu et sous la barre */
+  body:not(.hors-session) #app { margin-left: var(--lateral); padding-top: var(--barre); }
+  body:not(.hors-session) { background: color-mix(in srgb, var(--principale) 4%, #f4f6f9); }
+}
+
+/* ---------- Tableau de bord enrichi ---------- */
+
+.kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 720px) { .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 900px) { .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } .kpi__valeur { font-size: 2.1rem; } }
+
+.kpi { position: relative; overflow: hidden; }
+.kpi__courbe { display: block; width: 100%; height: 38px; margin-top: 8px; overflow: visible; }
+.kpi__courbe path.zone { fill: color-mix(in srgb, var(--principale) 14%, transparent); stroke: none; }
+.kpi__courbe path.trait { fill: none; stroke: var(--principale); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.kpi--vif .kpi__courbe path.zone { fill: color-mix(in srgb, var(--t-accent) 20%, transparent); }
+.kpi--vif .kpi__courbe path.trait { stroke: var(--t-accent); }
+.kpi__anneau { position: absolute; top: 14px; right: 14px; width: 52px; height: 52px; }
+.kpi__anneau circle { fill: none; stroke-width: 6; }
+.kpi__anneau .piste { stroke: var(--teinte); }
+.kpi__anneau .plein { stroke: var(--accent); stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; }
+
+.bord-rangee { display: grid; gap: 12px; margin-top: 0; }
+@media (min-width: 1100px) { .bord-rangee { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 16px; } .bord-rangee .bloc-graphe { margin-top: 12px; } }
+
+/* Classement des catégories : numéros dans des pastilles */
+.barres__ligne { grid-template-columns: 28px minmax(80px, 28%) 1fr 36px; }
+.barres__rang { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; font-size: 0.75rem; font-weight: 800; background: var(--teinte); color: var(--principale); }
+.barres__rang--haut { background: var(--sombre); color: #ffffff; }
+
+@media print { .haut, .haut__outils, .cloche__panneau { display: none !important; } body:not(.hors-session) #app { margin: 0; padding: 0; } }
+
+/* ---------- Retouches des boutons (étape 15 ter) ---------- */
+/* Dans une carte, les <span> sont du texte secondaire gris : ne pas l'appliquer au texte d'un bouton. */
+.bouton > span, .carte__corps .bouton > span, .carte--bloc .bouton > span { display: inline; margin: 0; font-size: inherit; font-weight: inherit; color: inherit; text-align: center; line-height: 1.25; }
+/* Les boutons d'une carte sont empilés : assez larges pour que le texte tienne sur une ligne. */
+.carte--bloc .actions-bas { grid-template-columns: 1fr; }
+.carte__corps .badge { display: inline-block; margin: 0 0 8px; font-size: 0.8125rem; font-weight: 800; color: var(--principale); }
+.carte__corps .badge--vif { color: var(--t-accent); }
+.carte__corps .badge--gris { color: #374151; }
+#vue-compte .actions-bas { grid-template-columns: 1fr; }
+
+/* Boutons « doux » : un fond et un contour à la couleur de l'organisation, pour rester bien visibles
+   sur le fond clair de la page (sans cela, ils se confondaient presque avec lui). */
+.bouton--doux, .bouton--discret {
+  background: color-mix(in srgb, var(--principale) 11%, #ffffff);
+  border: 1.5px solid color-mix(in srgb, var(--principale) 32%, #ffffff);
+  color: var(--principale);
+}
+.bouton--doux:hover, .bouton--discret:hover {
+  background: color-mix(in srgb, var(--principale) 19%, #ffffff);
+  border-color: color-mix(in srgb, var(--principale) 50%, #ffffff);
+}
+.bouton--danger-doux { border: 1.5px solid #fecdca; }
+
+/* ---------- Photos entières, sans rognage (étape 15 quinquies) ----------
+   Une photo n'a presque jamais la forme de sa carte. Au lieu de la couper (cover), on l'affiche ENTIÈRE
+   (contain) et on remplit le reste de la carte avec la même photo, agrandie et floutée : pas de bandes vides,
+   pas de débordement, et l'objet reste visible en entier. L'adresse de la photo est donnée par --photo. */
+.cadre-photo { position: relative; overflow: hidden; isolation: isolate; background: var(--teinte, #e9eef5); }
+.cadre-photo::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  z-index: -1;
+  background: var(--photo) center / cover no-repeat;
+  filter: blur(16px) saturate(1.15) brightness(.9);
+}
+.cadre-photo > img { display: block; width: 100%; height: 100%; object-fit: contain; }

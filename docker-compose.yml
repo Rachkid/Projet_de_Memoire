@@ -35,12 +35,27 @@ services:
       db:
         condition: service_healthy
     env_file: .env
+    environment:
+      # Courriels (étape 15). Par défaut : MailHog, la boîte de réception factice ci-dessous.
+      # En production, mettre SMTP_HOST (et les autres SMTP_*) dans .env : cela remplace ces valeurs.
+      SMTP_HOST: ${SMTP_HOST-mailhog}
+      SMTP_PORT: ${SMTP_PORT-1025}
     volumes:
       # Les photos envoyées par les agents sont conservées dans ce volume :
       # sans lui, elles disparaîtraient à chaque reconstruction du conteneur.
       - uploads:/app/uploads
     ports:
       - "8000:8000"
+
+  # Boîte de réception factice pour les essais (étape 15) : capte tous les courriels envoyés par
+  # l'application, sans rien envoyer à l'extérieur. On les lit sur http://localhost:8025.
+  # En production, ce service est inutile : le supprimer et renseigner SMTP_HOST dans .env.
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    restart: unless-stopped
+    ports:
+      - "8025:8025"  # interface web pour lire les courriels
+      # Le port SMTP (1025) n'est PAS ouvert vers l'extérieur : seul l'application l'utilise, par le réseau Docker.
 
 # Volume nommé pour que les données de la base survivent aux redémarrages du conteneur
 volumes:
