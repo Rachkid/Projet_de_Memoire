@@ -135,10 +135,30 @@ mettre l'application à jour ne fait perdre aucune donnée.
 - L'interface du personnel (agents, administrateurs) reste en français.
 - **Photos** : réduites à 1600 px (navigateur puis serveur) à l'envoi, et affichées ENTIÈRES dans les cartes (hall, portail,
   interface agent), le reste de la carte étant rempli par la même photo agrandie et floutée : ni rognage, ni débordement.
-- **Catégories d'objets** : une liste commune (31 catégories, dont tapis de prière, casquette, bonnet, chapelet,
-  gourde, carte scolaire, passeport, clé USB, argent, chaussures…) plus des catégories propres au secteur (écoles :
+- **Catégories d'objets** : une liste commune (32 catégories, dont tapis de prière, casquette, bonnet, chapelet,
+  gourde, carte scolaire, passeport, clé USB, argent, chaussures, permis de conduire…) plus des catégories propres au secteur (écoles :
   tenue scolaire, ensemble géométrique, bic, calculatrice, kit de maintenance et robotique ; transport : billet de voyage) ; « Autre » reste en dernier. Elles sont définies dans
   `app/services/categories.py` et servies par `GET /portail/{slug}/categories`.
+
+## Sécurité et finition (Étape 16)
+
+- **Limitation des tentatives** : après 5 échecs de connexion (même adresse et même identifiant) en 5 minutes,
+  l'accès est bloqué quelques minutes (erreur 429), même avec le bon mot de passe. Les formulaires publics
+  (déclaration de perte) sont limités à 20 requêtes par adresse sur 10 minutes. Réglable dans `.env`.
+  Les compteurs sont en mémoire : remis à zéro au redémarrage (limite connue).
+- **Sessions** : changer ou réinitialiser un mot de passe, ou désactiver un compte, met fin à TOUTES les sessions
+  ouvertes de ce compte (autre téléphone, poste oublié).
+- **Mot de passe provisoire** : un compte créé par un administrateur, ou dont le mot de passe est réinitialisé,
+  doit choisir son propre mot de passe à la première connexion ; tant que ce n'est pas fait, le serveur refuse
+  tout le reste (403).
+- **Journal d'audit** (onglet « Journal », administrateurs) : connexions réussies, échouées ou bloquées, changements
+  de mot de passe, gestion des comptes, archivages. Lecture seule ; jamais de mot de passe ni de donnée d'usager.
+  Route : `GET /audit/`.
+- **Archivage automatique** : un objet resté « en attente » au-delà du délai de conservation de son organisation
+  est archivé (jamais supprimé), vérifié au démarrage puis toutes les 6 heures. `ARCHIVAGE_AUTO=false` le désactive.
+- **Téléphone** : le serveur applique lui-même la règle de la page (8 chiffres du Niger ou numéro étranger en +).
+- Migration Alembic `0004` (deux colonnes sur `utilisateurs`) ; la table `journal_audit` est créée au démarrage.
+- Tests sans base de données : `python -m unittest discover -s tests -v`.
 
 ## Documentation du projet
 

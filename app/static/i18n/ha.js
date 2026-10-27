@@ -107,6 +107,7 @@
   "cat.billet_de_voyage": "Tikitin tafiya",
   "cat.carte_scolaire": "Katin makaranta",
   "cat.chaussures": "Takalma",
+  "cat.permis_de_conduire": "Lasisin tuƙi",
   "cat.ensemble_geometrique": "Kayan aikin lissafi",
   "cat.bic": "Biro",
   "cat.calculatrice": "Kalkuleta",

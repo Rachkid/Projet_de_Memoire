@@ -25,6 +25,7 @@
       <a href="#nouveau" data-vue="nouveau" id="onglet-nouveau"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 8v8M8 12h8"/></svg><span>Enregistrer</span></a>
       <a href="#pertes" data-vue="pertes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6l1 2h3a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h3l1-2zM9 12h6M9 16h4"/></svg><span>Déclarations</span></a>
       <a href="#historique" data-vue="historique" id="onglet-historique" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/></svg><span>Historique</span></a>
+      <a href="#journal" data-vue="journal" id="onglet-journal" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3zM9 12l2 2 4-4"/></svg><span>Journal</span></a>
     </nav>
     <div class="haut__outils">
       <p class="haut__titre" id="haut-titre" aria-hidden="true"></p>
@@ -315,14 +316,30 @@
     </section>
 
     <!-- MON COMPTE -->
+    <!-- JOURNAL D'AUDIT (administrateurs) -->
+    <section class="vue contenu contenu--large" id="vue-journal" aria-labelledby="journal-titre" hidden>
+      <h2 id="journal-titre" tabindex="-1">Journal d'audit</h2>
+      <p class="chapeau">Les actions sensibles : connexions, mots de passe, comptes, archivages. Ce journal ne peut être ni modifié ni effacé depuis l'application.</p>
+      <div class="filtres filtres--ligne">
+        <div><label for="ja-action">Action</label><select id="ja-action"><option value="">Toutes les actions</option></select></div>
+      </div>
+      <div id="audit-etat" class="etat" role="status"></div>
+      <div class="tableau-defile"><table class="tableau" id="audit-tableau" hidden>
+        <thead><tr><th>Date</th><th>Action</th><th>Par</th><th>Concerne</th><th>Détail</th><th>Adresse</th></tr></thead>
+        <tbody id="audit-corps"></tbody>
+      </table></div>
+      <button type="button" class="bouton bouton--doux" id="audit-plus" hidden>Voir plus</button>
+    </section>
+
     <section class="vue contenu" id="vue-compte" aria-labelledby="compte-titre" hidden>
       <h2 id="compte-titre" tabindex="-1">Mon compte</h2>
+      <p class="alerte alerte--info" id="mdp-force" role="status" hidden>Votre mot de passe est provisoire : il a été choisi par un administrateur. Choisissez maintenant le vôtre pour accéder à l'application.</p>
       <dl class="infos" id="compte-infos"></dl>
 
       <h3 class="sous-titre">Changer mon mot de passe</h3>
       <form id="form-mdp" class="panneau" novalidate>
         <div class="champ">
-          <label for="ancien-mdp">Mot de passe actuel</label>
+          <label for="ancien-mdp" id="ancien-mdp-libelle">Mot de passe actuel</label>
           <input id="ancien-mdp" type="password" autocomplete="current-password" maxlength="72">
         </div>
         <div class="champ">

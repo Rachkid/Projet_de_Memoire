@@ -45,6 +45,7 @@ CATEGORIES_COMMUNES: list[str] = [
     "Enveloppe",
     "Thermos",
     "Chaussures",
+    "Permis de conduire",
 ]
 
 # Catégories propres à un secteur : insérées avant « Autre ».

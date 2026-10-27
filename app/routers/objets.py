@@ -19,6 +19,7 @@ from app.models.enums import StatutObjet
 from app.schemas.signalement_perte import SignalementPersonnelRead
 from app.schemas.objet import ObjetCreate, ObjetCreeRead, ObjetRead, ObjetUpdate
 from app.security import exiger_enregistrement, exiger_enregistrement_ou_administrateur, get_utilisateur_courant
+from app.services import audit
 from app.services.rapprochement import signalements_correspondants, traiter_nouvel_objet
 
 router = APIRouter(prefix="/objets", tags=["Objets"])
@@ -176,6 +177,8 @@ def archiver_objet(
     objet.statut = StatutObjet.ARCHIVE.value
     db.commit()
     db.refresh(objet)
+    audit.tracer(db, audit.OBJET_ARCHIVE, acteur=utilisateur, organisation_id=objet.organisation_id,
+                 cible=objet.qr_code, detail=f"Catégorie : {objet.categorie}")
     return objet
 
 

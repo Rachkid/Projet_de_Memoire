@@ -107,6 +107,7 @@
   "cat.billet_de_voyage": "Tike dirrayan",
   "cat.carte_scolaire": "Sekoli karta",
   "cat.chaussures": "Tamu",
+  "cat.permis_de_conduire": "Permi",
   "cat.ensemble_geometrique": "Ensemble géométrique",
   "cat.bic": "Bik",
   "cat.calculatrice": "Kalkilatoor",

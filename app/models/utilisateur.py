@@ -7,7 +7,7 @@ extérieure (élève, voyageur) sans compte ni mot de passe (voir usager.py).
 
 import uuid
 
-from sqlalchemy import Boolean, ForeignKey, String
+from sqlalchemy import Boolean, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -44,6 +44,15 @@ class Utilisateur(Base):
 
     # Mot de passe chiffré avec bcrypt (jamais stocké en clair).
     mot_de_passe_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    # Étape 16 : numéro de « génération » des sessions. Chaque jeton de connexion porte le numéro courant ; on
+    # l'augmente quand le mot de passe change, est réinitialisé ou que le compte est désactivé : tous les jetons
+    # déjà émis (par exemple sur un téléphone volé) cessent aussitôt de fonctionner.
+    version_session: Mapped[int] = mapped_column(Integer, default=0, server_default="0", nullable=False)
+
+    # Étape 16 : vrai tant que le mot de passe est PROVISOIRE (compte créé ou réinitialisé par un administrateur).
+    # Tant qu'il l'est, le serveur ne laisse faire que « voir mon profil » et « changer mon mot de passe ».
+    doit_changer_mot_de_passe: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false", nullable=False)
 
     organisation: Mapped["Organisation"] = relationship(back_populates="utilisateurs")
     objets_enregistres: Mapped[list["Objet"]] = relationship(back_populates="agent_enregistrement")

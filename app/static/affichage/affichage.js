@@ -106,6 +106,7 @@
     "thermos": "M8 2h8v3H8zM7 5h10v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1zM7 10h10",
     "billet de voyage": "M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4zM14 7v10",
     "chaussures": "M3 16V8l5 2 3 3h6a4 4 0 0 1 4 4v0H3zM3 19h18",
+    "permis de conduire": "M4.5 5h15A2.5 2.5 0 0 1 22 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 16.5v-9A2.5 2.5 0 0 1 4.5 5zM5.5 15.5h6M14 10h5M14 13.5h5" + cercle(8.5, 10, 1.8),
     "ensemble geometrique": "M3 20L12 4l9 16zM8 20l4-8M3 20h18",
     "bic": "M17 3l4 4L8 20l-5 1 1-5zM14 6l4 4",
     "calculatrice": "M6 2h12a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18h.01M12 18h.01M16 18h.01",

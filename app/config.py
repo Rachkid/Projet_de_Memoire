@@ -51,6 +51,26 @@ class Settings(BaseSettings):
     smtp_ssl: bool = False  # chiffrement SSL direct (en général port 465)
     courriel_expediteur: str = "Tsintuwa <ne-pas-repondre@tsintuwa.local>"
 
+    # Limitation des tentatives (étape 16). Voir services/limitation.py.
+    # Connexion : au plus « limite_connexion_essais » échecs par adresse ET identifiant sur « limite_connexion_minutes »
+    # minutes (au-delà : blocage temporaire), et « limite_connexion_par_adresse » échecs au total par adresse
+    # (essai de plusieurs identifiants depuis un même poste).
+    limite_connexion_essais: int = 5
+    limite_connexion_par_adresse: int = 20
+    limite_connexion_minutes: int = 5
+    # Formulaires publics (création d'usager, déclaration de perte) : au plus « limite_declarations » requêtes
+    # par adresse sur « limite_declarations_minutes » minutes (une déclaration en compte deux).
+    limite_declarations: int = 20
+    limite_declarations_minutes: int = 10
+    # Archivage automatique (étape 16) des objets restés « en attente » au-delà du délai de conservation de leur
+    # organisation. Vérifié au démarrage puis toutes les « archivage_intervalle_heures » heures.
+    archivage_auto: bool = True
+    archivage_intervalle_heures: int = 6
+
+    # À mettre à True UNIQUEMENT si le serveur est derrière un relais de confiance (Nginx, Caddy…) qui ajoute
+    # l'en-tête X-Forwarded-For. Sinon n'importe qui pourrait falsifier son adresse et contourner la limitation.
+    proxy_de_confiance: bool = False
+
     # Indique à Pydantic de lire les valeurs manquantes depuis le fichier .env
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

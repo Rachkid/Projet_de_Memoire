@@ -22,7 +22,8 @@ from app.models import (  # noqa: F401 — l'import garantit que tous les modèl
     SignalementPerte,
 )
 from app.migrations_runner import appliquer_migrations
-from app.routers import alertes, auth, historique, objets, organisations, photos, portail, restitutions, signalements, statistiques, usagers, utilisateurs
+from app.services.archivage import demarrer_archivage_automatique
+from app.routers import alertes, audit, auth, historique, objets, organisations, photos, portail, restitutions, signalements, statistiques, usagers, utilisateurs
 
 # 1) Crée les tables qui n'existent pas encore (base neuve).
 Base.metadata.create_all(bind=engine)
@@ -36,7 +37,7 @@ app = FastAPI(
         "API du projet de mémoire de fin de cycle M2 Génie Logiciel — "
         "Institut Africain de Technologie (IAT), Niamey, Niger."
     ),
-    version="0.11.0",
+    version="0.12.0",
     redoc_url=None,  # remplacée plus bas par une version figée (voir page_redoc)
 )
 
@@ -54,6 +55,13 @@ app.include_router(photos.router)
 app.include_router(portail.router)
 app.include_router(statistiques.router)
 app.include_router(historique.router)
+app.include_router(audit.router)
+
+
+@app.on_event("startup")
+def demarrer_les_taches_de_fond():
+    """Étape 16 : lance l'archivage automatique des objets dont le délai de conservation est dépassé."""
+    demarrer_archivage_automatique()
 
 # Les photos d'OBJETS sont publiques : on expose leur dossier tel quel. Le
 # dossier des photos de propriétaires n'est volontairement PAS exposé ici.

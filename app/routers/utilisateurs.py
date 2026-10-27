@@ -11,7 +11,7 @@ Règles d'accès (étape 8) :
 
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -25,7 +25,9 @@ from app.schemas.utilisateur import (
     UtilisateurRead,
     UtilisateurUpdate,
 )
+from app.limites import adresse_client
 from app.security import exiger_administrateur, hacher_mot_de_passe
+from app.services import audit
 
 router = APIRouter(prefix="/utilisateurs", tags=["Utilisateurs"])
 
@@ -36,6 +38,7 @@ def _est_super(utilisateur: Utilisateur) -> bool:
 
 @router.post("/", response_model=UtilisateurRead, status_code=status.HTTP_201_CREATED)
 def creer_utilisateur(
+    requete: Request,
     payload: UtilisateurCreate,
     db: Session = Depends(get_db),
     createur: Utilisateur = Depends(exiger_administrateur),
@@ -52,7 +55,10 @@ def creer_utilisateur(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organisation introuvable")
 
     donnees = payload.model_dump(exclude={"mot_de_passe"})
-    utilisateur = Utilisateur(**donnees, mot_de_passe_hash=hacher_mot_de_passe(payload.mot_de_passe))
+    # Le mot de passe choisi par l'administrateur est PROVISOIRE : la personne devra choisir le sien à sa première connexion.
+    utilisateur = Utilisateur(
+        **donnees, mot_de_passe_hash=hacher_mot_de_passe(payload.mot_de_passe), doit_changer_mot_de_passe=True
+    )
     db.add(utilisateur)
     try:
         db.commit()
@@ -60,6 +66,8 @@ def creer_utilisateur(
         db.rollback()
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Cet identifiant existe déjà.")
     db.refresh(utilisateur)
+    audit.tracer(db, audit.COMPTE_CREE, acteur=createur, organisation_id=utilisateur.organisation_id,
+                 cible=utilisateur.identifiant, detail=f"Rôle : {utilisateur.role}", adresse=adresse_client(requete))
     return utilisateur
 
 
@@ -98,6 +106,7 @@ def _compte_gerable(db: Session, utilisateur_id: uuid.UUID, demandeur: Utilisate
 
 @router.patch("/{utilisateur_id}", response_model=UtilisateurRead)
 def modifier_utilisateur(
+    requete: Request,
     utilisateur_id: uuid.UUID,
     payload: UtilisateurUpdate,
     db: Session = Depends(get_db),
@@ -112,11 +121,15 @@ def modifier_utilisateur(
         setattr(cible, champ, valeur)
     db.commit()
     db.refresh(cible)
+    audit.tracer(db, audit.COMPTE_MODIFIE, acteur=demandeur, organisation_id=cible.organisation_id,
+                 cible=cible.identifiant, detail="Champs modifiés : " + ", ".join(sorted(modifications)),
+                 adresse=adresse_client(requete))
     return cible
 
 
 @router.patch("/{utilisateur_id}/desactiver", response_model=UtilisateurRead)
 def desactiver_utilisateur(
+    requete: Request,
     utilisateur_id: uuid.UUID,
     db: Session = Depends(get_db),
     demandeur: Utilisateur = Depends(exiger_administrateur),
@@ -129,13 +142,17 @@ def desactiver_utilisateur(
     if cible.id == demandeur.id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Vous ne pouvez pas désactiver votre propre compte.")
     cible.actif = False
+    cible.version_session = (cible.version_session or 0) + 1  # ses jetons actuels ne serviront plus, même après réactivation
     db.commit()
     db.refresh(cible)
+    audit.tracer(db, audit.COMPTE_DESACTIVE, acteur=demandeur, organisation_id=cible.organisation_id,
+                 cible=cible.identifiant, adresse=adresse_client(requete))
     return cible
 
 
 @router.patch("/{utilisateur_id}/reactiver", response_model=UtilisateurRead)
 def reactiver_utilisateur(
+    requete: Request,
     utilisateur_id: uuid.UUID,
     db: Session = Depends(get_db),
     demandeur: Utilisateur = Depends(exiger_administrateur),
@@ -147,11 +164,14 @@ def reactiver_utilisateur(
     cible.actif = True
     db.commit()
     db.refresh(cible)
+    audit.tracer(db, audit.COMPTE_REACTIVE, acteur=demandeur, organisation_id=cible.organisation_id,
+                 cible=cible.identifiant, adresse=adresse_client(requete))
     return cible
 
 
 @router.patch("/{utilisateur_id}/reinitialiser-mot-de-passe", response_model=UtilisateurRead)
 def reinitialiser_mot_de_passe(
+    requete: Request,
     utilisateur_id: uuid.UUID,
     payload: ReinitialisationMotDePasse,
     db: Session = Depends(get_db),
@@ -171,6 +191,10 @@ def reinitialiser_mot_de_passe(
             detail="Pour changer votre propre mot de passe, utilisez /auth/mot-de-passe.",
         )
     cible.mot_de_passe_hash = hacher_mot_de_passe(payload.nouveau_mot_de_passe)
+    cible.version_session = (cible.version_session or 0) + 1  # met fin à ses sessions ouvertes
+    cible.doit_changer_mot_de_passe = True                     # le mot de passe fourni est provisoire
     db.commit()
     db.refresh(cible)
+    audit.tracer(db, audit.MOT_DE_PASSE_REINITIALISE, acteur=demandeur, organisation_id=cible.organisation_id,
+                 cible=cible.identifiant, adresse=adresse_client(requete))
     return cible

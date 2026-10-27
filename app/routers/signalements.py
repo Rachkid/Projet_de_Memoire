@@ -15,6 +15,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.limites import limiter_requetes_publiques
 from app.models.enums import StatutSignalement
 from app.models.organisation import Organisation
 from app.models.signalement_perte import SignalementPerte
@@ -29,7 +30,7 @@ from app.services.rapprochement import objets_correspondants, traiter_nouveau_si
 router = APIRouter(prefix="/signalements", tags=["Signalements de perte"])
 
 
-@router.post("/", response_model=SignalementPerteRead, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=SignalementPerteRead, status_code=status.HTTP_201_CREATED, dependencies=[Depends(limiter_requetes_publiques)])
 def declarer_perte(payload: SignalementPerteCreate, db: Session = Depends(get_db)):
     """Enregistre un signalement (public) puis lance le rapprochement automatique."""
     if db.get(Organisation, payload.organisation_id) is None:

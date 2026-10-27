@@ -120,5 +120,6 @@ class UtilisateurRead(UtilisateurBase):
     id: uuid.UUID
     identifiant: str
     actif: bool
+    doit_changer_mot_de_passe: bool = False
 
     model_config = ConfigDict(from_attributes=True)

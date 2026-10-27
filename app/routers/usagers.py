@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.limites import limiter_requetes_publiques
 from app.models.usager import Usager
 from app.models.utilisateur import Utilisateur
 from app.security import exiger_super_administrateur
@@ -14,7 +15,7 @@ from app.schemas.usager import UsagerCreate, UsagerRead
 router = APIRouter(prefix="/usagers", tags=["Usagers"])
 
 
-@router.post("/", response_model=UsagerRead, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=UsagerRead, status_code=status.HTTP_201_CREATED, dependencies=[Depends(limiter_requetes_publiques)])
 def creer_ou_recuperer_usager(payload: UsagerCreate, db: Session = Depends(get_db)):
     """
     Si un usager existe déjà avec ce numéro de téléphone, on le renvoie

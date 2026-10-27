@@ -22,7 +22,7 @@ from app.config import settings
 from app.database import get_db
 from app.models.enums import RoleUtilisateur
 from app.models.utilisateur import Utilisateur
-from app.services.jetons import creer_jeton, lire_jeton
+from app.services.jetons import creer_jeton, lire_jeton_complet
 
 # bcrypt : algorithme volontairement lent, recommandé pour les mots de passe.
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -56,6 +56,7 @@ def creer_jeton_acces(utilisateur: Utilisateur) -> str:
         cle=settings.secret_key,
         algorithme=settings.algorithm,
         duree_minutes=settings.access_token_expire_minutes,
+        version=utilisateur.version_session or 0,
     )
 
 
@@ -67,13 +68,17 @@ def _non_authentifie() -> HTTPException:
     )
 
 
-def get_utilisateur_courant(
+def get_utilisateur_courant_libre(
     jeton: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ) -> Utilisateur:
-    """Identifie la personne connectée à partir du jeton présenté."""
-    sujet = lire_jeton(jeton, settings.secret_key, settings.algorithm)
-    if sujet is None:
+    """
+    Identifie la personne connectée à partir du jeton présenté, SANS exiger qu'elle ait choisi son propre mot de
+    passe. Réservé aux deux routes qui permettent justement de le faire : voir son profil et changer son mot de passe.
+    """
+    lu = lire_jeton_complet(jeton, settings.secret_key, settings.algorithm)
+    if lu is None:
         raise _non_authentifie()
+    sujet, version = lu
     try:
         utilisateur_id = uuid.UUID(sujet)
     except ValueError:
@@ -82,6 +87,21 @@ def get_utilisateur_courant(
     # Compte supprimé ou désactivé : le jeton, même valide, ne donne plus rien.
     if utilisateur is None or not utilisateur.actif:
         raise _non_authentifie()
+    # Étape 16 : mot de passe changé ou réinitialisé depuis l'émission du jeton (ou compte désactivé puis
+    # réactivé) : ce jeton appartient à une ancienne session, il est refusé.
+    if version != (utilisateur.version_session or 0):
+        raise _non_authentifie()
+    return utilisateur
+
+
+def get_utilisateur_courant(utilisateur: Utilisateur = Depends(get_utilisateur_courant_libre)) -> Utilisateur:
+    """
+    Personne connectée, pour toutes les routes ordinaires. Étape 16 : tant que son mot de passe est provisoire
+    (compte créé ou réinitialisé par un administrateur), le serveur refuse tout (403) sauf le changement de mot de
+    passe : on ne peut pas travailler avec un mot de passe que quelqu'un d'autre connaît.
+    """
+    if utilisateur.doit_changer_mot_de_passe:
+        raise _interdit("Votre mot de passe est provisoire : choisissez le vôtre pour continuer.")
     return utilisateur
 
 

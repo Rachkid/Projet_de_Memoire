@@ -17,21 +17,26 @@ import jwt
 
 
 def creer_jeton(sujet: str, cle: str, algorithme: str, duree_minutes: int,
-                maintenant: datetime | None = None) -> str:
-    """Fabrique un jeton signé contenant l'identifiant de l'utilisateur (« sub »)."""
+                maintenant: datetime | None = None, version: int = 0) -> str:
+    """
+    Fabrique un jeton signé contenant l'identifiant de l'utilisateur (« sub ») et le numéro de génération de
+    ses sessions (« v », étape 16) : si le compte change de numéro, ce jeton n'est plus accepté.
+    """
     maintenant = maintenant or datetime.now(timezone.utc)
     contenu = {
         "sub": sujet,                                         # à qui appartient le jeton
+        "v": version,                                         # génération de session
         "iat": maintenant,                                    # émis à
         "exp": maintenant + timedelta(minutes=duree_minutes), # expire à
     }
     return jwt.encode(contenu, cle, algorithm=algorithme)
 
 
-def lire_jeton(jeton: str, cle: str, algorithme: str) -> str | None:
+def lire_jeton_complet(jeton: str, cle: str, algorithme: str) -> tuple[str, int] | None:
     """
-    Renvoie l'identifiant contenu dans le jeton, ou None si le jeton est
-    invalide (mauvaise signature, expiré, mal formé, sans « sub »).
+    Renvoie (identifiant, génération de session) contenus dans le jeton, ou None si le jeton est
+    invalide (mauvaise signature, expiré, mal formé, sans « sub »). Un jeton émis avant l'étape 16,
+    sans « v », est lu comme génération 0.
 
     On impose la liste des algorithmes acceptés (algorithms=[algorithme]) :
     sans cela, un attaquant pourrait présenter un jeton déclarant
@@ -42,4 +47,13 @@ def lire_jeton(jeton: str, cle: str, algorithme: str) -> str | None:
     except jwt.PyJWTError:
         return None
     sujet = contenu.get("sub")
-    return sujet if isinstance(sujet, str) else None
+    version = contenu.get("v", 0)
+    if not isinstance(sujet, str) or not isinstance(version, int) or isinstance(version, bool):
+        return None
+    return sujet, version
+
+
+def lire_jeton(jeton: str, cle: str, algorithme: str) -> str | None:
+    """Renvoie seulement l'identifiant contenu dans le jeton (ou None) : voir lire_jeton_complet."""
+    lu = lire_jeton_complet(jeton, cle, algorithme)
+    return lu[0] if lu else None

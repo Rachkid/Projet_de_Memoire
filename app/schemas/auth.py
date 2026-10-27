@@ -8,3 +8,5 @@ class Jeton(BaseModel):
 
     access_token: str
     token_type: str = "bearer"
+    # Étape 16 : vrai si le mot de passe est provisoire (la page doit alors demander d'en choisir un).
+    doit_changer_mot_de_passe: bool = False

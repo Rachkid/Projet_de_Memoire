@@ -26,6 +26,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 # On copie ensuite le code de l'application
 COPY ./app ./app
+COPY ./tests ./tests
 COPY alembic.ini .
 
 # Commande de démarrage du serveur au lancement du conteneur

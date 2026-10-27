@@ -107,6 +107,7 @@
   "cat.billet_de_voyage": "تذكرة سفر",
   "cat.carte_scolaire": "بطاقة مدرسية",
   "cat.chaussures": "أحذية",
+  "cat.permis_de_conduire": "رخصة القيادة",
   "cat.ensemble_geometrique": "أدوات هندسية",
   "cat.bic": "قلم حبر جاف",
   "cat.calculatrice": "آلة حاسبة",

@@ -158,6 +158,31 @@
     "montre": "M10 2.5h4l1 4M14 21.5h-4l-1-4M10 6.5h4a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3v-5a3 3 0 0 1 3-3zM12 10v2.2l1.5 1",
     "bijou": "M6 3h12l4 6-10 12L2 9l4-6zM2 9h20M9 3L7 9l5 12 5-12-2-6",
     "livre ou cahier": "M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5zM4 19a2 2 0 0 0 2 2h13M8 7h7",
+    "tapis de priere": "M6 3h12v18H6zM9 21V10a3 3 0 0 1 6 0v11",
+    "casquette": "M5 15a7 7 0 0 1 14 0zM19 15h3M12 8V6",
+    "bonnet": "M5 16a7 7 0 0 1 14 0zM4 16h16v3H4zM12 9V6",
+    "chapelet": cercle(12, 5, 2) + cercle(6.5, 10, 2) + cercle(17.5, 10, 2) + cercle(8, 17, 2) + cercle(16, 17, 2),
+    "gourde": "M10 2h4v3h-4zM8 5h8l1 4v11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9zM7 11h10",
+    "sachet": "M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0",
+    "tenue scolaire": "M9 3L3 6l2.2 4.2L8 9v12h8V9l2.8 1.2L21 6l-6-3a3 3 0 0 1-6 0zM12 12v5",
+    "carte scolaire": "M4.5 5h15A2.5 2.5 0 0 1 22 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 16.5v-9A2.5 2.5 0 0 1 4.5 5zM15 10h4M15 14h4M5.5 16.5c.5-2 5.5-2 6 0" + cercle(8.5, 10.5, 1.8),
+    "carte d'identite": "M4.5 5h15A2.5 2.5 0 0 1 22 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 16.5v-9A2.5 2.5 0 0 1 4.5 5zM15 10h4M15 14h4M5.5 16.5c.5-2 5.5-2 6 0" + cercle(8.5, 10.5, 1.8),
+    "passeport": "M6 2h12a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM9 17h6" + cercle(12, 10, 3),
+    "cle usb": "M9 2h6v6H9zM10 8v3M14 8v3M7 11h10v9a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z",
+    "disque dur": "M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM7 14h.01M11 14h6",
+    "chargeur": "M9 2v5M15 2v5M6 7h12v4a6 6 0 0 1-12 0zM12 17v5",
+    "argent": "M2 6h20v12H2zM5.5 12h.01M18.5 12h.01" + cercle(12, 12, 3),
+    "pochette": "M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 11h18M10 11v2h4v-2",
+    "bracelet": cercle(12, 12, 8) + cercle(12, 12, 5),
+    "enveloppe": "M3 6h18v12H3zM3 7l9 7 9-7",
+    "thermos": "M8 2h8v3H8zM7 5h10v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1zM7 10h10",
+    "billet de voyage": "M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4zM14 7v10",
+    "chaussures": "M3 16V8l5 2 3 3h6a4 4 0 0 1 4 4v0H3zM3 19h18",
+    "permis de conduire": "M4.5 5h15A2.5 2.5 0 0 1 22 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 16.5v-9A2.5 2.5 0 0 1 4.5 5zM5.5 15.5h6M14 10h5M14 13.5h5" + cercle(8.5, 10, 1.8),
+    "ensemble geometrique": "M3 20L12 4l9 16zM8 20l4-8M3 20h18",
+    "bic": "M17 3l4 4L8 20l-5 1 1-5zM14 6l4 4",
+    "calculatrice": "M6 2h12a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18h.01M12 18h.01M16 18h.01",
+    "kit de maintenance et robotique": cercle(12, 12, 3) + "M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2",
     "autre": "M21 8l-9-5-9 5v8l9 5 9-5V8zM3 8l9 5 9-5M12 13v8",
     "recherche": "M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-5-5"
   };
@@ -345,7 +370,7 @@
 
   /* ---------- Affichage des vues ---------- */
 
-  const VUES = ["connexion", "objets", "nouveau", "enregistre", "fiche", "restituer", "remis", "pertes", "bord", "historique", "compte"];
+  const VUES = ["connexion", "objets", "nouveau", "enregistre", "fiche", "restituer", "remis", "pertes", "bord", "historique", "journal", "compte"];
 
   function afficherVue(nom, titreId) {
     VUES.forEach(function (v) { $("vue-" + v).hidden = (v !== nom); });
@@ -353,11 +378,11 @@
     $("haut").hidden = !connecte;
     $("onglets").hidden = !connecte;
     document.body.classList.toggle("hors-session", !connecte);
-    const cible = { objets: "objets", nouveau: "nouveau", enregistre: "nouveau", fiche: "objets", restituer: "objets", remis: "objets", pertes: "pertes", bord: "bord", historique: "historique" }[nom];
+    const cible = { objets: "objets", nouveau: "nouveau", enregistre: "nouveau", fiche: "objets", restituer: "objets", remis: "objets", pertes: "pertes", bord: "bord", historique: "historique", journal: "journal" }[nom];
     document.querySelectorAll("#onglets a").forEach(function (a) {
       if (a.getAttribute("data-vue") === cible) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
-    $("haut-titre").textContent = { objets: "Objets trouvés", nouveau: "Enregistrer un objet", pertes: "Déclarations", bord: "Tableau de bord", historique: "Historique", compte: "Mon compte" }[cible || (nom === "compte" ? "compte" : "")] || "";
+    $("haut-titre").textContent = { objets: "Objets trouvés", nouveau: "Enregistrer un objet", pertes: "Déclarations", bord: "Tableau de bord", historique: "Historique", journal: "Journal d'audit", compte: "Mon compte" }[cible || (nom === "compte" ? "compte" : "")] || "";
     window.scrollTo(0, 0);
     const titre = $(titreId);
     if (titre) titre.focus({ preventScroll: true });
@@ -378,6 +403,9 @@
 
     if (!moi) { montrerConnexion(); return; }
 
+    // Étape 16 : mot de passe provisoire : seule la page « Mon compte » est accessible, le temps d'en choisir un.
+    if (moi.doit_changer_mot_de_passe) { if (page !== "compte") { aller("#compte"); return; } return pageCompte(); }
+
     if (page === "" || page === "connexion") { aller(pageAccueil()); return; }
     if (page === "objets") return pageObjets();
     if (page === "nouveau") return pageNouveau();
@@ -388,6 +416,7 @@
     if (page === "pertes") return pagePertes();
     if (page === "bord") return estAdmin() ? pageBord() : aller("#objets");
     if (page === "historique") return estAdmin() ? pageHistorique(morceaux[1], morceaux[2]) : aller("#objets");
+    if (page === "journal") return estAdmin() ? pageJournal() : aller("#objets");
     if (page === "compte") return pageCompte();
     aller("#objets");
   }
@@ -422,10 +451,19 @@
     const initiales = (moi.nom || "?").split(/\s+/).filter(Boolean).slice(0, 2).map(function (m) { return m.charAt(0); }).join("").toUpperCase();
     compte.appendChild(el("span", "avatar", initiales));
     compte.appendChild(el("span", "haut__nom", moi.nom));
+    document.querySelectorAll("#onglets a").forEach(function (a) { a.hidden = false; });
     $("onglet-nouveau").hidden = !aDroit("droit_enregistrement");
     $("onglet-bord").hidden = !estAdmin();
     $("onglet-historique").hidden = !estAdmin();
-    demarrerAlertes();
+    $("onglet-journal").hidden = !estAdmin();
+    if (moi.doit_changer_mot_de_passe) {
+      // Mot de passe provisoire : aucun menu, pas d'alertes (le serveur les refuserait) tant qu'il n'est pas changé.
+      document.querySelectorAll("#onglets a").forEach(function (a) { a.hidden = true; });
+      $("cloche").hidden = true;
+    } else {
+      $("cloche").hidden = false;
+      demarrerAlertes();
+    }
   }
 
   $("form-connexion").addEventListener("submit", async function (e) {
@@ -1488,6 +1526,9 @@
     ligneInfo(infos, "Droits", droits.length ? "Peut " + droits.join(" et ") : "Consultation seulement");
     $("form-mdp").reset();
     montrerErreur("mdp-erreur", ""); montrerErreur("mdp-ok", "");
+    const force = !!moi.doit_changer_mot_de_passe;
+    $("mdp-force").hidden = !force;
+    $("ancien-mdp-libelle").textContent = force ? "Mot de passe provisoire (celui que vous avez reçu)" : "Mot de passe actuel";
   }
 
   $("form-mdp").addEventListener("submit", async function (e) {
@@ -1499,15 +1540,74 @@
     const bouton = $("mdp-envoyer");
     bouton.disabled = true;
     try {
-      await api("POST", "/auth/mot-de-passe", { ancien_mot_de_passe: ancien, nouveau_mot_de_passe: nouveau });
+      const r = await api("POST", "/auth/mot-de-passe", { ancien_mot_de_passe: ancien, nouveau_mot_de_passe: nouveau });
       $("form-mdp").reset();
-      montrerErreur("mdp-ok", "Mot de passe modifié.");
+      // Étape 16 : le serveur met fin à toutes les anciennes sessions et remet un nouveau jeton pour celle-ci.
+      if (r && r.access_token) { jeton = r.access_token; ecrireJeton(jeton); }
+      if (moi.doit_changer_mot_de_passe) {
+        await ouvrirSession(jeton);   // recharge le profil : les menus apparaissent
+        aller(pageAccueil());
+        return;
+      }
+      montrerErreur("mdp-ok", "Mot de passe modifié. Vos autres appareils connectés ont été déconnectés.");
     } catch (err) {
       montrerErreur("mdp-erreur", err.message);
     } finally {
       bouton.disabled = false;
     }
   });
+
+  /* ---------- Journal d'audit (administrateurs) ---------- */
+
+  const ACTIONS_AUDIT = {
+    connexion: "Connexion",
+    connexion_echec: "Connexion échouée",
+    connexion_bloquee: "Connexion bloquée (trop d'essais)",
+    mot_de_passe_change: "Mot de passe changé",
+    mot_de_passe_reinitialise: "Mot de passe réinitialisé",
+    compte_cree: "Compte créé",
+    compte_modifie: "Compte modifié",
+    compte_desactive: "Compte désactivé",
+    compte_reactive: "Compte réactivé",
+    objet_archive: "Objet archivé",
+    objet_archive_auto: "Archivage automatique"
+  };
+  const PAGE_AUDIT = 100;
+  let decalageAudit = 0;
+
+  async function pageJournal() {
+    afficherVue("journal", "journal-titre");
+    const choix = $("ja-action");
+    if (choix.options.length <= 1) {
+      Object.keys(ACTIONS_AUDIT).forEach(function (k) { const o = el("option", null, ACTIONS_AUDIT[k]); o.value = k; choix.appendChild(o); });
+    }
+    chargerAudit(true);
+  }
+
+  async function chargerAudit(depuisLeDebut) {
+    const etat = $("audit-etat"), corps = $("audit-corps");
+    if (depuisLeDebut) { decalageAudit = 0; vider(corps); }
+    etat.textContent = "Chargement…";
+    $("audit-plus").hidden = true;
+    let r;
+    try {
+      const filtre = $("ja-action").value ? "&action=" + encodeURIComponent($("ja-action").value) : "";
+      r = await api("GET", "/audit/?limite=" + PAGE_AUDIT + "&decalage=" + decalageAudit + filtre);
+    } catch (err) { etat.textContent = err.message; return; }
+    etat.textContent = r.total ? "" : "Aucune action enregistrée pour ce filtre.";
+    r.lignes.forEach(function (l) {
+      const tr = el("tr");
+      [dateHeure(l.date_heure), ACTIONS_AUDIT[l.action] || l.action, l.acteur || "—", l.cible || "—", l.detail || "", l.adresse || ""].forEach(function (v) {
+        tr.appendChild(el("td", null, v));
+      });
+      corps.appendChild(tr);
+    });
+    decalageAudit += r.lignes.length;
+    $("audit-tableau").hidden = !corps.children.length;
+    $("audit-plus").hidden = decalageAudit >= r.total;
+  }
+  $("ja-action").addEventListener("change", function () { chargerAudit(true); });
+  $("audit-plus").addEventListener("click", function () { chargerAudit(false); });
 
   /* ---------- Démarrage ---------- */
 

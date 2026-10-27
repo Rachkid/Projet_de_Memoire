@@ -15,6 +15,7 @@ from app.models.usager import Usager
 from app.models.objet import Objet
 from app.models.restitution import Restitution
 from app.models.signalement_perte import SignalementPerte
+from app.models.journal_audit import JournalAudit
 
 __all__ = [
     "Organisation",
@@ -23,4 +24,5 @@ __all__ = [
     "Objet",
     "Restitution",
     "SignalementPerte",
+    "JournalAudit",
 ]

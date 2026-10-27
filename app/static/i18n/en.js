@@ -107,6 +107,7 @@
   "cat.billet_de_voyage": "Travel ticket",
   "cat.carte_scolaire": "School card",
   "cat.chaussures": "Shoes",
+  "cat.permis_de_conduire": "Driving licence",
   "cat.ensemble_geometrique": "Geometry set",
   "cat.bic": "Pen",
   "cat.calculatrice": "Calculator",

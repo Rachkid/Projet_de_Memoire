@@ -107,6 +107,7 @@
   "cat.billet_de_voyage": "Billet de voyage",
   "cat.carte_scolaire": "Carte scolaire",
   "cat.chaussures": "Chaussures",
+  "cat.permis_de_conduire": "Permis de conduire",
   "cat.ensemble_geometrique": "Ensemble géométrique",
   "cat.bic": "Bic",
   "cat.calculatrice": "Calculatrice",
