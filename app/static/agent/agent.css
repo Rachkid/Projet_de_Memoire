@@ -853,3 +853,11 @@ a.tel { color: var(--principale); font-weight: 700; }
 }
 #audit-plus { margin-top: 16px; }
 #audit-tableau td:nth-child(5) { white-space: normal; min-width: 14ch; }
+
+/* Équipe : gestion des comptes */
+.mdp-ligne { display: flex; gap: 10px; align-items: stretch; }
+.mdp-ligne input { flex: 1; min-width: 0; font-family: ui-monospace, Menlo, Consolas, monospace; letter-spacing: 0.04em; }
+.tableau__actions { display: flex; gap: 8px; flex-wrap: nowrap; }
+.tableau__actions .bouton { min-height: 40px; padding: 8px 12px; font-size: 0.875rem; }
+.tableau input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--principale); }
+#equipe-resultat dd { font-family: ui-monospace, Menlo, Consolas, monospace; word-break: break-all; }

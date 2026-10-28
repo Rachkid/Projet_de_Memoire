@@ -37,7 +37,7 @@ app = FastAPI(
         "API du projet de mémoire de fin de cycle M2 Génie Logiciel — "
         "Institut Africain de Technologie (IAT), Niamey, Niger."
     ),
-    version="0.12.1",
+    version="0.13.0",
     redoc_url=None,  # remplacée plus bas par une version figée (voir page_redoc)
 )
 

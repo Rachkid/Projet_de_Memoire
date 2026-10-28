@@ -26,6 +26,7 @@
       <a href="#pertes" data-vue="pertes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6l1 2h3a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h3l1-2zM9 12h6M9 16h4"/></svg><span>Déclarations</span></a>
       <a href="#historique" data-vue="historique" id="onglet-historique" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/></svg><span>Historique</span></a>
       <a href="#journal" data-vue="journal" id="onglet-journal" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3zM9 12l2 2 4-4"/></svg><span>Journal</span></a>
+      <a href="#equipe" data-vue="equipe" id="onglet-equipe" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1M17 4a4 4 0 0 1 0 7M22 21v-1a6 6 0 0 0-4-5.6"/></svg><span>Équipe</span></a>
     </nav>
     <div class="haut__outils">
       <p class="haut__titre" id="haut-titre" aria-hidden="true"></p>
@@ -322,6 +323,58 @@
     </section>
 
     <!-- MON COMPTE -->
+    <!-- ÉQUIPE (administrateurs) -->
+    <section class="vue contenu contenu--large" id="vue-equipe" aria-labelledby="equipe-titre" hidden>
+      <h2 id="equipe-titre" tabindex="-1">Équipe</h2>
+      <p class="chapeau">Les comptes des agents de votre organisation. Vous choisissez un mot de passe provisoire : la personne en choisira un à elle dès sa première connexion.</p>
+
+      <div class="panneau alerte--info" id="equipe-resultat" role="status" hidden>
+        <p id="equipe-resultat-titre"><strong></strong></p>
+        <dl class="infos" id="equipe-resultat-infos"></dl>
+        <p class="champ__aide">Notez ou copiez ces informations maintenant : le mot de passe ne sera plus affiché ensuite. Transmettez-le à la personne de vive voix ou par un canal privé.</p>
+        <button type="button" class="bouton bouton--doux" id="equipe-copier">Copier les informations</button>
+      </div>
+
+      <h3 class="sous-titre">Ajouter un agent</h3>
+      <form id="form-equipe" class="panneau" novalidate>
+        <div class="champ">
+          <label for="eq-nom">Nom complet</label>
+          <input id="eq-nom" type="text" maxlength="100" autocomplete="off">
+          <p class="champ__erreur" id="erreur-eq-nom" role="alert" hidden></p>
+        </div>
+        <div class="champ">
+          <label for="eq-identifiant">Identifiant de connexion</label>
+          <input id="eq-identifiant" type="text" maxlength="50" autocomplete="off" autocapitalize="none" spellcheck="false">
+          <p class="champ__aide">3 à 50 caractères : lettres minuscules, chiffres, point, tiret ou souligné. Exemple : <em>amina.diallo</em></p>
+          <p class="champ__erreur" id="erreur-eq-identifiant" role="alert" hidden></p>
+        </div>
+        <fieldset class="champ">
+          <legend>Ce que cet agent peut faire</legend>
+          <label class="case"><input type="checkbox" id="eq-enreg" checked><span>Enregistrer les objets trouvés</span></label>
+          <label class="case"><input type="checkbox" id="eq-resti" checked><span>Remettre les objets à leurs propriétaires</span></label>
+          <p class="champ__erreur" id="erreur-eq-droits" role="alert" hidden></p>
+        </fieldset>
+        <div class="champ">
+          <label for="eq-mdp">Mot de passe provisoire</label>
+          <div class="mdp-ligne">
+            <input id="eq-mdp" type="text" maxlength="72" autocomplete="off" autocapitalize="none" spellcheck="false">
+            <button type="button" class="bouton bouton--doux" id="eq-generer">Générer</button>
+          </div>
+          <p class="champ__aide">8 caractères au minimum. Le bouton « Générer » en propose un solide.</p>
+          <p class="champ__erreur" id="erreur-eq-mdp" role="alert" hidden></p>
+        </div>
+        <p class="alerte" id="equipe-erreur" role="alert" hidden></p>
+        <button class="bouton bouton--accent bouton--plein" type="submit" id="eq-envoyer">Créer le compte</button>
+      </form>
+
+      <h3 class="sous-titre">Comptes existants</h3>
+      <div id="equipe-etat" class="etat" role="status"></div>
+      <div class="tableau-defile"><table class="tableau" id="equipe-tableau" hidden>
+        <thead><tr><th>Nom</th><th>Identifiant</th><th>Rôle</th><th>Enregistre</th><th>Remet</th><th>État</th><th>Actions</th></tr></thead>
+        <tbody id="equipe-corps"></tbody>
+      </table></div>
+    </section>
+
     <!-- JOURNAL D'AUDIT (administrateurs) -->
     <section class="vue contenu contenu--large" id="vue-journal" aria-labelledby="journal-titre" hidden>
       <h2 id="journal-titre" tabindex="-1">Journal d'audit</h2>
@@ -361,6 +414,17 @@
       <div class="actions-bas"><button type="button" class="bouton bouton--danger-doux bouton--plein" id="deconnexion"><svg class="bouton__icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4M16 8l4 4-4 4M20 12H9"/></svg>Se déconnecter</button></div>
     </section>
   </main>
+
+  <dialog id="confirmer-compte" aria-labelledby="confirmer-compte-titre">
+    <div class="detail__corps">
+      <h3 id="confirmer-compte-titre"></h3>
+      <p class="chapeau" id="confirmer-compte-texte"></p>
+      <div class="actions-bas">
+        <button type="button" class="bouton bouton--accent bouton--plein" id="confirmer-compte-oui">Confirmer</button>
+        <button type="button" class="bouton bouton--doux bouton--plein" id="confirmer-compte-non">Annuler</button>
+      </div>
+    </div>
+  </dialog>
 
   <dialog id="confirmer" aria-labelledby="confirmer-titre">
     <div class="detail__corps">

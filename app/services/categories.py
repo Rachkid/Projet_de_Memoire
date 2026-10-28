@@ -61,6 +61,11 @@ CATEGORIES_COMMUNES: list[str] = [
     "Papiers de voiture ou moto",
     "Kit de maquillage",
     "Casque de moto",
+    "Carte de crédit",
+    "Batterie",
+    "Objets électroniques",
+    "Pièces mécaniques",
+    "Outils de chantier",
 ]
 
 # Catégories propres à un secteur : insérées avant « Autre ».

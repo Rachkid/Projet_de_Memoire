@@ -135,12 +135,21 @@ mettre l'application à jour ne fait perdre aucune donnée.
 - L'interface du personnel (agents, administrateurs) reste en français.
 - **Photos** : réduites à 1600 px (navigateur puis serveur) à l'envoi, et affichées ENTIÈRES dans les cartes (hall, portail,
   interface agent), le reste de la carte étant rempli par la même photo agrandie et floutée : ni rognage, ni débordement.
-- **Catégories d'objets** : une liste commune (47 catégories, dont tapis de prière, casquette, bonnet, chapelet,
-  gourde, carte scolaire, passeport, clé USB, argent, chaussures, permis de conduire, hijab ou voile, carte professionnelle, chaussettes, produits (médicaux, cosmétiques, alimentaires, d'hygiène, ménagers), ustensiles de cuisine, parfums, amplificateur sonore, boissons, papiers de voiture ou moto, kit de maquillage, casque de moto…) plus des catégories propres au secteur (écoles :
+- **Catégories d'objets** : une liste commune (52 catégories, dont tapis de prière, casquette, bonnet, chapelet,
+  gourde, carte scolaire, passeport, clé USB, argent, chaussures, permis de conduire, hijab ou voile, carte professionnelle, chaussettes, produits (médicaux, cosmétiques, alimentaires, d'hygiène, ménagers), ustensiles de cuisine, parfums, amplificateur sonore, boissons, papiers de voiture ou moto, kit de maquillage, casque de moto, carte de crédit, batterie, objets électroniques, pièces mécaniques, outils de chantier…) plus des catégories propres au secteur (écoles :
   tenue scolaire, ensemble géométrique, bic, calculatrice, kit de maintenance et robotique, reçu de paiement ou quittance ; transport : billet de voyage) ; « Autre » reste en dernier. Elles sont définies dans
   `app/services/categories.py` et servies par `GET /portail/{slug}/categories`.
 - **Matricule de l'étudiant** : champ facultatif à la restitution, affiché seulement dans les organisations du secteur éducation ;
   enregistré avec la remise (colonne `matricule_etudiant`, migration `0005`), visible dans l'historique et l'export CSV.
+
+## Gestion de l'équipe (Étape 17)
+
+- **Onglet « Équipe »** (administrateurs seulement) dans l'interface agent : liste des comptes de l'organisation, ajout d'un agent
+  (nom, identifiant, droits d'enregistrement et de restitution, mot de passe provisoire proposé par le bouton « Générer »),
+  modification des droits d'un clic, désactivation / réactivation, nouveau mot de passe provisoire.
+- Le mot de passe provisoire n'est affiché qu'une seule fois, avec l'identifiant et l'adresse de connexion (bouton « Copier ») ;
+  l'agent doit en choisir un à sa première connexion. Chaque action est tracée dans le journal d'audit.
+- Aucune nouvelle route : l'interface utilise `POST/GET/PATCH /utilisateurs/…` déjà protégées (un administrateur ne gère que les agents de son organisation).
 
 ## Sécurité et finition (Étape 16)
 

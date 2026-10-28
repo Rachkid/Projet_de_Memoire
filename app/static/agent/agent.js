@@ -151,6 +151,11 @@
     "sac": "M6 8h12l1 12H5L6 8zM9 8V6a3 3 0 0 1 6 0v2",
     "documents": "M7 3h7l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM14 3v5h5M9 13h6M9 17h6",
     "carte bancaire": "M4.5 5h15A2.5 2.5 0 0 1 22 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 16.5v-9A2.5 2.5 0 0 1 4.5 5zM2 10h20M6 15h4",
+    "carte de credit": "M4.5 5h15A2.5 2.5 0 0 1 22 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 16.5v-9A2.5 2.5 0 0 1 4.5 5zM2 10h20M6 15h4",
+    "batterie": "M3 8h16v10H3zM19 11h2v4h-2zM7 11v4M11 11v4",
+    "objets electroniques": "M7 7h10v10H7zM10 10h4v4h-4zM9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4",
+    "pieces mecaniques": "M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-2.3-.7-.7-2.3z",
+    "outils de chantier": "M2 21h20M4 21V11l8-6 8 6v10M9 21v-6h6v6M12 5V2",
     "vetement": "M9 3L3 6l2.2 4.2L8 9v12h8V9l2.8 1.2L21 6l-6-3a3 3 0 0 1-6 0z",
     "lunettes": cercle(6.5, 14, 3.5) + cercle(17.5, 14, 3.5) + "M10 14h4M3 14l2-7M21 14l-2-7",
     "ordinateur": "M5 5h14a1 1 0 0 1 1 1v9H4V6a1 1 0 0 1 1-1zM2 19h20",
@@ -386,7 +391,7 @@
 
   /* ---------- Affichage des vues ---------- */
 
-  const VUES = ["connexion", "objets", "nouveau", "enregistre", "fiche", "restituer", "remis", "pertes", "bord", "historique", "journal", "compte"];
+  const VUES = ["connexion", "objets", "nouveau", "enregistre", "fiche", "restituer", "remis", "pertes", "bord", "historique", "journal", "equipe", "compte"];
 
   function afficherVue(nom, titreId) {
     VUES.forEach(function (v) { $("vue-" + v).hidden = (v !== nom); });
@@ -394,11 +399,11 @@
     $("haut").hidden = !connecte;
     $("onglets").hidden = !connecte;
     document.body.classList.toggle("hors-session", !connecte);
-    const cible = { objets: "objets", nouveau: "nouveau", enregistre: "nouveau", fiche: "objets", restituer: "objets", remis: "objets", pertes: "pertes", bord: "bord", historique: "historique", journal: "journal" }[nom];
+    const cible = { objets: "objets", nouveau: "nouveau", enregistre: "nouveau", fiche: "objets", restituer: "objets", remis: "objets", pertes: "pertes", bord: "bord", historique: "historique", journal: "journal", equipe: "equipe" }[nom];
     document.querySelectorAll("#onglets a").forEach(function (a) {
       if (a.getAttribute("data-vue") === cible) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
-    $("haut-titre").textContent = { objets: "Objets trouvés", nouveau: "Enregistrer un objet", pertes: "Déclarations", bord: "Tableau de bord", historique: "Historique", journal: "Journal d'audit", compte: "Mon compte" }[cible || (nom === "compte" ? "compte" : "")] || "";
+    $("haut-titre").textContent = { objets: "Objets trouvés", nouveau: "Enregistrer un objet", pertes: "Déclarations", bord: "Tableau de bord", historique: "Historique", journal: "Journal d'audit", equipe: "Équipe", compte: "Mon compte" }[cible || (nom === "compte" ? "compte" : "")] || "";
     window.scrollTo(0, 0);
     const titre = $(titreId);
     if (titre) titre.focus({ preventScroll: true });
@@ -433,6 +438,7 @@
     if (page === "bord") return estAdmin() ? pageBord() : aller("#objets");
     if (page === "historique") return estAdmin() ? pageHistorique(morceaux[1], morceaux[2]) : aller("#objets");
     if (page === "journal") return estAdmin() ? pageJournal() : aller("#objets");
+    if (page === "equipe") return estAdmin() ? pageEquipe() : aller("#objets");
     if (page === "compte") return pageCompte();
     aller("#objets");
   }
@@ -472,6 +478,7 @@
     $("onglet-bord").hidden = !estAdmin();
     $("onglet-historique").hidden = !estAdmin();
     $("onglet-journal").hidden = !estAdmin();
+    $("onglet-equipe").hidden = !estAdmin();
     if (moi.doit_changer_mot_de_passe) {
       // Mot de passe provisoire : aucun menu, pas d'alertes (le serveur les refuserait) tant qu'il n'est pas changé.
       document.querySelectorAll("#onglets a").forEach(function (a) { a.hidden = true; });
@@ -1634,6 +1641,156 @@
   }
   $("ja-action").addEventListener("change", function () { chargerAudit(true); });
   $("audit-plus").addEventListener("click", function () { chargerAudit(false); });
+
+  /* ---------- Équipe : gestion des comptes agents (administrateurs) ---------- */
+
+  const ALPHABET_MDP = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";  // sans caractères qui se ressemblent (0/O, 1/l/I)
+  let resultatEquipe = "";   // texte copiable du dernier compte créé / mot de passe réinitialisé
+
+  function genererMotDePasse() {
+    const tirage = new Uint32Array(10);
+    window.crypto.getRandomValues(tirage);
+    return Array.prototype.map.call(tirage, function (n) { return ALPHABET_MDP.charAt(n % ALPHABET_MDP.length); }).join("");
+  }
+
+  /* Boîte de confirmation générale : renvoie une promesse (true si l'administrateur confirme). */
+  function demanderConfirmation(titre, texte, libelleOui) {
+    return new Promise(function (resoudre) {
+      const boite = $("confirmer-compte");
+      $("confirmer-compte-titre").textContent = titre;
+      $("confirmer-compte-texte").textContent = texte;
+      $("confirmer-compte-oui").textContent = libelleOui;
+      let reponse = false;
+      function oui() { reponse = true; boite.close(); }
+      function non() { boite.close(); }
+      function fin() {
+        $("confirmer-compte-oui").removeEventListener("click", oui);
+        $("confirmer-compte-non").removeEventListener("click", non);
+        boite.removeEventListener("close", fin);
+        resoudre(reponse);
+      }
+      $("confirmer-compte-oui").addEventListener("click", oui);
+      $("confirmer-compte-non").addEventListener("click", non);
+      boite.addEventListener("close", fin);
+      boite.showModal();
+    });
+  }
+
+  function montrerResultatEquipe(titre, identifiant, motDePasse) {
+    const adresse = location.origin + "/" + slug + "/agent";
+    $("equipe-resultat-titre").firstChild.textContent = titre;
+    const infos = vider($("equipe-resultat-infos"));
+    [["Adresse de connexion", adresse], ["Identifiant", identifiant], ["Mot de passe provisoire", motDePasse]].forEach(function (c) {
+      infos.appendChild(el("dt", null, c[0]));
+      infos.appendChild(el("dd", null, c[1]));
+    });
+    resultatEquipe = "Adresse : " + adresse + "\nIdentifiant : " + identifiant + "\nMot de passe provisoire : " + motDePasse;
+    $("equipe-resultat").hidden = false;
+    $("equipe-resultat").scrollIntoView({ block: "nearest" });
+  }
+
+  $("equipe-copier").addEventListener("click", async function () {
+    try { await navigator.clipboard.writeText(resultatEquipe); $("equipe-copier").textContent = "Copié ✓"; }
+    catch (e) { $("equipe-copier").textContent = "Copie impossible : sélectionnez le texte à la main"; }
+    setTimeout(function () { $("equipe-copier").textContent = "Copier les informations"; }, 2500);
+  });
+
+  async function pageEquipe() {
+    afficherVue("equipe", "equipe-titre");
+    $("equipe-resultat").hidden = true; resultatEquipe = "";
+    if (!$("eq-mdp").value) $("eq-mdp").value = genererMotDePasse();
+    chargerEquipe();
+  }
+
+  $("eq-generer").addEventListener("click", function () { $("eq-mdp").value = genererMotDePasse(); });
+
+  async function chargerEquipe() {
+    const etat = $("equipe-etat"), corps = vider($("equipe-corps"));
+    etat.textContent = "Chargement…";
+    let comptes;
+    try { comptes = await api("GET", "/utilisateurs/"); }
+    catch (err) { etat.textContent = err.message; $("equipe-tableau").hidden = true; return; }
+    comptes.sort(function (a, b) { return (a.role === "agent") - (b.role === "agent") || a.nom.localeCompare(b.nom, "fr"); });
+    etat.textContent = comptes.length ? "" : "Aucun compte.";
+    const superAdmin = moi.role === "super_administrateur";
+    comptes.forEach(function (c) {
+      const moiMeme = c.id === moi.id;
+      const gerable = !moiMeme && (superAdmin || c.role === "agent");
+      const tr = el("tr");
+      tr.appendChild(el("td", null, c.nom + (moiMeme ? " (vous)" : "")));
+      tr.appendChild(el("td", null, c.identifiant));
+      tr.appendChild(el("td", null, ROLES[c.role] || c.role));
+      [["droit_enregistrement", "Enregistrer des objets"], ["droit_restitution", "Remettre des objets"]].forEach(function (d) {
+        const td = el("td"), boite = el("input");
+        boite.type = "checkbox"; boite.checked = !!c[d[0]]; boite.disabled = !gerable;
+        boite.setAttribute("aria-label", d[1] + " : " + c.nom);
+        boite.addEventListener("change", async function () {
+          boite.disabled = true;
+          try { await api("PATCH", "/utilisateurs/" + c.id, { [d[0]]: boite.checked }); c[d[0]] = boite.checked; etat.textContent = "Droits de " + c.nom + " mis à jour."; }
+          catch (err) { boite.checked = !boite.checked; etat.textContent = err.message; }
+          boite.disabled = false;
+        });
+        td.appendChild(boite); tr.appendChild(td);
+      });
+      const tdEtat = el("td");
+      if (!c.actif) tdEtat.appendChild(el("span", "badge badge--gris", "Désactivé"));
+      else if (c.doit_changer_mot_de_passe) tdEtat.appendChild(el("span", "badge badge--gris", "Mot de passe provisoire"));
+      else tdEtat.appendChild(el("span", "badge badge--vif", "Actif"));
+      tr.appendChild(tdEtat);
+      const tdAct = el("td", "tableau__actions");
+      if (gerable) {
+        const bMdp = el("button", "bouton bouton--doux", "Nouveau mot de passe"); bMdp.type = "button";
+        bMdp.addEventListener("click", async function () {
+          if (!await demanderConfirmation("Nouveau mot de passe pour " + c.nom + " ?", "L'ancien mot de passe ne fonctionnera plus et ses sessions ouvertes seront fermées. Vous recevrez un mot de passe provisoire à lui transmettre.", "Réinitialiser")) return;
+          const mdp = genererMotDePasse();
+          try {
+            await api("PATCH", "/utilisateurs/" + c.id + "/reinitialiser-mot-de-passe", { nouveau_mot_de_passe: mdp });
+            montrerResultatEquipe("Mot de passe réinitialisé pour " + c.nom, c.identifiant, mdp);
+            chargerEquipe();
+          } catch (err) { etat.textContent = err.message; }
+        });
+        tdAct.appendChild(bMdp);
+        const bActif = el("button", c.actif ? "bouton bouton--danger-doux" : "bouton bouton--doux", c.actif ? "Désactiver" : "Réactiver"); bActif.type = "button";
+        bActif.addEventListener("click", async function () {
+          const texte = c.actif ? "Cette personne ne pourra plus se connecter, même avec une session ouverte. Vous pourrez la réactiver plus tard." : "Cette personne pourra de nouveau se connecter avec son mot de passe.";
+          if (!await demanderConfirmation((c.actif ? "Désactiver " : "Réactiver ") + c.nom + " ?", texte, c.actif ? "Désactiver" : "Réactiver")) return;
+          try { await api("PATCH", "/utilisateurs/" + c.id + (c.actif ? "/desactiver" : "/reactiver")); chargerEquipe(); }
+          catch (err) { etat.textContent = err.message; }
+        });
+        tdAct.appendChild(bActif);
+      }
+      tr.appendChild(tdAct);
+      corps.appendChild(tr);
+    });
+    $("equipe-tableau").hidden = !corps.children.length;
+  }
+
+  $("form-equipe").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    ["erreur-eq-nom", "erreur-eq-identifiant", "erreur-eq-droits", "erreur-eq-mdp", "equipe-erreur"].forEach(function (i) { montrerErreur(i, ""); });
+    const nom = $("eq-nom").value.trim(), identifiant = $("eq-identifiant").value.trim().toLowerCase(), mdp = $("eq-mdp").value;
+    let ok = true;
+    if (!nom) { montrerErreur("erreur-eq-nom", "Indiquez le nom de la personne."); ok = false; }
+    if (!/^[a-z0-9._-]{3,50}$/.test(identifiant)) { montrerErreur("erreur-eq-identifiant", "3 à 50 caractères : lettres minuscules sans accent, chiffres, point, tiret ou souligné."); ok = false; }
+    if (!$("eq-enreg").checked && !$("eq-resti").checked) { montrerErreur("erreur-eq-droits", "Cochez au moins un droit, sinon l'agent ne pourra rien faire."); ok = false; }
+    if (mdp.length < 8) { montrerErreur("erreur-eq-mdp", "Le mot de passe doit contenir au moins 8 caractères."); ok = false; }
+    else if (new TextEncoder().encode(mdp).length > 72) { montrerErreur("erreur-eq-mdp", "Le mot de passe est trop long (72 octets au maximum)."); ok = false; }
+    if (!ok) return;
+    const bouton = $("eq-envoyer"); bouton.disabled = true;
+    try {
+      await api("POST", "/utilisateurs/", {
+        nom: nom, identifiant: identifiant, role: "agent", organisation_id: org.id,
+        droit_enregistrement: $("eq-enreg").checked, droit_restitution: $("eq-resti").checked, mot_de_passe: mdp
+      });
+      montrerResultatEquipe("Compte créé pour " + nom, identifiant, mdp);
+      $("eq-nom").value = ""; $("eq-identifiant").value = ""; $("eq-mdp").value = genererMotDePasse();
+      $("eq-enreg").checked = true; $("eq-resti").checked = true;
+      chargerEquipe();
+    } catch (err) {
+      if (err.status === 409) montrerErreur("erreur-eq-identifiant", "Cet identifiant existe déjà. Choisissez-en un autre.");
+      else montrerErreur("equipe-erreur", err.message);
+    } finally { bouton.disabled = false; }
+  });
 
   /* ---------- Démarrage ---------- */
 
