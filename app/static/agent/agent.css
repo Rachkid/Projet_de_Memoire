@@ -861,3 +861,7 @@ a.tel { color: var(--principale); font-weight: 700; }
 .tableau__actions .bouton { min-height: 40px; padding: 8px 12px; font-size: 0.875rem; }
 .tableau input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--principale); }
 #equipe-resultat dd { font-family: ui-monospace, Menlo, Consolas, monospace; word-break: break-all; }
+
+.recherche-cat { width: 100%; min-height: 48px; margin: 0 0 12px; padding: 0 16px; font: inherit; background: #ffffff; border: 1.5px solid rgba(17, 24, 39, 0.14); border-radius: 999px; }
+.recherche-cat:focus { outline: none; border-color: var(--principale); box-shadow: 0 0 0 3px var(--accent); }
+.tuile[hidden], .puce[hidden] { display: none; }

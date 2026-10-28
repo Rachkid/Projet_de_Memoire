@@ -155,6 +155,23 @@
     "batterie": "M3 8h16v10H3zM19 11h2v4h-2zM7 11v4M11 11v4",
     "objets electroniques": "M7 7h10v10H7zM10 10h4v4h-4zM9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4",
     "pieces mecaniques": "M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-2.3-.7-.7-2.3z",
+    "pieces de telephone ou d'appareils": "M7 2h10a1 1 0 0 1 1 1v8M6 8v13a1 1 0 0 0 1 1h4M6 5v1M14 14l-2 2 2 2M18 14l2 2-2 2M12 22l4-8",
+    "materiel electrique": "M13 2L4 14h7l-1 8 9-12h-7z",
+    "kit ou objet pour bebe": "M12 3a4 4 0 0 0-4 4v2h8V7a4 4 0 0 0-4-4zM6 9h12l-1 5a5 5 0 0 1-10 0zM9 20h6",
+    "materiel de plomberie": "M3 7h10a3 3 0 0 1 3 3v1h5v4h-5v1a3 3 0 0 1-3 3H3zM7 7v10M7 12h5",
+    "materiel de soudure": "M14 3l7 7-3 3-7-7zM11 6L3 14l3 3 8-8M4 20l4-4M17 17l2 2M20 15l-1 1",
+    "carte sim": "M6 2h8l4 4v16H6zM9 11h6v7H9zM9 14.5h6M12 11v7",
+    "multiprise ou rallonge": "M3 8h18v8H3zM7 11v2M11 11v2M15 11v2M3 12H1M21 12h2",
+    "masque ou niqab": "M4 8c0-2 3-3 8-3s8 1 8 3v4c0 4-3.5 7-8 7s-8-3-8-7zM2 10l2 1M22 10l-2 1M8 12h8",
+    "coran": "M5 3h13a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H5zM5 3v18M12 8l1.2 2.5L16 11l-2 2 .5 3-2.5-1.5L9.5 16l.5-3-2-2 2.8-.5z",
+    "ceinture": "M2 9h20v6H2zM15 9v6M17 12h.01M6 12h5",
+    "clavier": "M2 6h20v12H2zM6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10",
+    "souris": "M12 2a6 6 0 0 1 6 6v8a6 6 0 0 1-12 0V8a6 6 0 0 1 6-6zM12 2v7M6 9h12",
+    "outils informatiques": "M4 5h16v10H4zM2 19h20M9 15v4M15 15v4M10 8l-2 2 2 2M14 8l2 2-2 2",
+    "memoire ram ou sd": "M7 2h8l4 4v16H7zM10 2v4M13 2v4M10 12h6M10 16h6",
+    "tenue de sport": "M8 3L2 6l2 5 3-1v11h10V10l3 1 2-5-6-3a4 4 0 0 1-8 0zM9 21V13M15 21V13",
+    "copie de devoir ou d'examen": "M6 2h9l4 4v16H6zM14 2v5h5M9 12h7M9 16h7M9 9h3",
+    "releve de notes ou bulletin": "M5 3h14a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM8 8h8M8 12h3M13 12h3M8 16h3M13 16h3",
     "outils de chantier": "M2 21h20M4 21V11l8-6 8 6v10M9 21v-6h6v6M12 5V2",
     "vetement": "M9 3L3 6l2.2 4.2L8 9v12h8V9l2.8 1.2L21 6l-6-3a3 3 0 0 1-6 0z",
     "lunettes": cercle(6.5, 14, 3.5) + cercle(17.5, 14, 3.5) + "M10 14h4M3 14l2-7M21 14l-2-7",
@@ -612,8 +629,29 @@
     } catch (e) {
       categories = CATEGORIES_SECOURS;
     }
+    // Ordre alphabétique (« Autre » en dernier) : avec une longue liste, on retrouve plus vite sa catégorie.
+    const tri = new Intl.Collator("fr", { sensitivity: "base" });
+    categories = categories.slice().sort(function (a, b) {
+      if ((a === "Autre") !== (b === "Autre")) return a === "Autre" ? 1 : -1;
+      return tri.compare(a, b);
+    });
     return categories;
   }
+
+  function sansAccent(t) { return String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim(); }
+
+  function filtrerCategories() {
+    const q = sansAccent($("cat-recherche").value);
+    let visibles = 0;
+    document.querySelectorAll("#puces .tuile").forEach(function (t) {
+      const inp = t.querySelector("input");
+      const ok = !q || inp.value === "Autre" || inp.checked || sansAccent(inp.value).indexOf(q) !== -1;
+      t.hidden = !ok;
+      if (ok && inp.value !== "Autre") visibles++;
+    });
+    $("cat-aucune").hidden = !q || visibles > 0;
+  }
+  $("cat-recherche").addEventListener("input", filtrerCategories);
 
   function puceRadio(conteneur, nom, valeur, libelle, coche) {
     const lab = el("label", "puce");
@@ -658,6 +696,7 @@
       puceRadio(pe, "emplacement", "locaux", "En gare ou en agence", false);
     }
     $("form-nouveau").reset();
+    filtrerCategories();
     $("quand").value = valeurMaintenant();
     $("quand").max = valeurMaintenant();
     retirerPhotoObjet();

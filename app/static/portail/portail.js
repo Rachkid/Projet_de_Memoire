@@ -177,6 +177,37 @@
       etiquette.appendChild(libelle);
       zone.appendChild(etiquette);
     });
+    $("cat-recherche").addEventListener("input", trierEtFiltrerPuces);
+    trierEtFiltrerPuces();
+  }
+
+  /* Tri alphabétique dans la langue choisie (« Autre » reste en dernier) + filtre de recherche. */
+  function sansAccent(t) { return String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim(); }
+
+  function trierEtFiltrerPuces() {
+    var zone = $("puces");
+    if (!zone) return;
+    var puces = Array.prototype.slice.call(zone.querySelectorAll(".puce"));
+    var tri;
+    try { tri = new Intl.Collator(I18N.code(), { sensitivity: "base" }); } catch (e) { tri = new Intl.Collator("fr", { sensitivity: "base" }); }
+    puces.sort(function (a, b) {
+      var an = a.querySelector(".puce__texte"), bn = b.querySelector(".puce__texte");
+      var aAutre = an.getAttribute("data-categorie") === "Autre", bAutre = bn.getAttribute("data-categorie") === "Autre";
+      if (aAutre !== bAutre) return aAutre ? 1 : -1;
+      return tri.compare(an.textContent, bn.textContent);
+    });
+    var q = sansAccent($("cat-recherche").value);
+    var visibles = 0;
+    puces.forEach(function (p) {
+      zone.appendChild(p);
+      var texte = p.querySelector(".puce__texte");
+      var autre = texte.getAttribute("data-categorie") === "Autre";
+      var choisie = p.querySelector("input").checked;
+      var ok = !q || autre || choisie || sansAccent(texte.textContent).indexOf(q) !== -1 || sansAccent(texte.getAttribute("data-categorie")).indexOf(q) !== -1;
+      p.hidden = !ok;
+      if (ok && !autre) visibles++;
+    });
+    $("cat-aucune").hidden = !q || visibles > 0;
   }
 
   /* ---------- Navigation ---------- */
@@ -407,6 +438,7 @@
     document.title = t("portail.titre_page", { org: org.nom });
     var libelles = document.querySelectorAll(".puce__texte");
     for (var i = 0; i < libelles.length; i++) libelles[i].textContent = I18N.categorie(libelles[i].getAttribute("data-categorie"));
+    trierEtFiltrerPuces();
     ["categorie", "telephone", "email"].forEach(effacerErreur);
     $("erreur-general").hidden = true;
     if ($("detail").open) $("detail").close();

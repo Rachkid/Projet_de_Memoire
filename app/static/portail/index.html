@@ -48,7 +48,9 @@
       <form id="formulaire" novalidate>
         <fieldset class="champ">
           <legend data-i18n="declarer.perdu">Qu'avez-vous perdu ?</legend>
+          <input type="search" id="cat-recherche" class="recherche-cat" autocomplete="off" maxlength="40" data-i18n-ph="declarer.cat_recherche" data-i18n-aria="declarer.cat_recherche" placeholder="Rechercher une catégorie…">
           <div class="puces" id="puces"></div>
+          <p class="champ__aide" id="cat-aucune" role="status" data-i18n="declarer.cat_aucune" hidden></p>
           <p class="champ__erreur" id="erreur-categorie" role="alert" hidden></p>
         </fieldset>
 

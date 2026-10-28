@@ -66,6 +66,19 @@ CATEGORIES_COMMUNES: list[str] = [
     "Objets électroniques",
     "Pièces mécaniques",
     "Outils de chantier",
+    "Carte SIM",
+    "Multiprise ou rallonge",
+    "Masque ou niqab",
+    "Coran",
+    "Ceinture",
+    "Clavier",
+    "Souris",
+    "Outils informatiques",
+    "Mémoire RAM ou SD",
+    "Tenue de sport",
+    "Matériel électrique",
+    "Kit ou objet pour bébé",
+    "Pièces de téléphone ou d'appareils",
 ]
 
 # Catégories propres à un secteur : insérées avant « Autre ».
@@ -77,8 +90,10 @@ CATEGORIES_PAR_SECTEUR: dict[str, list[str]] = {
         "Calculatrice",
         "Kit de maintenance et robotique",
         "Reçu de paiement ou quittance",
+        "Copie de devoir ou d'examen",
+        "Relevé de notes ou bulletin",
     ],
-    "transport": ["Billet de voyage"],
+    "transport": ["Billet de voyage", "Matériel de plomberie", "Matériel de soudure"],
 }
 
 

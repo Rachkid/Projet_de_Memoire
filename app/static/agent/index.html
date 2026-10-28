@@ -106,7 +106,9 @@
 
         <fieldset class="champ">
           <legend>Catégorie</legend>
+          <input type="search" id="cat-recherche" class="recherche-cat" autocomplete="off" maxlength="40" placeholder="Rechercher une catégorie…" aria-label="Rechercher une catégorie">
           <div class="tuiles" id="puces"></div>
+          <p class="champ__aide" id="cat-aucune" role="status" hidden>Aucune catégorie ne correspond. Choisissez « Autre ».</p>
           <p class="champ__erreur" id="erreur-categorie" role="alert" hidden></p>
         </fieldset>
 
