@@ -46,11 +46,33 @@ CATEGORIES_COMMUNES: list[str] = [
     "Thermos",
     "Chaussures",
     "Permis de conduire",
+    "Hijab ou voile",
+    "Carte professionnelle",
+    "Chaussettes",
+    "Produits médicaux",
+    "Produits cosmétiques",
+    "Produits alimentaires",
+    "Produits d'hygiène",
+    "Produits ménagers",
+    "Ustensiles de cuisine",
+    "Parfums",
+    "Amplificateur sonore",
+    "Boissons",
+    "Papiers de voiture ou moto",
+    "Kit de maquillage",
+    "Casque de moto",
 ]
 
 # Catégories propres à un secteur : insérées avant « Autre ».
 CATEGORIES_PAR_SECTEUR: dict[str, list[str]] = {
-    "education": ["Tenue scolaire", "Ensemble géométrique", "Bic", "Calculatrice", "Kit de maintenance et robotique"],
+    "education": [
+        "Tenue scolaire",
+        "Ensemble géométrique",
+        "Bic",
+        "Calculatrice",
+        "Kit de maintenance et robotique",
+        "Reçu de paiement ou quittance",
+    ],
     "transport": ["Billet de voyage"],
 }
 

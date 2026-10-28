@@ -111,6 +111,22 @@
     "bic": "M17 3l4 4L8 20l-5 1 1-5zM14 6l4 4",
     "calculatrice": "M6 2h12a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18h.01M12 18h.01M16 18h.01",
     "kit de maintenance et robotique": cercle(12, 12, 3) + "M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2",
+    "hijab ou voile": "M12 3a6 6 0 0 0-6 6v4c0 3 1.5 5 3 6l3 2 3-2c1.5-1 3-3 3-6V9a6 6 0 0 0-6-6zM9 9.5a3 3 0 0 1 6 0v3a3 3 0 0 1-6 0z",
+    "carte professionnelle": "M5 3h14a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM9 3v3h6V3M8 16h8" + cercle(12, 11, 2.2),
+    "recu de paiement ou quittance": "M6 2h12v20l-3-2-3 2-3-2-3 2V2zM9 8h6M9 12h6M9 16h3",
+    "chaussettes": "M8 2h7v9l5 5a3 3 0 0 1 0 4l-1 1a3 3 0 0 1-4 0l-7-6zM8 6h7",
+    "produits medicaux": "M4 7h16v13H4zM9 7V4h6v3M12 11v6M9 14h6",
+    "produits cosmetiques": "M9 3h6v6H9zM7 9h10v12H7zM7 14h10",
+    "produits alimentaires": "M5 8h14l-1 13H6zM8 8a4 4 0 0 1 8 0M9 13h6",
+    "produits d'hygiene": "M9 2h6v3H9zM7 5h10v17H7zM12 10c-2 2.5-2 4 0 5.5 2-1.5 2-3 0-5.5z",
+    "produits menagers": "M7 3h6l2 3v3H7zM6 9h10v12H6zM16 6h3v3M6 14h10",
+    "ustensiles de cuisine": "M6 2v8a2 2 0 0 0 2 2v10M10 2v8M6 6h4M17 2c-2 2-2 6 0 8v12",
+    "parfums": "M10 2h4v3h-4zM8 5h8v3H8zM6 8h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zM12 12v5",
+    "amplificateur sonore": "M4 9h4l6-5v16l-6-5H4zM17 8a5 5 0 0 1 0 8M19.5 5.5a9 9 0 0 1 0 13",
+    "boissons": "M7 3h10l-1 18H8zM7.5 9h9M12 3l2-2",
+    "papiers de voiture ou moto": "M6 2h9l4 4v16H6zM14 2v5h5M9 12h7M9 16h7",
+    "kit de maquillage": "M3 9h18v11H3zM8 9V6h8v3M12 13v3M9 14.5h6",
+    "casque de moto": "M3 14a9 9 0 0 1 18 0v4H3zM3 14h18M12 5v9M14 14h7",
     "autre": "M21 8l-9-5-9 5v8l9 5 9-5V8zM3 8l9 5 9-5M12 13v8"
   };
 

@@ -135,10 +135,12 @@ mettre l'application à jour ne fait perdre aucune donnée.
 - L'interface du personnel (agents, administrateurs) reste en français.
 - **Photos** : réduites à 1600 px (navigateur puis serveur) à l'envoi, et affichées ENTIÈRES dans les cartes (hall, portail,
   interface agent), le reste de la carte étant rempli par la même photo agrandie et floutée : ni rognage, ni débordement.
-- **Catégories d'objets** : une liste commune (32 catégories, dont tapis de prière, casquette, bonnet, chapelet,
-  gourde, carte scolaire, passeport, clé USB, argent, chaussures, permis de conduire…) plus des catégories propres au secteur (écoles :
-  tenue scolaire, ensemble géométrique, bic, calculatrice, kit de maintenance et robotique ; transport : billet de voyage) ; « Autre » reste en dernier. Elles sont définies dans
+- **Catégories d'objets** : une liste commune (47 catégories, dont tapis de prière, casquette, bonnet, chapelet,
+  gourde, carte scolaire, passeport, clé USB, argent, chaussures, permis de conduire, hijab ou voile, carte professionnelle, chaussettes, produits (médicaux, cosmétiques, alimentaires, d'hygiène, ménagers), ustensiles de cuisine, parfums, amplificateur sonore, boissons, papiers de voiture ou moto, kit de maquillage, casque de moto…) plus des catégories propres au secteur (écoles :
+  tenue scolaire, ensemble géométrique, bic, calculatrice, kit de maintenance et robotique, reçu de paiement ou quittance ; transport : billet de voyage) ; « Autre » reste en dernier. Elles sont définies dans
   `app/services/categories.py` et servies par `GET /portail/{slug}/categories`.
+- **Matricule de l'étudiant** : champ facultatif à la restitution, affiché seulement dans les organisations du secteur éducation ;
+  enregistré avec la remise (colonne `matricule_etudiant`, migration `0005`), visible dans l'historique et l'export CSV.
 
 ## Sécurité et finition (Étape 16)
 

@@ -34,6 +34,8 @@ class Restitution(Base):
 
     type_piece_identite: Mapped[str] = mapped_column(String(50), nullable=True)
     numero_piece: Mapped[str] = mapped_column(String(50), nullable=True)
+    # Étape 16 bis : matricule de l'étudiant (écoles seulement), facultatif.
+    matricule_etudiant: Mapped[str | None] = mapped_column(String(50), nullable=True)
     photo_proprietaire_url: Mapped[str] = mapped_column(String(500), nullable=True)
     date_heure: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 

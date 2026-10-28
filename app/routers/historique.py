@@ -53,6 +53,7 @@ def _ligne_remise(r: Restitution, objet: Objet, agent: Utilisateur, usager: Opti
         "usager_telephone": usager.telephone if usager else None,
         "type_piece": r.type_piece_identite,
         "numero_piece_masque": _masquer(r.numero_piece),
+        "matricule_etudiant": r.matricule_etudiant,
     }
 
 
@@ -130,6 +131,7 @@ def frise_d_un_objet(objet_id: uuid.UUID, db: Session = Depends(get_db), admin: 
                 usager.nom if usager and usager.nom else None,
                 usager.telephone if usager else None,
                 restitution.type_piece_identite,
+                f"matricule {restitution.matricule_etudiant}" if restitution.matricule_etudiant else None,
             ) if x),
         })
     return {"objet_id": str(objet.id), "statut": objet.statut, "etapes": etapes}

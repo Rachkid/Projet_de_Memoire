@@ -9,17 +9,33 @@ Deux choix de conception importants :
   objet sans savoir à qui (cahier des charges, section 5.1.4).
 """
 
+import re
 import uuid
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class RestitutionBase(BaseModel):
     type_piece_identite: str = Field(min_length=1, max_length=50)
     numero_piece: str = Field(min_length=1, max_length=50)
     photo_proprietaire_url: Optional[str] = None
+    # Facultatif (écoles) : le matricule de l'étudiant à qui l'objet est remis.
+    matricule_etudiant: Optional[str] = Field(default=None, max_length=50)
+
+    @field_validator("matricule_etudiant", mode="before")
+    @classmethod
+    def matricule_valide(cls, valeur):
+        if valeur is None:
+            return None
+        valeur = str(valeur).strip()
+        if valeur == "":
+            return None
+        # Lettres, chiffres, espace, point, tiret, souligné et barre oblique : assez pour les formats de matricule usuels.
+        if not re.fullmatch(r"[\w .\-/]{1,50}", valeur):
+            raise ValueError("Matricule invalide : lettres, chiffres, point, tiret ou barre oblique seulement.")
+        return valeur
 
 
 class RestitutionCreate(RestitutionBase):
