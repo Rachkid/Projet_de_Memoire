@@ -135,9 +135,9 @@ mettre l'application à jour ne fait perdre aucune donnée.
 - L'interface du personnel (agents, administrateurs) reste en français.
 - **Photos** : réduites à 1600 px (navigateur puis serveur) à l'envoi, et affichées ENTIÈRES dans les cartes (hall, portail,
   interface agent), le reste de la carte étant rempli par la même photo agrandie et floutée : ni rognage, ni débordement.
-- **Catégories d'objets** : une liste commune (65 catégories, dont tapis de prière, casquette, bonnet, chapelet,
-  gourde, carte scolaire, passeport, clé USB, argent, chaussures, permis de conduire, hijab ou voile, carte professionnelle, chaussettes, produits (médicaux, cosmétiques, alimentaires, d'hygiène, ménagers), ustensiles de cuisine, parfums, amplificateur sonore, boissons, papiers de voiture ou moto, kit de maquillage, casque de moto, carte de crédit, batterie, objets électroniques, pièces mécaniques, outils de chantier, carte SIM, coran, clavier, souris, tenue de sport, matériel électrique, kit pour bébé, pièces de téléphone…) plus des catégories propres au secteur (écoles :
-  tenue scolaire, ensemble géométrique, bic, calculatrice, kit de maintenance et robotique, reçu de paiement ou quittance, copie de devoir ou d'examen, relevé de notes ou bulletin ; transport : billet de voyage, matériel de plomberie, matériel de soudure) ; « Autre » reste en dernier. Elles sont définies dans
+- **Catégories d'objets** : une liste commune (67 catégories, dont tapis de prière, casquette, bonnet, chapelet,
+  gourde, carte scolaire, passeport, clé USB, argent, chaussures, permis de conduire, hijab ou voile, carte professionnelle, chaussettes, produits (médicaux, cosmétiques, alimentaires, d'hygiène, ménagers), ustensiles de cuisine, parfums, amplificateur sonore, boissons, papiers de voiture ou moto, kit de maquillage, casque de moto, carte de crédit, batterie, objets électroniques, pièces mécaniques, outils de chantier, carte SIM, coran, clavier, souris, tenue de sport, matériel électrique, kit pour bébé, pièces de téléphone, bazin ou tissu, outils de réparation…) plus des catégories propres au secteur (écoles :
+  tenue scolaire, ensemble géométrique, bic, calculatrice, kit de maintenance ou de robotique, reçu de paiement ou quittance, copie de devoir ou d'examen, relevé de notes ou bulletin ; transport : billet de voyage, matériel de plomberie, matériel de soudure) ; « Autre » reste en dernier. Elles sont définies dans
   `app/services/categories.py` et servies par `GET /portail/{slug}/categories`.
 - **Matricule de l'étudiant** : champ facultatif à la restitution, affiché seulement dans les organisations du secteur éducation ;
   enregistré avec la remise (colonne `matricule_etudiant`, migration `0005`), visible dans l'historique et l'export CSV.
@@ -150,6 +150,24 @@ mettre l'application à jour ne fait perdre aucune donnée.
 - Le mot de passe provisoire n'est affiché qu'une seule fois, avec l'identifiant et l'adresse de connexion (bouton « Copier ») ;
   l'agent doit en choisir un à sa première connexion. Chaque action est tracée dans le journal d'audit.
 - Aucune nouvelle route : l'interface utilise `POST/GET/PATCH /utilisateurs/…` déjà protégées (un administrateur ne gère que les agents de son organisation).
+
+## Corrections et paramètres (Étape 18)
+
+- **Corriger un objet** (bouton sur la fiche, agents autorisés à enregistrer et administrateurs) : catégorie, date, lieu, détail secret.
+  Un objet remis ou archivé n'est plus modifiable. Si la catégorie ou la date change, le rapprochement est refait.
+- **Corriger une déclaration** (écran « Déclarations », personnel de l'organisation) : catégorie, description, date, lieu.
+  Le citoyen ne peut pas modifier sa déclaration lui-même (il n'a pas de compte) ; il peut en refaire une.
+- **Désarchiver un objet** (administrateurs) : l'objet redevient « En attente » et le délai de conservation repart d'aujourd'hui
+  (colonne `retention_depuis`, migration `0006`) ; sans cela l'archivage automatique le reprendrait aussitôt.
+- **Modifier un compte** (onglet Équipe) : le nom, toujours ; l'identifiant seulement tant que la personne n'a pas choisi son
+  mot de passe ni commencé à travailler. Ensuite : désactiver le compte et en créer un autre.
+- **Onglet « Paramètres »** (administrateurs) : délai de conservation (1 à 3650 jours) et consultation à distance du portail.
+- **Référence du talon** : la référence remise au citoyen (8 caractères) s'affiche sur chaque déclaration de l'écran « Déclarations » et dans la liste de remise ; la barre de recherche de cet écran retrouve une déclaration par référence, nom, téléphone ou catégorie.
+- **Apparence** (même onglet) : couleurs (principale, accent, fond, avec retour au calcul par défaut), logo (avec option « rendre transparent le fond blanc ») et photo de fond ; les changements s'appliquent aussi au portail public et à l'écran d'affichage.
+- Chaque correction ou changement de paramètres est tracé dans le journal d'audit.
+- La migration `0006` renomme aussi, dans les données existantes, « Écouteurs » en « Écouteurs ou baladeur » et
+  « Kit de maintenance et robotique » en « Kit de maintenance ou de robotique ».
+- Tests : `tests/test_etape18.py`.
 
 ## Sécurité et finition (Étape 16)
 

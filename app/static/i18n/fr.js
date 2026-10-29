@@ -10,7 +10,7 @@
   "erreur.champ": "Une information n'est pas valable : {msg}",
   "erreur.autre": "Une erreur est survenue (code {code}). Réessayez dans un instant.",
   "erreur.org_inconnue": "Cette adresse ne correspond à aucune organisation.",
-  "portail.titre_page": "{org} — Objets perdus",
+  "portail.titre_page": "{org}, Objets perdus",
   "signature": "Propulsé par Tsintuwa",
   "retour.accueil.aria": "Retour à l'accueil",
   "nav.accueil": "Accueil",
@@ -84,7 +84,7 @@
   "cat.vetement": "Vêtement",
   "cat.lunettes": "Lunettes",
   "cat.ordinateur": "Ordinateur",
-  "cat.ecouteurs": "Écouteurs",
+  "cat.ecouteurs_ou_baladeur": "Écouteurs ou baladeur",
   "cat.montre": "Montre",
   "cat.bijou": "Bijou",
   "cat.livre_ou_cahier": "Livre ou cahier",
@@ -148,10 +148,12 @@
   "cat.materiel_de_plomberie": "Matériel de plomberie",
   "cat.materiel_de_soudure": "Matériel de soudure",
   "cat.pieces_de_telephone_ou_d'appareils": "Pièces de téléphone ou d'appareils",
+  "cat.bazin_ou_tissu": "Bazin ou tissu",
+  "cat.outils_de_reparation": "Outils de réparation",
   "cat.ensemble_geometrique": "Ensemble géométrique",
   "cat.bic": "Bic",
   "cat.calculatrice": "Calculatrice",
-  "cat.kit_de_maintenance_et_robotique": "Kit de maintenance et robotique",
+  "cat.kit_de_maintenance_ou_de_robotique": "Kit de maintenance ou de robotique",
   "hall.sous.transport": "Objets trouvés dans nos véhicules et nos gares",
   "hall.sous.education": "Objets trouvés dans l'établissement",
   "hall.aide.transport": "Scannez le code pour le déclarer depuis votre téléphone. Pour récupérer un objet, présentez-vous à l'agence avec une pièce d'identité.",
@@ -168,6 +170,6 @@
   "hall.indice": "Appuyez sur F pour le plein écran",
   "hall.hors_ligne": "Connexion perdue : les derniers objets reçus restent affichés",
   "hall.logo_alt": "Logo de {org}",
-  "hall.titre_page": "{org} — Objets trouvés"
+  "hall.titre_page": "{org}, Objets trouvés"
   });
 })();

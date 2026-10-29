@@ -115,7 +115,7 @@ def statistiques_organisation(db: Session, organisation: Organisation) -> dict:
     limite = maintenant - timedelta(days=max(delai - PREAVIS_RETENTION_JOURS, 0))
     proches = (
         db.query(func.count(Objet.id))
-        .filter(Objet.organisation_id == org_id, Objet.statut == StatutObjet.EN_ATTENTE.value, Objet.date_heure_decouverte <= limite)
+        .filter(Objet.organisation_id == org_id, Objet.statut == StatutObjet.EN_ATTENTE.value, func.coalesce(Objet.retention_depuis, Objet.date_heure_decouverte) <= limite)
         .scalar()
     )
 

@@ -52,6 +52,10 @@ class Objet(Base):
         String(20), nullable=False, default=StatutObjet.EN_ATTENTE.value
     )
 
+    # Étape 18 : date à partir de laquelle on compte le délai de conservation quand un objet est DÉSARCHIVÉ.
+    # Vide dans le cas général (le délai se compte alors depuis la date de découverte).
+    retention_depuis: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
     organisation: Mapped["Organisation"] = relationship(back_populates="objets")
     agent_enregistrement: Mapped["Utilisateur"] = relationship(back_populates="objets_enregistres")
 

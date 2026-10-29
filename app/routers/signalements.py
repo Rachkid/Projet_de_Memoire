@@ -22,8 +22,9 @@ from app.models.signalement_perte import SignalementPerte
 from app.models.usager import Usager
 from app.models.utilisateur import Utilisateur
 from app.schemas.objet import ObjetRead
-from app.schemas.signalement_perte import SignalementPerteCreate, SignalementPerteRead, SignalementPersonnelRead
+from app.schemas.signalement_perte import SignalementPerteCreate, SignalementPerteRead, SignalementPerteUpdate, SignalementPersonnelRead
 from app.security import get_utilisateur_courant
+from app.services import audit
 from app.services.notifications import notifier_declaration_enregistree
 from app.services.rapprochement import objets_correspondants, traiter_nouveau_signalement
 
@@ -102,3 +103,38 @@ def cloturer_signalement(
     db.commit()
     db.refresh(signalement)
     return signalement
+
+
+@router.patch("/{signalement_id}", response_model=SignalementPersonnelRead)
+def corriger_signalement(
+    signalement_id: uuid.UUID,
+    payload: SignalementPerteUpdate,
+    db: Session = Depends(get_db),
+    personnel: Utilisateur = Depends(get_utilisateur_courant),
+):
+    """
+    Corrige une déclaration (erreur de saisie de l'usager ou de l'agent qui l'a recueillie).
+    Seul le personnel de l'organisation peut le faire : l'usager n'a pas de compte, donc rien ne prouve
+    qu'une demande de modification vient bien de lui. Une déclaration clôturée n'est plus modifiable.
+    Si la catégorie ou la date change, le rapprochement avec les objets trouvés est refait.
+    """
+    signalement = db.get(SignalementPerte, signalement_id)
+    if signalement is None or signalement.organisation_id != personnel.organisation_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Signalement introuvable")
+    if signalement.statut == StatutSignalement.CLOTURE.value:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Cette déclaration est clôturée : elle n'est plus modifiable.")
+    modifications = payload.model_dump(exclude_unset=True)
+    if not modifications:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Aucune modification fournie.")
+    for champ, valeur in modifications.items():
+        setattr(signalement, champ, valeur)
+    if "categorie" in modifications or "date_perte" in modifications:
+        signalement.statut = StatutSignalement.EN_ATTENTE.value  # l'ancienne correspondance n'est plus forcément valable
+    db.commit()
+    db.refresh(signalement)
+    if "categorie" in modifications or "date_perte" in modifications:
+        traiter_nouveau_signalement(db, signalement)
+        db.refresh(signalement)
+    audit.tracer(db, audit.DECLARATION_CORRIGEE, acteur=personnel, organisation_id=signalement.organisation_id,
+                 cible=str(signalement.id)[:8], detail="Champs modifiés : " + ", ".join(sorted(modifications)))
+    return SignalementPersonnelRead.depuis_signalement(signalement)

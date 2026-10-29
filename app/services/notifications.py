@@ -42,7 +42,7 @@ def notifier_correspondance(usager: Usager, signalement: SignalementPerte, objet
     reference = str(signalement.id).replace("-", "")[:8].upper()
     envoyer_courriel(
         signalement.email,
-        f"Un objet pourrait être le vôtre — {organisation}".strip(" —"),
+        f"Un objet pourrait être le vôtre, {organisation}".strip(" ,"),
         [
             _salutation(usager),
             f"Un objet de la catégorie « {signalement.categorie} » a été enregistré et pourrait correspondre à votre déclaration.",
@@ -61,7 +61,7 @@ def notifier_declaration_enregistree(usager: Usager, signalement: SignalementPer
     reference = str(signalement.id).replace("-", "")[:8].upper()
     envoyer_courriel(
         signalement.email,
-        f"Votre déclaration est enregistrée — {organisation}".strip(" —"),
+        f"Votre déclaration est enregistrée, {organisation}".strip(" ,"),
         [
             _salutation(usager),
             f"Nous avons bien enregistré votre déclaration de perte ({signalement.categorie}).",

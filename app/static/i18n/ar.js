@@ -10,7 +10,7 @@
   "erreur.champ": "إحدى المعلومات غير صالحة: {msg}",
   "erreur.autre": "حدث خطأ (الرمز {code}). أعد المحاولة بعد قليل.",
   "erreur.org_inconnue": "هذا العنوان لا يطابق أي مؤسسة.",
-  "portail.titre_page": "{org} — الأغراض المفقودة",
+  "portail.titre_page": "{org}, الأغراض المفقودة",
   "signature": "بدعم من Tsintuwa",
   "retour.accueil.aria": "العودة إلى الصفحة الرئيسية",
   "nav.accueil": "الرئيسية",
@@ -84,7 +84,7 @@
   "cat.vetement": "ملابس",
   "cat.lunettes": "نظارات",
   "cat.ordinateur": "حاسوب",
-  "cat.ecouteurs": "سماعات",
+  "cat.ecouteurs_ou_baladeur": "سماعات أو مشغل موسيقى",
   "cat.montre": "ساعة",
   "cat.bijou": "مجوهرات",
   "cat.livre_ou_cahier": "كتاب أو دفتر",
@@ -148,10 +148,12 @@
   "cat.materiel_de_plomberie": "معدات سباكة",
   "cat.materiel_de_soudure": "معدات لحام",
   "cat.pieces_de_telephone_ou_d'appareils": "قطع هاتف أو أجهزة",
+  "cat.bazin_ou_tissu": "بازان أو قماش",
+  "cat.outils_de_reparation": "أدوات إصلاح",
   "cat.ensemble_geometrique": "أدوات هندسية",
   "cat.bic": "قلم حبر جاف",
   "cat.calculatrice": "آلة حاسبة",
-  "cat.kit_de_maintenance_et_robotique": "عدّة الصيانة والروبوتات",
+  "cat.kit_de_maintenance_ou_de_robotique": "عدّة الصيانة أو الروبوتات",
   "hall.sous.transport": "أغراض تم العثور عليها في مركباتنا ومحطاتنا",
   "hall.sous.education": "أغراض تم العثور عليها داخل المؤسسة",
   "hall.aide.transport": "امسح الرمز للإبلاغ من هاتفك. لاسترجاع غرض، توجّه إلى الوكالة ومعك وثيقة هوية.",
@@ -168,6 +170,6 @@
   "hall.indice": "اضغط F لملء الشاشة",
   "hall.hors_ligne": "انقطع الاتصال: تبقى آخر الأغراض المستلمة معروضة",
   "hall.logo_alt": "شعار {org}",
-  "hall.titre_page": "{org} — الأغراض الموجودة"
+  "hall.titre_page": "{org}, الأغراض الموجودة"
   });
 })();

@@ -10,7 +10,7 @@
   "erreur.champ": "Sanni fo si hanse: {msg}",
   "erreur.autre": "Kuuru go (nimro {code}). Ye ka ceeci jirbi kayna banda.",
   "erreur.org_inconnue": "Adiresu wo si saba organisasiyon fo se.",
-  "portail.titre_page": "{org} — Hayey kaŋ ɲaŋ",
+  "portail.titre_page": "{org}, Hayey kaŋ ɲaŋ",
   "signature": "Tsintuwa no k'a te",
   "retour.accueil.aria": "Ye ka koy hugu",
   "nav.accueil": "Hugu",
@@ -84,7 +84,7 @@
   "cat.vetement": "Bankaaray",
   "cat.lunettes": "Lunet",
   "cat.ordinateur": "Ordinatoor",
-  "cat.ecouteurs": "Hanga goy",
+  "cat.ecouteurs_ou_baladeur": "Hanga goy wala baladeur",
   "cat.montre": "Montar",
   "cat.bijou": "Ado hay",
   "cat.livre_ou_cahier": "Tira wala kaayeti",
@@ -148,10 +148,12 @@
   "cat.materiel_de_plomberie": "Ciiri jinay (plomberie)",
   "cat.materiel_de_soudure": "Soudure jinay",
   "cat.pieces_de_telephone_ou_d'appareils": "Telefon wala jinay hari-hari",
+  "cat.bazin_ou_tissu": "Bazin wala bankaaray tuuri",
+  "cat.outils_de_reparation": "Fix goy jinay",
   "cat.ensemble_geometrique": "Ensemble géométrique",
   "cat.bic": "Bik",
   "cat.calculatrice": "Kalkilatoor",
-  "cat.kit_de_maintenance_et_robotique": "Kit maintenance nda robotik",
+  "cat.kit_de_maintenance_ou_de_robotique": "Kit maintenance wala robotik",
   "hall.sous.transport": "Hayey kaŋ i gar iri wasayan nda iri gareyan ra",
   "hall.sous.education": "Hayey kaŋ i gar sekoolu ra",
   "hall.aide.transport": "Ma kode wo ceeci zama ni ma rahotu samba ni telefon ra. Ni hay ye ta: ma kaa ajãsi ra nda ni takarda cebe.",
@@ -168,6 +170,6 @@
   "hall.indice": "Ma F dabu zama ecran ma kuuru",
   "hall.hors_ligne": "Internet bu: hayey kaŋ i ta bisa ga bangay",
   "hall.logo_alt": "{org} tambari",
-  "hall.titre_page": "{org} — Hay kayyan kaŋ i duwa"
+  "hall.titre_page": "{org}, Hay kayyan kaŋ i duwa"
   });
 })();

@@ -43,11 +43,11 @@ def construire_message(destinataire: str, sujet: str, paragraphes: list[str], or
     message["Subject"] = sujet
     message["From"] = formataddr((organisation_nom or nom_expediteur, adresse_expediteur))
     message["To"] = destinataire
-    message.set_content("\n\n".join(paragraphes) + f"\n\n— {organisation_nom}\n(Message automatique, merci de ne pas y répondre.)")
+    message.set_content("\n\n".join(paragraphes) + f"\n\n{organisation_nom}\n(Message automatique, merci de ne pas y répondre.)")
     corps = "".join(f"<p style=\"margin:0 0 14px\">{html.escape(p)}</p>" for p in paragraphes)
     message.add_alternative(
         f"<div style=\"font-family:Arial,sans-serif;font-size:16px;line-height:1.5;color:#1b2430;max-width:560px\">"
-        f"{corps}<p style=\"margin:22px 0 0;color:#5b6674;font-size:14px\">— {html.escape(organisation_nom)}<br>"
+        f"{corps}<p style=\"margin:22px 0 0;color:#5b6674;font-size:14px\">{html.escape(organisation_nom)}<br>"
         f"Message automatique, merci de ne pas y répondre.</p></div>",
         subtype="html",
     )

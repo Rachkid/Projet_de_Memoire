@@ -27,6 +27,7 @@
       <a href="#historique" data-vue="historique" id="onglet-historique" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/></svg><span>Historique</span></a>
       <a href="#journal" data-vue="journal" id="onglet-journal" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3zM9 12l2 2 4-4"/></svg><span>Journal</span></a>
       <a href="#equipe" data-vue="equipe" id="onglet-equipe" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1M17 4a4 4 0 0 1 0 7M22 21v-1a6 6 0 0 0-4-5.6"/></svg><span>Équipe</span></a>
+      <a href="#parametres" data-vue="parametres" id="onglet-parametres" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M16 4v6M8 14v6"/></svg><span>Paramètres</span></a>
     </nav>
     <div class="haut__outils">
       <p class="haut__titre" id="haut-titre" aria-hidden="true"></p>
@@ -65,7 +66,7 @@
           <p class="alerte" id="connexion-erreur" role="alert" hidden></p>
           <button class="bouton bouton--accent bouton--plein" type="submit" id="connexion-envoyer">Se connecter</button>
         </form>
-        <a class="lien-public" id="lien-public" href="/">Vous cherchez un objet perdu ? Aller au portail public</a>
+        <a class="lien-public" id="lien-public" href="/"><span>Vous cherchez un objet perdu ?</span><strong>Aller au portail public</strong><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       </div>
     </section>
 
@@ -320,11 +321,72 @@
     <section class="vue contenu contenu--large" id="vue-pertes" aria-labelledby="pertes-titre" hidden>
       <h2 id="pertes-titre" tabindex="-1">Déclarations de perte</h2>
       <p class="chapeau">Les personnes à prévenir en premier sont tout en haut : un objet correspondant a déjà été enregistré.</p>
+      <div class="champ" id="bloc-recherche-pertes" hidden>
+        <input type="search" id="pertes-recherche" class="recherche-cat" autocomplete="off" maxlength="60" placeholder="Rechercher : référence du talon, nom, téléphone, catégorie…" aria-label="Rechercher une déclaration">
+      </div>
       <div id="pertes-etat" class="etat" role="status"></div>
       <div class="liste" id="pertes-liste"></div>
     </section>
 
     <!-- MON COMPTE -->
+    <!-- PARAMÈTRES (administrateurs) -->
+    <section class="vue contenu" id="vue-parametres" aria-labelledby="parametres-titre" hidden>
+      <h2 id="parametres-titre" tabindex="-1">Paramètres</h2>
+      <p class="chapeau">Le fonctionnement de votre organisation. Les changements s'appliquent tout de suite.</p>
+      <form id="form-parametres" class="panneau" novalidate>
+        <div class="champ">
+          <label for="par-delai">Délai de conservation des objets (en jours)</label>
+          <input id="par-delai" type="number" inputmode="numeric" min="1" max="3650" step="1">
+          <p class="champ__aide">Un objet resté « en attente » plus longtemps est archivé automatiquement. Il n'est jamais supprimé, et un administrateur peut le désarchiver.</p>
+          <p class="champ__erreur" id="erreur-par-delai" role="alert" hidden></p>
+        </div>
+        <div class="champ">
+          <label class="case"><input type="checkbox" id="par-consultation"><span>Le public peut consulter les objets trouvés à distance</span></label>
+          <p class="champ__aide">Si cette case est décochée, le portail ne montre pas la liste des objets : les personnes doivent venir sur place.</p>
+        </div>
+        <p class="alerte" id="parametres-erreur" role="alert" hidden></p>
+        <p class="statut" id="parametres-ok" role="status" hidden></p>
+        <button class="bouton bouton--accent bouton--plein" type="submit" id="parametres-envoyer">Enregistrer</button>
+      </form>
+
+      <h3 class="sous-titre">Apparence</h3>
+      <p class="chapeau">Le logo, la photo de fond et les couleurs de votre espace, du portail public et de l'écran d'affichage.</p>
+
+      <form id="form-couleurs" class="panneau" novalidate>
+        <div class="champ"><label for="coul-principale">Couleur principale</label>
+          <div class="mdp-ligne"><input id="coul-principale" type="color"><button type="button" class="bouton bouton--doux" data-defaut="principale">Par défaut</button></div></div>
+        <div class="champ"><label for="coul-accent">Couleur d'accent (boutons)</label>
+          <div class="mdp-ligne"><input id="coul-accent" type="color"><button type="button" class="bouton bouton--doux" data-defaut="accent">Par défaut</button></div></div>
+        <div class="champ"><label for="coul-fond">Couleur de fond</label>
+          <div class="mdp-ligne"><input id="coul-fond" type="color"><button type="button" class="bouton bouton--doux" data-defaut="fond">Par défaut</button></div>
+          <p class="champ__aide">« Par défaut » recalcule la couleur à partir de la couleur principale.</p></div>
+        <p class="alerte" id="couleurs-erreur" role="alert" hidden></p>
+        <p class="statut" id="couleurs-ok" role="status" hidden></p>
+        <button class="bouton bouton--accent bouton--plein" type="submit" id="couleurs-envoyer">Enregistrer les couleurs</button>
+      </form>
+
+      <form id="form-logo" class="panneau" novalidate>
+        <div class="champ"><label for="logo-fichier">Logo</label>
+          <div class="apercu-habillage" id="logo-apercu"></div>
+          <input id="logo-fichier" type="file" accept="image/png,image/jpeg,image/webp">
+          <label class="case"><input type="checkbox" id="logo-fond-blanc"><span>Rendre transparent le fond blanc autour du logo</span></label>
+          <p class="champ__aide">PNG, JPEG ou WEBP, 5 Mo au maximum.</p></div>
+        <p class="alerte" id="logo-erreur" role="alert" hidden></p>
+        <p class="statut" id="logo-ok" role="status" hidden></p>
+        <button class="bouton bouton--accent bouton--plein" type="submit" id="logo-envoyer">Envoyer le logo</button>
+      </form>
+
+      <form id="form-fond" class="panneau" novalidate>
+        <div class="champ"><label for="fond-fichier">Photo de fond</label>
+          <div class="apercu-habillage apercu-habillage--fond" id="fond-apercu"></div>
+          <input id="fond-fichier" type="file" accept="image/png,image/jpeg,image/webp">
+          <p class="champ__aide" id="fond-aide">Une belle photo de votre établissement. Elle est réduite automatiquement. 5 Mo au maximum.</p></div>
+        <p class="alerte" id="fond-erreur" role="alert" hidden></p>
+        <p class="statut" id="fond-ok" role="status" hidden></p>
+        <button class="bouton bouton--accent bouton--plein" type="submit" id="fond-envoyer">Envoyer la photo de fond</button>
+      </form>
+    </section>
+
     <!-- ÉQUIPE (administrateurs) -->
     <section class="vue contenu contenu--large" id="vue-equipe" aria-labelledby="equipe-titre" hidden>
       <h2 id="equipe-titre" tabindex="-1">Équipe</h2>
@@ -416,6 +478,19 @@
       <div class="actions-bas"><button type="button" class="bouton bouton--danger-doux bouton--plein" id="deconnexion"><svg class="bouton__icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4M16 8l4 4-4 4M20 12H9"/></svg>Se déconnecter</button></div>
     </section>
   </main>
+
+  <dialog id="modal-form" class="modal-form" aria-labelledby="modal-form-titre">
+    <form id="modal-form-corps" class="detail__corps" novalidate>
+      <h3 id="modal-form-titre"></h3>
+      <p class="chapeau" id="modal-form-texte" hidden></p>
+      <div id="modal-form-champs"></div>
+      <p class="alerte" id="modal-form-erreur" role="alert" hidden></p>
+      <div class="actions-bas">
+        <button type="submit" class="bouton bouton--accent bouton--plein" id="modal-form-oui">Enregistrer</button>
+        <button type="button" class="bouton bouton--doux bouton--plein" id="modal-form-non">Annuler</button>
+      </div>
+    </form>
+  </dialog>
 
   <dialog id="confirmer-compte" aria-labelledby="confirmer-compte-titre">
     <div class="detail__corps">

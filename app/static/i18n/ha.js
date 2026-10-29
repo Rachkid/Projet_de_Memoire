@@ -10,7 +10,7 @@
   "erreur.champ": "Wani bayani bai yi daidai ba: {msg}",
   "erreur.autre": "An samu matsala (lamba {code}). Ku sake gwadawa nan da ɗan lokaci.",
   "erreur.org_inconnue": "Wannan adireshin bai dace da wata ƙungiya ba.",
-  "portail.titre_page": "{org} — Kayan da suka ɓace",
+  "portail.titre_page": "{org}, Kayan da suka ɓace",
   "signature": "Tsintuwa ne ya samar",
   "retour.accueil.aria": "Komawa shafin farko",
   "nav.accueil": "Shafin farko",
@@ -84,7 +84,7 @@
   "cat.vetement": "Tufafi",
   "cat.lunettes": "Gilashi",
   "cat.ordinateur": "Kwamfuta",
-  "cat.ecouteurs": "Belun kunne",
+  "cat.ecouteurs_ou_baladeur": "Belun kunne ko na'urar kiɗa",
   "cat.montre": "Agogo",
   "cat.bijou": "Kayan ado",
   "cat.livre_ou_cahier": "Littafi ko kundi",
@@ -148,10 +148,12 @@
   "cat.materiel_de_plomberie": "Kayan aikin famfo",
   "cat.materiel_de_soudure": "Kayan walda",
   "cat.pieces_de_telephone_ou_d'appareils": "Sassan waya ko na'urori",
+  "cat.bazin_ou_tissu": "Bazin ko yadi",
+  "cat.outils_de_reparation": "Kayan gyara",
   "cat.ensemble_geometrique": "Kayan aikin lissafi",
   "cat.bic": "Biro",
   "cat.calculatrice": "Kalkuleta",
-  "cat.kit_de_maintenance_et_robotique": "Kayan gyara da na robot",
+  "cat.kit_de_maintenance_ou_de_robotique": "Kayan gyara ko na robot",
   "hall.sous.transport": "Kayan da aka samu a motocinmu da tashoshinmu",
   "hall.sous.education": "Kayan da aka samu a cikin cibiyar",
   "hall.aide.transport": "Ku bincika lambar don bayar da rahoto daga wayarku. Don karɓar kaya, ku zo ofis da shaidar ɗan ƙasa.",
@@ -168,6 +170,6 @@
   "hall.indice": "Danna F don cikakken allo",
   "hall.hors_ligne": "An rasa haɗin intanet: ana nuna kayan da aka karɓa na ƙarshe",
   "hall.logo_alt": "Tambarin {org}",
-  "hall.titre_page": "{org} — Abubuwan da aka samu"
+  "hall.titre_page": "{org}, Abubuwan da aka samu"
   });
 })();

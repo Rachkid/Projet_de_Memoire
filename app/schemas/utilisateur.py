@@ -67,8 +67,20 @@ class UtilisateurUpdate(BaseModel):
     """
 
     nom: Optional[str] = None
+    # Réservé aux comptes dont le titulaire n'a pas encore commencé à travailler : voir routers/utilisateurs.py.
+    identifiant: Optional[str] = None
     droit_enregistrement: Optional[bool] = None
     droit_restitution: Optional[bool] = None
+
+    @field_validator("identifiant")
+    @classmethod
+    def identifiant_valide(cls, valeur):
+        if valeur is None:
+            raise ValueError("Ce champ ne peut pas être vide.")
+        valeur = valeur.strip().lower()
+        if not _MOTIF_IDENTIFIANT.match(valeur):
+            raise ValueError("3 à 50 caractères : lettres, chiffres, point, tiret ou souligné.")
+        return valeur
 
     @field_validator("nom", "droit_enregistrement", "droit_restitution")
     @classmethod

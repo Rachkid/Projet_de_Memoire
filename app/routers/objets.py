@@ -5,6 +5,7 @@ cas d'utilisation "Enregistrer un objet trouvé").
 """
 
 import uuid
+from datetime import datetime, timezone
 from io import BytesIO
 
 import qrcode
@@ -18,7 +19,7 @@ from app.models.utilisateur import Utilisateur
 from app.models.enums import StatutObjet
 from app.schemas.signalement_perte import SignalementPersonnelRead
 from app.schemas.objet import ObjetCreate, ObjetCreeRead, ObjetRead, ObjetUpdate
-from app.security import exiger_enregistrement, exiger_enregistrement_ou_administrateur, get_utilisateur_courant
+from app.security import exiger_administrateur, exiger_enregistrement, exiger_enregistrement_ou_administrateur, get_utilisateur_courant
 from app.services import audit
 from app.services.rapprochement import signalements_correspondants, traiter_nouvel_objet
 
@@ -143,7 +144,7 @@ def corriger_objet(
     objet_id: uuid.UUID,
     payload: ObjetUpdate,
     db: Session = Depends(get_db),
-    agent: Utilisateur = Depends(exiger_enregistrement),
+    agent: Utilisateur = Depends(exiger_enregistrement_ou_administrateur),
 ):
     """
     Corrige un objet (erreur de saisie). PATCH = modification partielle : seuls
@@ -160,6 +161,9 @@ def corriger_objet(
     db.refresh(objet)
     if "categorie" in modifications or "date_heure_decouverte" in modifications:
         traiter_nouvel_objet(db, objet)
+    # Le détail secret n'est jamais écrit dans le journal : on indique seulement qu'il a changé.
+    audit.tracer(db, audit.OBJET_CORRIGE, acteur=agent, organisation_id=objet.organisation_id, cible=objet.qr_code,
+                 detail="Champs modifiés : " + ", ".join(sorted(modifications)))
     return objet
 
 
@@ -178,6 +182,32 @@ def archiver_objet(
     db.commit()
     db.refresh(objet)
     audit.tracer(db, audit.OBJET_ARCHIVE, acteur=utilisateur, organisation_id=objet.organisation_id,
+                 cible=objet.qr_code, detail=f"Catégorie : {objet.categorie}")
+    return objet
+
+
+@router.patch("/{objet_id}/desarchiver", response_model=ObjetRead)
+def desarchiver_objet(
+    objet_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    administrateur: Utilisateur = Depends(exiger_administrateur),
+):
+    """
+    Remet en attente un objet archivé (archivage fait par erreur, ou objet réclamé après coup).
+    Réservé aux administrateurs. Le délai de conservation repart d'aujourd'hui : sans cela, un objet
+    archivé automatiquement parce que son délai était dépassé serait archivé de nouveau aussitôt.
+    """
+    objet = db.get(Objet, objet_id)
+    if objet is None or objet.organisation_id != administrateur.organisation_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Objet introuvable")
+    if objet.statut != StatutObjet.ARCHIVE.value:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Cet objet n'est pas archivé.")
+    objet.statut = StatutObjet.EN_ATTENTE.value
+    objet.retention_depuis = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(objet)
+    traiter_nouvel_objet(db, objet)  # des déclarations ont pu être déposées entre-temps
+    audit.tracer(db, audit.OBJET_DESARCHIVE, acteur=administrateur, organisation_id=objet.organisation_id,
                  cible=objet.qr_code, detail=f"Catégorie : {objet.categorie}")
     return objet
 

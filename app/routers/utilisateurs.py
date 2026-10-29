@@ -17,7 +17,9 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.enums import RoleUtilisateur
+from app.models.objet import Objet
 from app.models.organisation import Organisation
+from app.models.restitution import Restitution
 from app.models.utilisateur import Utilisateur
 from app.schemas.utilisateur import (
     ReinitialisationMotDePasse,
@@ -117,12 +119,38 @@ def modifier_utilisateur(
     modifications = payload.model_dump(exclude_unset=True)
     if not modifications:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Aucune modification fournie.")
+    ancien_identifiant = cible.identifiant
+    if "identifiant" in modifications and modifications["identifiant"] != cible.identifiant:
+        # L'identifiant sert à se connecter et figure dans l'historique : on ne le change qu'avant que la personne
+        # ait commencé à travailler (mot de passe encore provisoire, aucun objet enregistré ni remis).
+        a_travaille = (
+            db.query(Objet.id).filter(Objet.agent_id == cible.id).first() is not None
+            or db.query(Restitution.id).filter(Restitution.agent_id == cible.id).first() is not None
+        )
+        if not cible.doit_changer_mot_de_passe or a_travaille:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="L'identifiant ne peut plus être changé : cette personne a déjà commencé à travailler. Désactivez ce compte et créez-en un nouveau.",
+            )
+    elif "identifiant" in modifications:
+        del modifications["identifiant"]
+        if not modifications:
+            return cible
     for champ, valeur in modifications.items():
         setattr(cible, champ, valeur)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Cet identifiant existe déjà.")
     db.refresh(cible)
+    if "identifiant" in modifications:
+        cible.version_session = (cible.version_session or 0) + 1  # ses sessions éventuelles ne servent plus
+        db.commit()
+        db.refresh(cible)
     audit.tracer(db, audit.COMPTE_MODIFIE, acteur=demandeur, organisation_id=cible.organisation_id,
-                 cible=cible.identifiant, detail="Champs modifiés : " + ", ".join(sorted(modifications)),
+                 cible=cible.identifiant,
+                 detail="Champs modifiés : " + ", ".join(sorted(modifications)) + (f" (ancien identifiant : {ancien_identifiant})" if "identifiant" in modifications else ""),
                  adresse=adresse_client(requete))
     return cible
 

@@ -18,7 +18,7 @@
   const slug = (location.pathname.split("/").filter(Boolean)[0] || "").toLowerCase();
   const CLE_JETON = "tsintuwa_jeton_" + slug;
   const CATEGORIES_SECOURS = ["Téléphone", "Portefeuille", "Clés", "Sac", "Documents", "Carte bancaire", "Vêtement",
-    "Lunettes", "Ordinateur", "Écouteurs", "Montre", "Bijou", "Livre ou cahier", "Autre"];
+    "Lunettes", "Ordinateur", "Écouteurs ou baladeur", "Montre", "Bijou", "Livre ou cahier", "Autre"];
   const STATUTS = { en_attente: "En attente", reclame: "Réclamé", restitue: "Restitué", archive: "Archivé" };
   const ROLES = { agent: "Agent", administrateur: "Administrateur", super_administrateur: "Super-administrateur" };
   const PIECES = ["Carte d'identité", "Passeport", "Carte d'étudiant", "Permis de conduire", "Autre"];
@@ -155,6 +155,8 @@
     "batterie": "M3 8h16v10H3zM19 11h2v4h-2zM7 11v4M11 11v4",
     "objets electroniques": "M7 7h10v10H7zM10 10h4v4h-4zM9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4",
     "pieces mecaniques": "M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-2.3-.7-.7-2.3z",
+    "bazin ou tissu": "M3 5h18v14H3zM3 9h18M3 13h18M3 17h18M8 5v14M13 5v14M18 5v14",
+    "outils de reparation": "M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-2.3-.7-.7-2.3zM15 15l5 5",
     "pieces de telephone ou d'appareils": "M7 2h10a1 1 0 0 1 1 1v8M6 8v13a1 1 0 0 0 1 1h4M6 5v1M14 14l-2 2 2 2M18 14l2 2-2 2M12 22l4-8",
     "materiel electrique": "M13 2L4 14h7l-1 8 9-12h-7z",
     "kit ou objet pour bebe": "M12 3a4 4 0 0 0-4 4v2h8V7a4 4 0 0 0-4-4zM6 9h12l-1 5a5 5 0 0 1-10 0zM9 20h6",
@@ -176,6 +178,7 @@
     "vetement": "M9 3L3 6l2.2 4.2L8 9v12h8V9l2.8 1.2L21 6l-6-3a3 3 0 0 1-6 0z",
     "lunettes": cercle(6.5, 14, 3.5) + cercle(17.5, 14, 3.5) + "M10 14h4M3 14l2-7M21 14l-2-7",
     "ordinateur": "M5 5h14a1 1 0 0 1 1 1v9H4V6a1 1 0 0 1 1-1zM2 19h20",
+    "ecouteurs ou baladeur": "M4 15v-3a8 8 0 0 1 16 0v3M4 15a2 2 0 0 1 2-2h1v6H6a2 2 0 0 1-2-2zM20 15a2 2 0 0 0-2-2h-1v6h1a2 2 0 0 0 2-2z",
     "ecouteurs": "M4 15v-3a8 8 0 0 1 16 0v3M4 15a2 2 0 0 1 2-2h1v6H6a2 2 0 0 1-2-2zM20 15a2 2 0 0 0-2-2h-1v6h1a2 2 0 0 0 2-2z",
     "montre": "M10 2.5h4l1 4M14 21.5h-4l-1-4M10 6.5h4a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3v-5a3 3 0 0 1 3-3zM12 10v2.2l1.5 1",
     "bijou": "M6 3h12l4 6-10 12L2 9l4-6zM2 9h20M9 3L7 9l5 12 5-12-2-6",
@@ -204,6 +207,7 @@
     "ensemble geometrique": "M3 20L12 4l9 16zM8 20l4-8M3 20h18",
     "bic": "M17 3l4 4L8 20l-5 1 1-5zM14 6l4 4",
     "calculatrice": "M6 2h12a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18h.01M12 18h.01M16 18h.01",
+    "kit de maintenance ou de robotique": cercle(12, 12, 3) + "M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2",
     "kit de maintenance et robotique": cercle(12, 12, 3) + "M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2",
     "hijab ou voile": "M12 3a6 6 0 0 0-6 6v4c0 3 1.5 5 3 6l3 2 3-2c1.5-1 3-3 3-6V9a6 6 0 0 0-6-6zM9 9.5a3 3 0 0 1 6 0v3a3 3 0 0 1-6 0z",
     "carte professionnelle": "M5 3h14a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM9 3v3h6V3M8 16h8" + cercle(12, 11, 2.2),
@@ -382,9 +386,9 @@
     racine.setProperty("--t-fond", t.texte_sur_fond);
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute("content", t.principale);
-    document.title = "Espace agent — " + org.nom;
+    document.title = "Espace agent, " + org.nom;
 
-    if (estImage(org.fond_url)) racine.setProperty("--fond-image", 'url("' + org.fond_url + '")');
+    if (estImage(org.fond_url)) racine.setProperty("--fond-image", 'url("' + org.fond_url + '")'); else racine.removeProperty("--fond-image");
     $("haut-org").textContent = org.nom;
     $("connexion-org").textContent = org.nom;
     $("lien-public").href = "/" + slug;
@@ -408,7 +412,7 @@
 
   /* ---------- Affichage des vues ---------- */
 
-  const VUES = ["connexion", "objets", "nouveau", "enregistre", "fiche", "restituer", "remis", "pertes", "bord", "historique", "journal", "equipe", "compte"];
+  const VUES = ["connexion", "objets", "nouveau", "enregistre", "fiche", "restituer", "remis", "pertes", "bord", "historique", "journal", "equipe", "parametres", "compte"];
 
   function afficherVue(nom, titreId) {
     VUES.forEach(function (v) { $("vue-" + v).hidden = (v !== nom); });
@@ -416,11 +420,11 @@
     $("haut").hidden = !connecte;
     $("onglets").hidden = !connecte;
     document.body.classList.toggle("hors-session", !connecte);
-    const cible = { objets: "objets", nouveau: "nouveau", enregistre: "nouveau", fiche: "objets", restituer: "objets", remis: "objets", pertes: "pertes", bord: "bord", historique: "historique", journal: "journal", equipe: "equipe" }[nom];
+    const cible = { objets: "objets", nouveau: "nouveau", enregistre: "nouveau", fiche: "objets", restituer: "objets", remis: "objets", pertes: "pertes", bord: "bord", historique: "historique", journal: "journal", equipe: "equipe", parametres: "parametres" }[nom];
     document.querySelectorAll("#onglets a").forEach(function (a) {
       if (a.getAttribute("data-vue") === cible) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
-    $("haut-titre").textContent = { objets: "Objets trouvés", nouveau: "Enregistrer un objet", pertes: "Déclarations", bord: "Tableau de bord", historique: "Historique", journal: "Journal d'audit", equipe: "Équipe", compte: "Mon compte" }[cible || (nom === "compte" ? "compte" : "")] || "";
+    $("haut-titre").textContent = { objets: "Objets trouvés", nouveau: "Enregistrer un objet", pertes: "Déclarations", bord: "Tableau de bord", historique: "Historique", journal: "Journal d'audit", equipe: "Équipe", parametres: "Paramètres", compte: "Mon compte" }[cible || (nom === "compte" ? "compte" : "")] || "";
     window.scrollTo(0, 0);
     const titre = $(titreId);
     if (titre) titre.focus({ preventScroll: true });
@@ -456,6 +460,7 @@
     if (page === "historique") return estAdmin() ? pageHistorique(morceaux[1], morceaux[2]) : aller("#objets");
     if (page === "journal") return estAdmin() ? pageJournal() : aller("#objets");
     if (page === "equipe") return estAdmin() ? pageEquipe() : aller("#objets");
+    if (page === "parametres") return estAdmin() ? pageParametres() : aller("#objets");
     if (page === "compte") return pageCompte();
     aller("#objets");
   }
@@ -496,6 +501,7 @@
     $("onglet-historique").hidden = !estAdmin();
     $("onglet-journal").hidden = !estAdmin();
     $("onglet-equipe").hidden = !estAdmin();
+    $("onglet-parametres").hidden = !estAdmin();
     if (moi.doit_changer_mot_de_passe) {
       // Mot de passe provisoire : aucun menu, pas d'alertes (le serveur les refuserait) tant qu'il n'est pas changé.
       document.querySelectorAll("#onglets a").forEach(function (a) { a.hidden = true; });
@@ -610,7 +616,7 @@
       const corps = el("div", "objet-carte__corps");
       corps.appendChild(el("strong", null, o.categorie));
       corps.appendChild(el("span", "objet-carte__quand", jourRelatif(o.date_heure_decouverte)));
-      const lieu = [libelleEmplacement(o.type_emplacement), o.lieu_detail].filter(Boolean).join(" — ");
+      const lieu = [libelleEmplacement(o.type_emplacement), o.lieu_detail].filter(Boolean).join(", ");
       if (lieu) corps.appendChild(el("span", null, lieu));
       a.appendChild(corps);
       liste.appendChild(a);
@@ -809,7 +815,7 @@
 
     const infos = $("fiche-infos");
     ligneInfo(infos, "Trouvé le", dateHeure(objet.date_heure_decouverte));
-    const lieu = [libelleEmplacement(objet.type_emplacement), objet.lieu_detail].filter(Boolean).join(" — ");
+    const lieu = [libelleEmplacement(objet.type_emplacement), objet.lieu_detail].filter(Boolean).join(", ");
     if (lieu) ligneInfo(infos, "Lieu", lieu);
     ligneInfo(infos, "Code", objet.qr_code);
     $("etiquette-code").textContent = objet.qr_code;
@@ -825,6 +831,19 @@
       b.type = "button";
       b.addEventListener("click", function () { $("confirmer").showModal(); });
       actions.appendChild(b);
+    }
+
+    if ((aDroit("droit_enregistrement") || estAdmin()) && (objet.statut === "en_attente" || objet.statut === "reclame")) {
+      const m = boutonIcone("button", "bouton bouton--doux bouton--plein", "Corriger cet objet", "M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4");
+      m.type = "button";
+      m.addEventListener("click", function () { corrigerObjet(objet); });
+      actions.appendChild(m);
+    }
+    if (estAdmin() && objet.statut === "archive") {
+      const d = boutonIcone("button", "bouton bouton--accent bouton--plein", "Désarchiver cet objet", "M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5");
+      d.type = "button";
+      d.addEventListener("click", function () { desarchiverObjet(objet); });
+      actions.appendChild(d);
     }
 
     chargerAttente(objet);
@@ -907,18 +926,23 @@
     }
   });
 
+  /* Référence donnée à l'usager sur son talon : les 8 premiers caractères de l'identifiant (voir portail.js et notifications.py). */
+  function refSignalement(id) { return String(id || "").replace(/-/g, "").slice(0, 8).toUpperCase(); }
+
   function carteSignalement(s) {
     const c = el("div", "carte carte--bloc");
     const corps = el("div", "carte__corps");
+    corps.appendChild(el("span", "carte__ref", "Réf. " + refSignalement(s.id)));
     corps.appendChild(el("strong", null, s.usager_nom || "Nom non communiqué"));
     const tel = el("span");
     tel.appendChild(lienTel(s.usager_telephone));
     corps.appendChild(tel);
-    corps.appendChild(el("span", null, s.categorie + (s.description ? " — " + s.description : "")));
+    corps.appendChild(el("span", "carte__categorie", s.categorie));
+    if (s.description) corps.appendChild(el("span", null, s.description));
     const details = [];
     if (s.date_perte) details.push("Perdu le " + formatJour.format(new Date(s.date_perte + "T12:00:00")));
     if (s.lieu_approximatif) details.push(s.lieu_approximatif);
-    if (details.length) corps.appendChild(el("span", null, details.join(" — ")));
+    if (details.length) corps.appendChild(el("span", null, details.join(", ")));
     c.appendChild(corps);
     return c;
   }
@@ -945,7 +969,7 @@
       objet = await api("GET", "/objets/" + encodeURIComponent(id));
       if (objet.statut !== "en_attente") {
         $("restituer-objet").textContent = "Cet objet n'est plus en attente : il ne peut pas être remis.";
-        $("secret").textContent = "—";
+        $("secret").textContent = "Non disponible";
         return;
       }
       const r = await Promise.all([
@@ -956,11 +980,11 @@
       candidats = r[1];
     } catch (err) {
       $("restituer-objet").textContent = err.message;
-      $("secret").textContent = "—";
+      $("secret").textContent = "Non disponible";
       return;
     }
     objetCourant = objet;
-    $("restituer-objet").textContent = objet.categorie + " — trouvé le " + dateHeure(objet.date_heure_decouverte) + " (code " + objet.qr_code + ")";
+    $("restituer-objet").textContent = objet.categorie + ", trouvé le " + dateHeure(objet.date_heure_decouverte) + " (code " + objet.qr_code + ")";
     $("secret").textContent = secret ? secret : "Aucun détail secret n'a été enregistré pour cet objet : demandez une description précise (marque, couleur, contenu, signe particulier).";
 
     const zone = $("candidats");
@@ -971,7 +995,7 @@
       lab.appendChild(inp);
       const t = el("span");
       t.appendChild(document.createTextNode(s.usager_nom || "Nom non communiqué"));
-      t.appendChild(el("small", null, afficherTelephone(s.usager_telephone) + (s.description ? " — " + s.description : "")));
+      t.appendChild(el("small", null, afficherTelephone(s.usager_telephone) + (s.description ? ", " + s.description : "") + ", réf. " + refSignalement(s.id)));
       lab.appendChild(t);
       zone.appendChild(lab);
     });
@@ -1074,14 +1098,35 @@
     const etat = $("pertes-etat");
     const liste = vider($("pertes-liste"));
     etat.textContent = "Chargement…";
-    let signalements;
+    $("pertes-recherche").value = "";
     try {
-      signalements = await api("GET", "/signalements/");
+      signalementsCharges = await api("GET", "/signalements/");
     } catch (err) { etat.textContent = err.message; return; }
-    if (!signalements.length) { etat.textContent = ""; liste.appendChild(vide("Aucune déclaration de perte en cours.", "documents")); return; }
-    etat.textContent = signalements.length + (signalements.length > 1 ? " déclarations en cours" : " déclaration en cours");
-    signalements.forEach(function (s) { liste.appendChild(cartePerte(s)); });
+    dessinerPertes();
   }
+
+  let signalementsCharges = [];
+
+  function sansAccentMin(t) { return String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
+
+  /* Affiche les déclarations, filtrées par la recherche : référence du talon, nom, téléphone, catégorie ou description. */
+  function dessinerPertes() {
+    const etat = $("pertes-etat"), liste = vider($("pertes-liste"));
+    $("bloc-recherche-pertes").hidden = !signalementsCharges.length;
+    if (!signalementsCharges.length) { etat.textContent = ""; liste.appendChild(vide("Aucune déclaration de perte en cours.", "documents")); return; }
+    const q = sansAccentMin($("pertes-recherche").value).trim();
+    const chiffres = q.replace(/\D/g, "");
+    const visibles = signalementsCharges.filter(function (s) {
+      if (!q) return true;
+      if (refSignalement(s.id).toLowerCase().indexOf(q.replace(/\s/g, "")) !== -1) return true;
+      if (chiffres.length >= 3 && String(s.usager_telephone || "").replace(/\D/g, "").indexOf(chiffres) !== -1) return true;
+      return sansAccentMin([s.usager_nom, s.categorie, s.description, s.lieu_approximatif].join(" ")).indexOf(q) !== -1;
+    });
+    if (!visibles.length) { etat.textContent = "Aucune déclaration ne correspond à « " + $("pertes-recherche").value.trim() + " »."; return; }
+    etat.textContent = visibles.length + (visibles.length > 1 ? " déclarations" : " déclaration") + (q ? "" : " en cours");
+    visibles.forEach(function (s) { liste.appendChild(cartePerte(s)); });
+  }
+  $("pertes-recherche").addEventListener("input", dessinerPertes);
 
   function cartePerte(s) {
     const c = carteSignalement(s);
@@ -1117,13 +1162,18 @@
       });
       actions.appendChild(voir);
     }
+    const corriger = boutonIcone("button", "bouton bouton--doux bouton--plein", "Corriger", "M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4");
+    corriger.type = "button";
+    corriger.addEventListener("click", function () { corrigerDeclaration(s, pagePertes); });
+    actions.appendChild(corriger);
     const clore = boutonIcone("button", "bouton bouton--doux bouton--plein", "Clôturer cette déclaration", "M5 12l5 5 9-10");
     clore.type = "button";
     clore.addEventListener("click", async function () {
       clore.disabled = true;
       try {
         await api("PATCH", "/signalements/" + encodeURIComponent(s.id) + "/cloturer");
-        c.remove();
+        signalementsCharges = signalementsCharges.filter(function (x) { return x.id !== s.id; });
+        dessinerPertes();
       } catch (err) { zone.appendChild(el("p", "alerte", err.message)); clore.disabled = false; }
     });
     actions.appendChild(clore);
@@ -1144,7 +1194,7 @@
   function formaterNombre(n) { return Number(n).toLocaleString("fr-FR"); }
 
   function formaterDelai(heures) {
-    if (heures === null || heures === undefined) return "—";
+    if (heures === null || heures === undefined) return "Aucune";
     if (heures < 1) return "< 1 h";
     if (heures < 48) return Math.round(heures) + " h";
     return (Math.round(heures / 2.4) / 10).toLocaleString("fr-FR") + " j";
@@ -1260,7 +1310,7 @@
       lien.addEventListener("click", function () { $("bord-org").value = l.organisation_id; chargerBord(l.organisation_id); window.scrollTo(0, 0); });
       premiere.appendChild(lien); ligne.appendChild(premiere);
       [formaterNombre(l.objets_en_attente), formaterNombre(l.restitues_ce_mois), formaterNombre(l.declarations_en_cours),
-        l.taux_restitution === null ? "—" : l.taux_restitution + " %", formaterDelai(l.delai_moyen_heures), formaterNombre(l.proches_fin_retention)
+        l.taux_restitution === null ? "Aucune" : l.taux_restitution + " %", formaterDelai(l.delai_moyen_heures), formaterNombre(l.proches_fin_retention)
       ].forEach(function (v) { ligne.appendChild(el("td", "num", v)); });
       corps.appendChild(ligne);
     });
@@ -1302,7 +1352,7 @@
     } catch (err) { etat.textContent = err.message; $("bord-contenu").hidden = true; return; }
     etat.textContent = "";
     $("bord-contenu").hidden = false;
-    $("bord-chapeau").textContent = s.organisation_nom + " — les chiffres sont recalculés à chaque ouverture de la page.";
+    $("bord-chapeau").textContent = s.organisation_nom + " : les chiffres sont recalculés à chaque ouverture de la page.";
 
     const trouvesJour = s.serie_30_jours.map(function (j) { return j.trouves; });
     const remisJour = s.serie_30_jours.map(function (j) { return j.restitues; });
@@ -1313,7 +1363,7 @@
       miniCourbe(trouvesJour, "Objets trouvés par jour sur 30 jours")));
     kpis.appendChild(tuileChiffre(formaterNombre(s.restitues_ce_mois), "Remis ce mois-ci", formaterNombre(s.objets_restitues) + " au total", false,
       miniCourbe(remisJour, "Objets remis par jour sur 30 jours")));
-    kpis.appendChild(tuileChiffre(s.taux_restitution === null ? "—" : s.taux_restitution + " %", "Taux de remise", "Objets remis parmi ceux reçus", false,
+    kpis.appendChild(tuileChiffre(s.taux_restitution === null ? "Aucune" : s.taux_restitution + " %", "Taux de remise", "Objets remis parmi ceux reçus", false,
       s.taux_restitution === null ? null : anneau(s.taux_restitution)));
     kpis.appendChild(tuileChiffre(formaterNombre(s.declarations_en_cours), "Déclarations en cours", "Personnes qui cherchent un objet"));
     kpis.appendChild(tuileChiffre(formaterDelai(s.delai_moyen_heures), "Délai moyen de remise", "Entre la découverte et la remise"));
@@ -1371,7 +1421,7 @@
     const qui = el("span");
     qui.appendChild(document.createTextNode("Remis à "));
     if (l.usager_telephone) {
-      const a = el("a", null, (l.usager_nom ? l.usager_nom + " — " : "") + afficherTelephone(l.usager_telephone));
+      const a = el("a", null, (l.usager_nom ? l.usager_nom + ", " : "") + afficherTelephone(l.usager_telephone));
       a.href = "#historique/personne/" + encodeURIComponent(l.usager_telephone);
       qui.appendChild(a);
     } else qui.appendChild(document.createTextNode(l.usager_nom || "personne non renseignée"));
@@ -1642,7 +1692,11 @@
     compte_desactive: "Compte désactivé",
     compte_reactive: "Compte réactivé",
     objet_archive: "Objet archivé",
-    objet_archive_auto: "Archivage automatique"
+    objet_archive_auto: "Archivage automatique",
+    objet_corrige: "Objet corrigé",
+    objet_desarchive: "Objet désarchivé",
+    declaration_corrigee: "Déclaration corrigée",
+    organisation_modifiee: "Paramètres modifiés"
   };
   const PAGE_AUDIT = 100;
   let decalageAudit = 0;
@@ -1669,7 +1723,7 @@
     etat.textContent = r.total ? "" : "Aucune action enregistrée pour ce filtre.";
     r.lignes.forEach(function (l) {
       const tr = el("tr");
-      [dateHeure(l.date_heure), ACTIONS_AUDIT[l.action] || l.action, l.acteur || "—", l.cible || "—", l.detail || "", l.adresse || ""].forEach(function (v) {
+      [dateHeure(l.date_heure), ACTIONS_AUDIT[l.action] || l.action, l.acteur || "Système", l.cible || "", l.detail || "", l.adresse || ""].forEach(function (v) {
         tr.appendChild(el("td", null, v));
       });
       corps.appendChild(tr);
@@ -1680,6 +1734,91 @@
   }
   $("ja-action").addEventListener("change", function () { chargerAudit(true); });
   $("audit-plus").addEventListener("click", function () { chargerAudit(false); });
+
+  /* Apparence : couleurs, logo, photo de fond */
+  const NOMS_COULEURS = { principale: "couleur_principale", accent: "couleur_accent", fond: "couleur_fond" };
+  let couleursParDefaut = {};   // couleur remise « par défaut » (envoyée comme null)
+
+  function apercuImage(zoneId, url, texteVide) {
+    const zone = vider($(zoneId));
+    if (estImage(url)) { const img = el("img"); img.src = url; img.alt = ""; zone.appendChild(img); }
+    else zone.appendChild(el("span", "apercu-habillage__vide", texteVide));
+  }
+
+  function remplirApparence() {
+    couleursParDefaut = {};
+    document.querySelectorAll("#form-couleurs [data-defaut]").forEach(function (b) { b.textContent = "Par défaut"; });
+    Object.keys(NOMS_COULEURS).forEach(function (k) { $("coul-" + k).value = org.theme[k]; });
+    $("fond-aide").textContent = (org.secteur === "transport" ? "Une belle photo de votre gare ou de vos véhicules" : "Une belle photo de votre établissement")
+      + ". Elle est réduite automatiquement. 5 Mo au maximum.";
+    apercuImage("logo-apercu", org.logo_url, "Aucun logo");
+    apercuImage("fond-apercu", org.fond_url, "Aucune photo de fond");
+    ["couleurs-erreur", "logo-erreur", "fond-erreur"].forEach(function (i) { montrerErreur(i, ""); });
+    ["couleurs-ok", "logo-ok", "fond-ok"].forEach(function (i) { $(i).hidden = true; });
+    $("logo-fichier").value = ""; $("fond-fichier").value = ""; $("logo-fond-blanc").checked = false;
+  }
+
+  document.querySelectorAll("#form-couleurs [data-defaut]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      const k = b.getAttribute("data-defaut");
+      couleursParDefaut[k] = true;
+      b.textContent = "Par défaut ✓";
+    });
+  });
+  Object.keys(NOMS_COULEURS).forEach(function (k) {
+    $("coul-" + k).addEventListener("input", function () {
+      delete couleursParDefaut[k];
+      const b = document.querySelector('#form-couleurs [data-defaut="' + k + '"]'); if (b) b.textContent = "Par défaut";
+    });
+  });
+
+  function majOrganisation(maj) {
+    ["logo_url", "fond_url", "couleur_principale", "couleur_accent", "couleur_fond", "theme", "delai_retention_jours", "consultation_distance"].forEach(function (c) { if (maj[c] !== undefined) org[c] = maj[c]; });
+    appliquerTheme();
+  }
+
+  $("form-couleurs").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    montrerErreur("couleurs-erreur", ""); $("couleurs-ok").hidden = true;
+    const corps = {};
+    Object.keys(NOMS_COULEURS).forEach(function (k) {
+      const champ = NOMS_COULEURS[k], valeur = $("coul-" + k).value;
+      if (couleursParDefaut[k]) corps[champ] = null;
+      else if (valeur !== org.theme[k]) corps[champ] = valeur;
+    });
+    if (!Object.keys(corps).length) { montrerErreur("couleurs-erreur", "Aucune couleur n'a été changée."); return; }
+    const bouton = $("couleurs-envoyer"); bouton.disabled = true;
+    try {
+      majOrganisation(await api("PATCH", "/organisations/" + encodeURIComponent(org.id), corps));
+      remplirApparence();
+      $("couleurs-ok").textContent = "Couleurs enregistrées."; $("couleurs-ok").hidden = false;
+    } catch (err) { montrerErreur("couleurs-erreur", err.message); }
+    finally { bouton.disabled = false; }
+  });
+
+  function brancherEnvoiImage(formId, champFichier, chemin, prefixe, apercu, texteVide, urlChamp, extra) {
+    $(formId).addEventListener("submit", async function (e) {
+      e.preventDefault();
+      montrerErreur(prefixe + "-erreur", ""); $(prefixe + "-ok").hidden = true;
+      const fichier = $(champFichier).files[0];
+      if (!fichier) { montrerErreur(prefixe + "-erreur", "Choisissez d'abord une image."); return; }
+      if (fichier.size > 5 * 1024 * 1024) { montrerErreur(prefixe + "-erreur", "Image trop lourde (5 Mo au maximum)."); return; }
+      const donnees = new FormData(); donnees.append("fichier", fichier);
+      if (extra) extra(donnees);
+      const bouton = $(prefixe + "-envoyer"); bouton.disabled = true;
+      try {
+        const maj = await api("POST", "/organisations/" + encodeURIComponent(org.id) + chemin, donnees);
+        majOrganisation(maj);
+        apercuImage(apercu, org[urlChamp], texteVide);
+        $(champFichier).value = "";
+        $(prefixe + "-ok").textContent = "Image enregistrée."; $(prefixe + "-ok").hidden = false;
+      } catch (err) { montrerErreur(prefixe + "-erreur", err.message); }
+      finally { bouton.disabled = false; }
+    });
+  }
+  brancherEnvoiImage("form-logo", "logo-fichier", "/logo", "logo", "logo-apercu", "Aucun logo", "logo_url",
+    function (d) { d.append("retirer_fond_blanc", $("logo-fond-blanc").checked ? "true" : "false"); });
+  brancherEnvoiImage("form-fond", "fond-fichier", "/fond", "fond", "fond-apercu", "Aucune photo de fond", "fond_url");
 
   /* ---------- Équipe : gestion des comptes agents (administrateurs) ---------- */
 
@@ -1719,11 +1858,11 @@
     const adresse = location.origin + "/" + slug + "/agent";
     $("equipe-resultat-titre").firstChild.textContent = titre;
     const infos = vider($("equipe-resultat-infos"));
-    [["Adresse de connexion", adresse], ["Identifiant", identifiant], ["Mot de passe provisoire", motDePasse]].forEach(function (c) {
+    [["Adresse de connexion", adresse], ["Identifiant", identifiant], ["Mot de passe provisoire", motDePasse]].filter(function (c) { return c[1]; }).forEach(function (c) {
       infos.appendChild(el("dt", null, c[0]));
       infos.appendChild(el("dd", null, c[1]));
     });
-    resultatEquipe = "Adresse : " + adresse + "\nIdentifiant : " + identifiant + "\nMot de passe provisoire : " + motDePasse;
+    resultatEquipe = "Adresse : " + adresse + "\nIdentifiant : " + identifiant + (motDePasse ? "\nMot de passe provisoire : " + motDePasse : "");
     $("equipe-resultat").hidden = false;
     $("equipe-resultat").scrollIntoView({ block: "nearest" });
   }
@@ -1778,6 +1917,9 @@
       tr.appendChild(tdEtat);
       const tdAct = el("td", "tableau__actions");
       if (gerable) {
+        const bMod = el("button", "bouton bouton--doux", "Modifier"); bMod.type = "button";
+        bMod.addEventListener("click", function () { modifierCompte(c, chargerEquipe); });
+        tdAct.appendChild(bMod);
         const bMdp = el("button", "bouton bouton--doux", "Nouveau mot de passe"); bMdp.type = "button";
         bMdp.addEventListener("click", async function () {
           if (!await demanderConfirmation("Nouveau mot de passe pour " + c.nom + " ?", "L'ancien mot de passe ne fonctionnera plus et ses sessions ouvertes seront fermées. Vous recevrez un mot de passe provisoire à lui transmettre.", "Réinitialiser")) return;
@@ -1829,6 +1971,183 @@
       if (err.status === 409) montrerErreur("erreur-eq-identifiant", "Cet identifiant existe déjà. Choisissez-en un autre.");
       else montrerErreur("equipe-erreur", err.message);
     } finally { bouton.disabled = false; }
+  });
+
+  /* ---------- Corrections (étape 18) : fenêtre de saisie générale ---------- */
+
+  /*
+    Ouvre une fenêtre avec un petit formulaire. champs : [{ id, label, type, valeur, options, max, aide, desactive }]
+    type : "text" | "date" | "datetime-local" | "select". soumettre(valeurs) est appelée si tout est bon ;
+    si elle lance une erreur, son message s'affiche dans la fenêtre. Renvoie une promesse (true si enregistré).
+  */
+  function ouvrirFormulaire(titre, texte, champs, libelleOk, soumettre) {
+    return new Promise(function (resoudre) {
+      const boite = $("modal-form"), form = $("modal-form-corps"), zone = vider($("modal-form-champs"));
+      $("modal-form-titre").textContent = titre;
+      $("modal-form-texte").textContent = texte || ""; $("modal-form-texte").hidden = !texte;
+      $("modal-form-oui").textContent = libelleOk;
+      montrerErreur("modal-form-erreur", "");
+      const saisies = {};
+      champs.forEach(function (c) {
+        const bloc = el("div", "champ");
+        const etiquette = el("label", null, c.label); etiquette.setAttribute("for", "mf-" + c.id);
+        bloc.appendChild(etiquette);
+        let saisie;
+        if (c.type === "select") {
+          saisie = el("select");
+          c.options.forEach(function (o) { const opt = el("option", null, o[1]); opt.value = o[0]; if (o[0] === c.valeur) opt.selected = true; saisie.appendChild(opt); });
+        } else {
+          saisie = el("input"); saisie.type = c.type || "text";
+          if (c.max) saisie.maxLength = c.max;
+          saisie.value = c.valeur || "";
+          saisie.autocomplete = "off";
+        }
+        saisie.id = "mf-" + c.id;
+        if (c.desactive) saisie.disabled = true;
+        bloc.appendChild(saisie);
+        if (c.aide) bloc.appendChild(el("p", "champ__aide", c.aide));
+        zone.appendChild(bloc);
+        saisies[c.id] = saisie;
+      });
+      let enregistre = false;
+      async function envoyer(e) {
+        e.preventDefault();
+        const valeurs = {};
+        Object.keys(saisies).forEach(function (k) { valeurs[k] = saisies[k].value; });
+        const oui = $("modal-form-oui"); oui.disabled = true;
+        try { await soumettre(valeurs); enregistre = true; boite.close(); }
+        catch (err) { montrerErreur("modal-form-erreur", err.message); }
+        oui.disabled = false;
+      }
+      function annuler() { boite.close(); }
+      function fin() {
+        form.removeEventListener("submit", envoyer);
+        $("modal-form-non").removeEventListener("click", annuler);
+        boite.removeEventListener("close", fin);
+        resoudre(enregistre);
+      }
+      form.addEventListener("submit", envoyer);
+      $("modal-form-non").addEventListener("click", annuler);
+      boite.addEventListener("close", fin);
+      boite.showModal();
+    });
+  }
+
+  function optionsCategories(liste, actuelle) {
+    const noms = liste.slice();
+    if (actuelle && noms.indexOf(actuelle) === -1) noms.unshift(actuelle);   // ancienne catégorie hors liste : on la garde
+    return noms.map(function (n) { return [n, n]; });
+  }
+
+  function valeurLocale(iso) {
+    const d = new Date(iso);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0, 16);
+  }
+
+  /* Corriger un objet enregistré (agents ayant le droit d'enregistrement, et administrateurs) */
+  async function corrigerObjet(objet) {
+    const liste = await chargerCategories();
+    const champs = [
+      { id: "categorie", label: "Catégorie", type: "select", valeur: objet.categorie, options: optionsCategories(liste, objet.categorie) },
+      { id: "quand", label: "Date et heure de la découverte", type: "datetime-local", valeur: valeurLocale(objet.date_heure_decouverte) }
+    ];
+    if (org.secteur === "transport") {
+      champs.push({ id: "emplacement", label: "Où l'objet a-t-il été trouvé ?", type: "select", valeur: objet.type_emplacement || "locaux",
+        options: [["vehicule", "Dans un véhicule"], ["locaux", "En gare ou en agence"]] });
+    }
+    champs.push({ id: "lieu", label: "Précision sur le lieu (facultatif)", type: "text", valeur: objet.lieu_detail || "", max: 255 });
+    champs.push({ id: "secret", label: "Nouveau détail secret (facultatif)", type: "text", valeur: "", max: 255,
+      aide: "Laissez vide pour garder le détail secret actuel." });
+    const ok = await ouvrirFormulaire("Corriger l'objet", "Corrigez une erreur de saisie. Si la catégorie ou la date change, les déclarations correspondantes sont recherchées de nouveau.", champs, "Enregistrer la correction", async function (v) {
+      if (!v.quand) throw new Error("Indiquez la date et l'heure de la découverte.");
+      if (new Date(v.quand).getTime() > Date.now() + 60000) throw new Error("La découverte ne peut pas être dans le futur.");
+      const corps = {};
+      if (v.categorie !== objet.categorie) corps.categorie = v.categorie;
+      if (v.quand !== valeurLocale(objet.date_heure_decouverte)) corps.date_heure_decouverte = new Date(v.quand).toISOString();
+      if (v.emplacement !== undefined && v.emplacement !== (objet.type_emplacement || "locaux")) corps.type_emplacement = v.emplacement;
+      if ((v.lieu || "").trim() !== (objet.lieu_detail || "")) corps.lieu_detail = v.lieu.trim();
+      if ((v.secret || "").trim()) corps.detail_cache = v.secret.trim();
+      if (!Object.keys(corps).length) throw new Error("Aucune modification : changez au moins un champ.");
+      await api("PATCH", "/objets/" + encodeURIComponent(objet.id), corps);
+    });
+    if (ok) router();
+  }
+
+  /* Corriger une déclaration de perte (personnel de l'organisation) */
+  async function corrigerDeclaration(s, apres) {
+    const liste = await chargerCategories();
+    const champs = [
+      { id: "categorie", label: "Catégorie", type: "select", valeur: s.categorie, options: optionsCategories(liste, s.categorie) },
+      { id: "description", label: "Description (facultatif)", type: "text", valeur: s.description || "", max: 500 },
+      { id: "date_perte", label: "Date de la perte (facultatif)", type: "date", valeur: s.date_perte || "" },
+      { id: "lieu", label: "Lieu approximatif (facultatif)", type: "text", valeur: s.lieu_approximatif || "", max: 255 }
+    ];
+    const ok = await ouvrirFormulaire("Corriger la déclaration", "Seul le personnel peut corriger une déclaration. Si la catégorie ou la date change, la recherche d'un objet correspondant est refaite.", champs, "Enregistrer la correction", async function (v) {
+      const corps = {};
+      if (v.categorie !== s.categorie) corps.categorie = v.categorie;
+      if ((v.description || "").trim() !== (s.description || "")) corps.description = v.description.trim();
+      if ((v.date_perte || "") !== (s.date_perte || "")) corps.date_perte = v.date_perte || null;
+      if ((v.lieu || "").trim() !== (s.lieu_approximatif || "")) corps.lieu_approximatif = v.lieu.trim();
+      if (v.date_perte && new Date(v.date_perte + "T00:00:00").getTime() > Date.now()) throw new Error("La date de la perte ne peut pas être dans le futur.");
+      if (!Object.keys(corps).length) throw new Error("Aucune modification : changez au moins un champ.");
+      await api("PATCH", "/signalements/" + encodeURIComponent(s.id), corps);
+    });
+    if (ok) apres();
+  }
+
+  /* Remettre un objet archivé en attente (administrateurs) */
+  async function desarchiverObjet(objet) {
+    if (!await demanderConfirmation("Désarchiver cet objet ?", "Il redeviendra « En attente » et le délai de conservation repartira d'aujourd'hui.", "Désarchiver")) return;
+    try { await api("PATCH", "/objets/" + encodeURIComponent(objet.id) + "/desarchiver"); router(); }
+    catch (err) { $("fiche-attente").insertBefore(el("p", "alerte", err.message), $("fiche-attente").firstChild); }
+  }
+
+  /* Modifier le nom (et, avant sa première utilisation, l'identifiant) d'un compte */
+  async function modifierCompte(c, apres) {
+    const identifiantLibre = c.doit_changer_mot_de_passe;
+    const champs = [
+      { id: "nom", label: "Nom complet", type: "text", valeur: c.nom, max: 100 },
+      { id: "identifiant", label: "Identifiant de connexion", type: "text", valeur: c.identifiant, max: 50, desactive: !identifiantLibre,
+        aide: identifiantLibre ? "Modifiable tant que la personne n'a pas choisi son propre mot de passe et commencé à travailler." : "Non modifiable : cette personne a déjà choisi son mot de passe. En cas d'erreur, désactivez ce compte et créez-en un nouveau." }
+    ];
+    const ok = await ouvrirFormulaire("Modifier le compte", "", champs, "Enregistrer", async function (v) {
+      const nom = v.nom.trim(), identifiant = v.identifiant.trim().toLowerCase();
+      if (!nom) throw new Error("Indiquez le nom de la personne.");
+      if (!/^[a-z0-9._-]{3,50}$/.test(identifiant)) throw new Error("Identifiant : 3 à 50 caractères, lettres minuscules sans accent, chiffres, point, tiret ou souligné.");
+      const corps = {};
+      if (nom !== c.nom) corps.nom = nom;
+      if (identifiantLibre && identifiant !== c.identifiant) corps.identifiant = identifiant;
+      if (!Object.keys(corps).length) throw new Error("Aucune modification.");
+      await api("PATCH", "/utilisateurs/" + encodeURIComponent(c.id), corps);
+      if (corps.identifiant) montrerResultatEquipe("Identifiant modifié pour " + nom, identifiant, null);
+    });
+    if (ok) apres();
+  }
+
+  /* ---------- Paramètres de l'organisation (administrateurs) ---------- */
+
+  function pageParametres() {
+    afficherVue("parametres", "parametres-titre");
+    $("par-delai").value = org.delai_retention_jours || 90;
+    $("par-consultation").checked = !!org.consultation_distance;
+    ["erreur-par-delai", "parametres-erreur"].forEach(function (i) { montrerErreur(i, ""); });
+    $("parametres-ok").hidden = true;
+    remplirApparence();
+  }
+
+  $("form-parametres").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    montrerErreur("erreur-par-delai", ""); montrerErreur("parametres-erreur", ""); $("parametres-ok").hidden = true;
+    const delai = Number($("par-delai").value);
+    if (!Number.isInteger(delai) || delai < 1 || delai > 3650) { montrerErreur("erreur-par-delai", "Indiquez un nombre entier de jours entre 1 et 3650."); return; }
+    const bouton = $("parametres-envoyer"); bouton.disabled = true;
+    try {
+      const maj = await api("PATCH", "/organisations/" + encodeURIComponent(org.id), { delai_retention_jours: delai, consultation_distance: $("par-consultation").checked });
+      org.delai_retention_jours = maj.delai_retention_jours; org.consultation_distance = maj.consultation_distance;
+      $("parametres-ok").textContent = "Paramètres enregistrés."; $("parametres-ok").hidden = false;
+    } catch (err) { montrerErreur("parametres-erreur", err.message); }
+    finally { bouton.disabled = false; }
   });
 
   /* ---------- Démarrage ---------- */

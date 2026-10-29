@@ -127,7 +127,7 @@ def frise_d_un_objet(objet_id: uuid.UUID, db: Session = Depends(get_db), admin: 
             "date_heure": restitution.date_heure,
             "titre": "Remis à son propriétaire",
             "acteur": agent.nom if agent else None,
-            "detail": " — ".join(x for x in (
+            "detail": ", ".join(x for x in (
                 usager.nom if usager and usager.nom else None,
                 usager.telephone if usager else None,
                 restitution.type_piece_identite,

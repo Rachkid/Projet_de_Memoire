@@ -13,6 +13,7 @@ import logging
 import threading
 from datetime import datetime, timedelta, timezone
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -37,7 +38,7 @@ def archiver_perimes(db: Session, maintenant: datetime | None = None) -> int:
             .filter(
                 Objet.organisation_id == organisation.id,
                 Objet.statut == StatutObjet.EN_ATTENTE.value,
-                Objet.date_heure_decouverte < limite,
+                func.coalesce(Objet.retention_depuis, Objet.date_heure_decouverte) < limite,
             )
             .all()
         )

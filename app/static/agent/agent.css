@@ -865,3 +865,56 @@ a.tel { color: var(--principale); font-weight: 700; }
 .recherche-cat { width: 100%; min-height: 48px; margin: 0 0 12px; padding: 0 16px; font: inherit; background: #ffffff; border: 1.5px solid rgba(17, 24, 39, 0.14); border-radius: 999px; }
 .recherche-cat:focus { outline: none; border-color: var(--principale); box-shadow: 0 0 0 3px var(--accent); }
 .tuile[hidden], .puce[hidden] { display: none; }
+
+/* Fenêtres de saisie (corrections) */
+dialog.modal-form { overflow: auto; max-height: 92vh; }
+.modal-form .champ:first-of-type { margin-top: 16px; }
+.modal-form input[type="text"], .modal-form input[type="date"], .modal-form input[type="datetime-local"], .modal-form select, .modal-form textarea {
+  display: block; width: 100%; min-height: 52px; padding: 12px 14px; font: inherit; color: var(--encre);
+  background: var(--champ); border: 1.5px solid rgba(17, 24, 39, 0.1); border-radius: 14px;
+}
+.modal-form input:focus-visible, .modal-form select:focus-visible, .modal-form textarea:focus-visible {
+  outline: none; border-color: var(--principale); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+#vue-parametres input[type="number"] { max-width: 220px; }
+
+.apercu-habillage { display: flex; align-items: center; justify-content: center; min-height: 90px; margin-bottom: 12px; padding: 14px; border: 1px solid color-mix(in srgb, var(--principale) 14%, #ffffff); border-radius: 16px; background: linear-gradient(145deg, #ffffff, color-mix(in srgb, var(--principale) 5%, #ffffff)); box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.8); }
+.apercu-habillage img { max-width: 100%; max-height: 120px; object-fit: contain; }
+.apercu-habillage--fond { padding: 6px; }
+.apercu-habillage--fond img { width: 100%; max-height: 180px; object-fit: cover; border-radius: 11px; }
+.apercu-habillage__vide { color: var(--encre-douce); font-size: 0.9375rem; }
+input[type="color"] { flex: none; width: 64px; min-height: 54px; padding: 4px; background: #ffffff; border: 1.5px solid rgba(17, 24, 39, 0.1); border-radius: 14px; cursor: pointer; }
+#form-couleurs .mdp-ligne, #form-logo input[type="file"], #form-fond input[type="file"] { max-width: 100%; }
+#form-logo, #form-fond, #form-couleurs { margin-top: 18px; }
+
+/* Choix d'un fichier (logo, photo de fond) : le bouton natif est habillé comme les boutons « doux ». */
+#form-logo input[type="file"], #form-fond input[type="file"] {
+  display: block; width: 100%; padding: 8px; font: inherit; color: var(--encre-douce);
+  background: color-mix(in srgb, var(--principale) 4%, #ffffff); border: 1px solid color-mix(in srgb, var(--principale) 18%, #ffffff); border-radius: 16px; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05); cursor: pointer;
+}
+#form-logo input[type="file"]::file-selector-button, #form-fond input[type="file"]::file-selector-button {
+  margin-right: 14px; min-height: 44px; padding: 0 18px; font: inherit; font-weight: 800; cursor: pointer;
+  color: var(--principale); background: color-mix(in srgb, var(--principale) 11%, #ffffff);
+  border: 1.5px solid color-mix(in srgb, var(--principale) 32%, #ffffff); border-radius: 12px;
+}
+#form-logo input[type="file"]::file-selector-button:hover, #form-fond input[type="file"]::file-selector-button:hover { background: color-mix(in srgb, var(--principale) 18%, #ffffff); }
+#form-logo input[type="file"]:focus-visible, #form-fond input[type="file"]:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+#form-logo .case { margin-top: 10px; }
+
+/* Lien « portail public » de la page de connexion : un vrai bouton secondaire. */
+.lien-public {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 10px; margin-top: 18px; padding: 14px 16px;
+  font-size: 0.9375rem; color: var(--encre-douce); text-align: center; text-decoration: none;
+  background: color-mix(in srgb, var(--principale) 8%, #ffffff); border: 1.5px solid color-mix(in srgb, var(--principale) 26%, #ffffff); border-radius: 16px;
+  transition: background 0.15s, transform 0.12s;
+}
+.lien-public strong { color: var(--principale); font-weight: 800; }
+.lien-public svg { flex: none; width: 20px; height: 20px; fill: none; stroke: var(--principale); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.lien-public:hover { background: color-mix(in srgb, var(--principale) 15%, #ffffff); }
+.lien-public:active { transform: scale(0.98); }
+.lien-public:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* Cartes des déclarations : référence du talon et catégorie mises en valeur. */
+.carte__ref { display: inline-block; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.8125rem; font-weight: 800; letter-spacing: 0.06em; color: var(--principale); }
+.carte__categorie { display: inline-block; font-weight: 800; color: var(--principale); }
+#bloc-recherche-pertes { margin: 14px 0 6px; }

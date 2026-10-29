@@ -23,7 +23,7 @@ CATEGORIES_COMMUNES: list[str] = [
     "Vêtement",
     "Lunettes",
     "Ordinateur",
-    "Écouteurs",
+    "Écouteurs ou baladeur",
     "Montre",
     "Bijou",
     "Livre ou cahier",
@@ -79,6 +79,8 @@ CATEGORIES_COMMUNES: list[str] = [
     "Matériel électrique",
     "Kit ou objet pour bébé",
     "Pièces de téléphone ou d'appareils",
+    "Bazin ou tissu",
+    "Outils de réparation",
 ]
 
 # Catégories propres à un secteur : insérées avant « Autre ».
@@ -88,7 +90,7 @@ CATEGORIES_PAR_SECTEUR: dict[str, list[str]] = {
         "Ensemble géométrique",
         "Bic",
         "Calculatrice",
-        "Kit de maintenance et robotique",
+        "Kit de maintenance ou de robotique",
         "Reçu de paiement ou quittance",
         "Copie de devoir ou d'examen",
         "Relevé de notes ou bulletin",

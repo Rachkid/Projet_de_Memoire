@@ -10,7 +10,7 @@
   "erreur.champ": "Some information is not valid: {msg}",
   "erreur.autre": "Something went wrong (code {code}). Please try again in a moment.",
   "erreur.org_inconnue": "This address does not match any organisation.",
-  "portail.titre_page": "{org} — Lost items",
+  "portail.titre_page": "{org}, Lost items",
   "signature": "Powered by Tsintuwa",
   "retour.accueil.aria": "Back to home",
   "nav.accueil": "Home",
@@ -84,7 +84,7 @@
   "cat.vetement": "Clothing",
   "cat.lunettes": "Glasses",
   "cat.ordinateur": "Computer",
-  "cat.ecouteurs": "Earphones",
+  "cat.ecouteurs_ou_baladeur": "Earphones or music player",
   "cat.montre": "Watch",
   "cat.bijou": "Jewellery",
   "cat.livre_ou_cahier": "Book or notebook",
@@ -148,10 +148,12 @@
   "cat.materiel_de_plomberie": "Plumbing equipment",
   "cat.materiel_de_soudure": "Welding equipment",
   "cat.pieces_de_telephone_ou_d'appareils": "Phone or device parts",
+  "cat.bazin_ou_tissu": "Bazin or fabric",
+  "cat.outils_de_reparation": "Repair tools",
   "cat.ensemble_geometrique": "Geometry set",
   "cat.bic": "Pen",
   "cat.calculatrice": "Calculator",
-  "cat.kit_de_maintenance_et_robotique": "Maintenance and robotics kit",
+  "cat.kit_de_maintenance_ou_de_robotique": "Maintenance or robotics kit",
   "hall.sous.transport": "Items found in our vehicles and stations",
   "hall.sous.education": "Items found on the premises",
   "hall.aide.transport": "Scan the code to report a loss from your phone. To collect an item, come to the agency with an ID document.",
@@ -168,6 +170,6 @@
   "hall.indice": "Press F for full screen",
   "hall.hors_ligne": "Connection lost: the last items received remain displayed",
   "hall.logo_alt": "{org} logo",
-  "hall.titre_page": "{org} — Found items"
+  "hall.titre_page": "{org}, Found items"
   });
 })();

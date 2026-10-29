@@ -31,6 +31,10 @@ COMPTE_DESACTIVE = "compte_desactive"
 COMPTE_REACTIVE = "compte_reactive"
 OBJET_ARCHIVE = "objet_archive"
 OBJET_ARCHIVE_AUTO = "objet_archive_auto"
+OBJET_CORRIGE = "objet_corrige"
+OBJET_DESARCHIVE = "objet_desarchive"
+DECLARATION_CORRIGEE = "declaration_corrigee"
+ORGANISATION_MODIFIEE = "organisation_modifiee"
 
 
 def tracer(

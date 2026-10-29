@@ -44,6 +44,22 @@ class SignalementPerteCreate(SignalementPerteBase):
         return valeur
 
 
+class SignalementPerteUpdate(BaseModel):
+    """Correction d'une déclaration par le personnel (PATCH) : seuls les champs envoyés changent."""
+
+    categorie: Optional[str] = None
+    description: Optional[str] = None
+    date_perte: Optional[date] = None
+    lieu_approximatif: Optional[str] = None
+
+    @field_validator("categorie")
+    @classmethod
+    def categorie_valide(cls, valeur):
+        if valeur is None or not valeur.strip():
+            raise ValueError("La catégorie ne peut pas être vide.")
+        return valeur.strip()
+
+
 class SignalementPerteRead(SignalementPerteBase):
     id: uuid.UUID
     organisation_id: uuid.UUID

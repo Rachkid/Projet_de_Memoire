@@ -20,6 +20,7 @@ from app.models.utilisateur import Utilisateur
 from app.models.enums import RoleUtilisateur
 from app.schemas.organisation import OrganisationCreate, OrganisationRead, OrganisationUpdate
 from app.security import exiger_administrateur, exiger_super_administrateur
+from app.services import audit
 from app.services.habillage import enregistrer_fond, enregistrer_logo, supprimer_ancien
 from app.services.photos import PhotoInvalide
 
@@ -144,6 +145,8 @@ def modifier_organisation(
         db.rollback()
         raise _erreur_slug_pris()
     db.refresh(organisation)
+    audit.tracer(db, audit.ORGANISATION_MODIFIEE, acteur=demandeur, organisation_id=organisation.id,
+                 cible=organisation.slug, detail="Champs modifiés : " + ", ".join(sorted(modifications)))
     return organisation
 
 
@@ -183,6 +186,7 @@ async def envoyer_logo(
     db.commit()
     supprimer_ancien(ancien, URL_ORGANISATIONS, DOSSIER_ORGANISATIONS)  # après le commit : en cas d'échec, l'ancien reste intact
     db.refresh(organisation)
+    audit.tracer(db, audit.ORGANISATION_MODIFIEE, acteur=demandeur, organisation_id=organisation.id, cible=organisation.slug, detail="Logo remplacé")
     return organisation
 
 
@@ -206,4 +210,5 @@ async def envoyer_fond(
     db.commit()
     supprimer_ancien(ancien, URL_ORGANISATIONS, DOSSIER_ORGANISATIONS)
     db.refresh(organisation)
+    audit.tracer(db, audit.ORGANISATION_MODIFIEE, acteur=demandeur, organisation_id=organisation.id, cible=organisation.slug, detail="Photo de fond remplacée")
     return organisation
