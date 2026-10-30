@@ -73,6 +73,18 @@
     return texte !== undefined ? texte : nom;
   }
 
+  /* Catégories ajoutées par une organisation (étape 19) : [{ nom, traductions: { en, ha, dje, ar } }].
+     Une langue sans traduction affiche le nom français. Les catégories standard ne sont jamais remplacées. */
+  function ajouterCategories(liste) {
+    (liste || []).forEach(function (c) {
+      var cle = "cat." + normaliser(c.nom);
+      LANGUES.forEach(function (l) {
+        var d = dictionnaires[l.code], texte = l.code === "fr" ? c.nom : (c.traductions || {})[l.code];
+        if (d && texte && !Object.prototype.hasOwnProperty.call(d, cle)) d[cle] = texte;
+      });
+    });
+  }
+
   var formats = {};
   function formatteur(options) {
     var cle = courante + JSON.stringify(options);
@@ -170,6 +182,7 @@
     ajouter: ajouter,
     t: t,
     categorie: categorie,
+    ajouterCategories: ajouterCategories,
     formaterJour: formaterJour,
     formaterHeure: formaterHeure,
     formaterJourSemaine: formaterJourSemaine,

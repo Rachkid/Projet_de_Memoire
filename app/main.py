@@ -23,7 +23,7 @@ from app.models import (  # noqa: F401 — l'import garantit que tous les modèl
 )
 from app.migrations_runner import appliquer_migrations
 from app.services.archivage import demarrer_archivage_automatique
-from app.routers import alertes, audit, auth, historique, objets, organisations, photos, portail, restitutions, signalements, statistiques, usagers, utilisateurs
+from app.routers import alertes, audit, auth, categories, historique, objets, organisations, photos, portail, restitutions, signalements, statistiques, usagers, utilisateurs
 
 # 1) Crée les tables qui n'existent pas encore (base neuve).
 Base.metadata.create_all(bind=engine)
@@ -37,7 +37,7 @@ app = FastAPI(
         "API du projet de mémoire de fin de cycle M2 Génie Logiciel. "
         "Institut Africain de Technologie (IAT), Niamey, Niger."
     ),
-    version="0.14.1",
+    version="0.15.1",
     redoc_url=None,  # remplacée plus bas par une version figée (voir page_redoc)
 )
 
@@ -55,6 +55,7 @@ app.include_router(photos.router)
 app.include_router(portail.router)
 app.include_router(statistiques.router)
 app.include_router(historique.router)
+app.include_router(categories.router)
 app.include_router(audit.router)
 
 

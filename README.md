@@ -151,6 +151,10 @@ mettre l'application à jour ne fait perdre aucune donnée.
   l'agent doit en choisir un à sa première connexion. Chaque action est tracée dans le journal d'audit.
 - Aucune nouvelle route : l'interface utilise `POST/GET/PATCH /utilisateurs/…` déjà protégées (un administrateur ne gère que les agents de son organisation).
 
+### Créer d'autres administrateurs (0.15.1)
+
+Un administrateur peut créer des agents **et d'autres administrateurs** dans sa propre organisation (onglet Équipe, champ « Type de compte »), jusqu'à **5 administrateurs** par organisation. Il ne peut pas créer de super-administrateur, ni désactiver ou modifier un autre administrateur : seul le super-administrateur le peut. Chaque création est tracée au journal d'audit.
+
 ## Corrections et paramètres (Étape 18)
 
 - **Corriger un objet** (bouton sur la fiche, agents autorisés à enregistrer et administrateurs) : catégorie, date, lieu, détail secret.
@@ -168,6 +172,15 @@ mettre l'application à jour ne fait perdre aucune donnée.
 - La migration `0006` renomme aussi, dans les données existantes, « Écouteurs » en « Écouteurs ou baladeur » et
   « Kit de maintenance et robotique » en « Kit de maintenance ou de robotique ».
 - Tests : `tests/test_etape18.py`.
+
+## Catégories personnalisées (Étape 19)
+
+L'administrateur d'une organisation ajoute ses propres catégories dans **Paramètres → Catégories personnalisées** : nom (en français), icône choisie dans un catalogue de 84 pictogrammes distincts, traductions facultatives (anglais, haoussa, zarma, arabe ; repli sur le français si vide).
+
+- Maximum 30 par organisation ; un nom déjà utilisé (y compris par une catégorie standard) est refusé ; le nom ne peut plus être changé après création.
+- Une catégorie peut être désactivée puis réactivée (les objets existants la conservent).
+- Elles apparaissent à l'enregistrement, sur le portail public et à l'affichage du hall, traduites selon la langue.
+- La table `categories_personnalisees` est créée au démarrage, sans migration. Actions tracées au journal d'audit.
 
 ## Sécurité et finition (Étape 16)
 

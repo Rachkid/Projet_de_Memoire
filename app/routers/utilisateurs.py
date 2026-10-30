@@ -3,7 +3,7 @@ Points d'accès de l'API pour la ressource Utilisateur (agents, administrateurs)
 
 Règles d'accès (étape 8) :
 - le super-administrateur gère tous les comptes de toutes les organisations ;
-- un administrateur gère uniquement les AGENTS de sa propre organisation ;
+- un administrateur gère les AGENTS de sa propre organisation et peut créer d'autres administrateurs (5 au plus) ;
 - un agent n'a accès à aucune gestion de comptes.
 
 Étape 9 bis : un administrateur peut réinitialiser le mot de passe d'un agent qui l'a oublié.
@@ -31,6 +31,8 @@ from app.limites import adresse_client
 from app.security import exiger_administrateur, hacher_mot_de_passe
 from app.services import audit
 
+MAX_ADMINISTRATEURS = 5  # par organisation
+
 router = APIRouter(prefix="/utilisateurs", tags=["Utilisateurs"])
 
 
@@ -47,14 +49,25 @@ def creer_utilisateur(
 ):
     """Crée un compte. Le mot de passe est chiffré avant d'être stocké."""
     if not _est_super(createur):
-        # Un administrateur ne crée que des agents, et seulement dans son organisation.
-        if payload.role != RoleUtilisateur.AGENT:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Vous ne pouvez créer que des agents.")
+        # Un administrateur crée des agents ou d'autres administrateurs, et seulement dans son organisation.
+        if payload.role not in (RoleUtilisateur.AGENT, RoleUtilisateur.ADMINISTRATEUR):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Vous ne pouvez créer que des agents ou des administrateurs.")
         if payload.organisation_id != createur.organisation_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Vous ne pouvez créer des comptes que dans votre organisation.")
 
     if db.get(Organisation, payload.organisation_id) is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organisation introuvable")
+
+    if payload.role == RoleUtilisateur.ADMINISTRATEUR:
+        nombre = (
+            db.query(Utilisateur)
+            .filter(Utilisateur.organisation_id == payload.organisation_id,
+                    Utilisateur.role == RoleUtilisateur.ADMINISTRATEUR.value)
+            .count()
+        )
+        if nombre >= MAX_ADMINISTRATEURS:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                                detail=f"Une organisation ne peut pas avoir plus de {MAX_ADMINISTRATEURS} administrateurs.")
 
     donnees = payload.model_dump(exclude={"mot_de_passe"})
     # Le mot de passe choisi par l'administrateur est PROVISOIRE : la personne devra choisir le sien à sa première connexion.

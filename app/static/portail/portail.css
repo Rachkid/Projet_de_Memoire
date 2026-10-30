@@ -316,7 +316,7 @@ input:focus-visible, textarea:focus-visible {
 }
 .talon__bas {
   position: relative;
-  padding: 22px 22px 24px;
+  padding: 28px 22px 24px;
   border-radius: 0 0 18px 18px;
   -webkit-mask:
     radial-gradient(circle var(--encoche) at 0 0, #0000 98%, #000) left / 51% 100% no-repeat,
@@ -325,13 +325,30 @@ input:focus-visible, textarea:focus-visible {
     radial-gradient(circle var(--encoche) at 0 0, #0000 98%, #000) left / 51% 100% no-repeat,
     radial-gradient(circle var(--encoche) at 100% 0, #0000 98%, #000) right / 51% 100% no-repeat;
 }
+/* Ligne de déchirure : une barre en dégradé aux couleurs de l'organisation (principale vers accent), avec deux
+   petits repères ronds à ses extrémités, à la place des anciens pointillés. */
 .talon__bas::before {
   content: "";
   position: absolute;
   top: 0;
+  left: 30px;
+  right: 30px;
+  height: 7px;
+  border-radius: 7px;
+  background: linear-gradient(90deg, var(--principale), var(--accent));
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--principale) 28%, transparent);
+}
+.talon__bas::after {
+  content: "";
+  position: absolute;
+  top: -2px;
   left: 22px;
   right: 22px;
-  border-top: 2px dashed var(--ligne);
+  height: 11px;
+  background:
+    radial-gradient(circle 5px at 5px 50%, var(--principale) 97%, #0000) left / 11px 11px no-repeat,
+    radial-gradient(circle 5px at 6px 50%, var(--accent) 97%, #0000) right / 11px 11px no-repeat;
+  pointer-events: none;
 }
 
 .talon__org {

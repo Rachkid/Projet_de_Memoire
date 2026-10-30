@@ -35,6 +35,8 @@ OBJET_CORRIGE = "objet_corrige"
 OBJET_DESARCHIVE = "objet_desarchive"
 DECLARATION_CORRIGEE = "declaration_corrigee"
 ORGANISATION_MODIFIEE = "organisation_modifiee"
+CATEGORIE_AJOUTEE = "categorie_ajoutee"
+CATEGORIE_MODIFIEE = "categorie_modifiee"
 
 
 def tracer(

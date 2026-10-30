@@ -385,6 +385,39 @@
         <p class="statut" id="fond-ok" role="status" hidden></p>
         <button class="bouton bouton--accent bouton--plein" type="submit" id="fond-envoyer">Envoyer la photo de fond</button>
       </form>
+
+      <h3 class="sous-titre">Catégories personnalisées</h3>
+      <p class="chapeau">Ajoutez vos propres catégories d'objets, en plus de la liste standard. Une fois créé, un nom ne peut plus être changé (des objets peuvent l'utiliser) : on peut seulement modifier son icône et ses traductions, ou la désactiver.</p>
+
+      <form id="form-categorie" class="panneau" novalidate>
+        <div class="champ">
+          <label for="cat-nom">Nom de la catégorie (en français)</label>
+          <input id="cat-nom" type="text" maxlength="60" autocomplete="off" placeholder="Ex. : Casier de sport">
+          <p class="champ__erreur" id="erreur-cat-nom" role="alert" hidden></p>
+        </div>
+        <fieldset class="champ">
+          <legend>Icône</legend>
+          <div class="icones-choix" id="cat-icones" role="radiogroup" aria-label="Icône de la catégorie"></div>
+        </fieldset>
+        <details class="champ" id="cat-traductions">
+          <summary>Traductions <span class="facultatif">(facultatif)</span></summary>
+          <p class="champ__aide">Si une langue reste vide, elle affichera le nom français.</p>
+          <label for="cat-tr-en">Anglais</label><input id="cat-tr-en" type="text" maxlength="60" autocomplete="off">
+          <label for="cat-tr-ha" class="etiquette-suivante">Haoussa</label><input id="cat-tr-ha" type="text" maxlength="60" autocomplete="off">
+          <label for="cat-tr-dje" class="etiquette-suivante">Zarma</label><input id="cat-tr-dje" type="text" maxlength="60" autocomplete="off">
+          <label for="cat-tr-ar" class="etiquette-suivante">Arabe</label><input id="cat-tr-ar" type="text" maxlength="60" autocomplete="off" dir="rtl">
+        </details>
+        <p class="alerte" id="cat-erreur" role="alert" hidden></p>
+        <p class="statut" id="cat-ok" role="status" hidden></p>
+        <button class="bouton bouton--accent bouton--plein" type="submit" id="cat-envoyer">Ajouter la catégorie</button>
+        <button class="bouton bouton--doux bouton--plein" type="button" id="cat-annuler" hidden>Annuler la modification</button>
+      </form>
+
+      <div id="cat-etat" class="etat" role="status"></div>
+      <div class="tableau-defile"><table class="tableau" id="cat-tableau" hidden>
+        <thead><tr><th>Icône</th><th>Nom</th><th>Traductions</th><th>État</th><th>Actions</th></tr></thead>
+        <tbody id="cat-corps"></tbody>
+      </table></div>
     </section>
 
     <!-- ÉQUIPE (administrateurs) -->
@@ -399,7 +432,7 @@
         <button type="button" class="bouton bouton--doux" id="equipe-copier">Copier les informations</button>
       </div>
 
-      <h3 class="sous-titre">Ajouter un agent</h3>
+      <h3 class="sous-titre" id="eq-sous-titre">Ajouter un compte</h3>
       <form id="form-equipe" class="panneau" novalidate>
         <div class="champ">
           <label for="eq-nom">Nom complet</label>
@@ -412,7 +445,15 @@
           <p class="champ__aide">3 à 50 caractères : lettres minuscules, chiffres, point, tiret ou souligné. Exemple : <em>amina.diallo</em></p>
           <p class="champ__erreur" id="erreur-eq-identifiant" role="alert" hidden></p>
         </div>
-        <fieldset class="champ">
+        <div class="champ" id="eq-role-zone">
+          <label for="eq-role">Type de compte</label>
+          <select id="eq-role">
+            <option value="agent">Agent (enregistre et remet les objets)</option>
+            <option value="administrateur">Administrateur (gère aussi l'équipe et les paramètres)</option>
+          </select>
+          <p class="champ__aide" id="eq-role-aide" hidden>Un administrateur a tous les droits dans votre organisation. 5 au maximum. Seul le super-administrateur peut ensuite le désactiver.</p>
+        </div>
+        <fieldset class="champ" id="eq-droits">
           <legend>Ce que cet agent peut faire</legend>
           <label class="case"><input type="checkbox" id="eq-enreg" checked><span>Enregistrer les objets trouvés</span></label>
           <label class="case"><input type="checkbox" id="eq-resti" checked><span>Remettre les objets à leurs propriétaires</span></label>

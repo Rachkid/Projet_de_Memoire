@@ -10,6 +10,7 @@ La déclaration de perte elle-même réutilise les routes existantes
 POST /usagers/ puis POST /signalements/ (Étape 6).
 """
 
+import json
 from io import BytesIO
 
 import qrcode
@@ -23,6 +24,8 @@ from app.models.enums import StatutObjet
 from app.models.objet import Objet
 from app.models.organisation import Organisation
 from app.schemas.objet import ObjetPublicRead
+from app.models.categorie_personnalisee import CategoriePersonnalisee
+from app.schemas.categorie import CategoriePubliqueRead
 from app.services.categories import CATEGORIES, categories_pour
 
 router = APIRouter(prefix="/portail", tags=["Portail public"])
@@ -43,7 +46,28 @@ def lister_categories_organisation(slug: str, db: Session = Depends(get_db)):
     organisation = db.query(Organisation).filter(Organisation.slug == slug.strip().lower()).first()
     if organisation is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organisation introuvable")
-    return categories_pour(organisation.secteur)
+    return categories_pour(organisation.secteur, [c.nom for c in _personnalisees_actives(db, organisation)])
+
+
+def _personnalisees_actives(db: Session, organisation: Organisation) -> list[CategoriePersonnalisee]:
+    return (
+        db.query(CategoriePersonnalisee)
+        .filter(CategoriePersonnalisee.organisation_id == organisation.id, CategoriePersonnalisee.actif.is_(True))
+        .order_by(CategoriePersonnalisee.nom_cle)
+        .all()
+    )
+
+
+@router.get("/{slug}/categories/personnalisees", response_model=list[CategoriePubliqueRead])
+def categories_personnalisees(slug: str, db: Session = Depends(get_db)):
+    """Catégories ajoutées par l'organisation (nom, icône, traductions) : pour les afficher dans la bonne langue."""
+    organisation = db.query(Organisation).filter(Organisation.slug == slug.strip().lower()).first()
+    if organisation is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organisation introuvable")
+    return [
+        CategoriePubliqueRead(nom=c.nom, icone=c.icone, traductions=json.loads(c.traductions) if c.traductions else {})
+        for c in _personnalisees_actives(db, organisation)
+    ]
 
 
 @router.get("/{slug}/objets", response_model=list[ObjetPublicRead])

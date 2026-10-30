@@ -918,3 +918,28 @@ input[type="color"] { flex: none; width: 64px; min-height: 54px; padding: 4px; b
 .carte__ref { display: inline-block; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.8125rem; font-weight: 800; letter-spacing: 0.06em; color: var(--principale); }
 .carte__categorie { display: inline-block; font-weight: 800; color: var(--principale); }
 #bloc-recherche-pertes { margin: 14px 0 6px; }
+
+/* Catégories personnalisées : choix de l'icône */
+.icones-choix { display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: 8px; }
+.icones-choix label { position: relative; display: block; cursor: pointer; }
+.icones-choix input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.icones-choix .icone-case { display: flex; align-items: center; justify-content: center; height: 54px; border-radius: 14px; background: #ffffff; border: 1.5px solid rgba(17, 24, 39, 0.1); color: var(--principale); transition: background 0.15s, border-color 0.15s; }
+.icones-choix .icone-case svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.icones-choix input:checked + .icone-case { background: var(--principale); color: var(--t-principale); border-color: var(--principale); }
+.icones-choix input:focus-visible + .icone-case { outline: 3px solid var(--accent); outline-offset: 2px; }
+#form-categorie summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
+#form-categorie details input[type="text"] { display: block; width: 100%; min-height: 52px; padding: 12px 14px; font: inherit; background: var(--champ); border: 1.5px solid rgba(17, 24, 39, 0.1); border-radius: 14px; }
+#form-categorie details label { display: block; margin: 12px 0 6px; font-weight: 700; }
+#form-categorie .bouton + .bouton { margin-top: 10px; }
+.cat-pastille { display: inline-flex; width: 38px; height: 38px; align-items: center; justify-content: center; border-radius: 12px; background: color-mix(in srgb, var(--principale) 10%, #ffffff); color: var(--principale); }
+.cat-pastille svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Liste déroulante des formulaires (type de compte) */
+.panneau select {
+  display: block; width: 100%; min-height: 52px; padding: 12px 44px 12px 14px; font: inherit; color: var(--encre);
+  background-color: var(--champ); border: 1.5px solid rgba(17, 24, 39, 0.1); border-radius: 14px; cursor: pointer;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat: no-repeat; background-position: right 16px center;
+}
+.panneau select:focus-visible { outline: none; border-color: var(--principale); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 45%, transparent); }

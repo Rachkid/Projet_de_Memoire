@@ -145,6 +145,50 @@
      même quand l'objet n'a pas de photo. */
   function cercle(cx, cy, r) { return "M" + (cx - r) + " " + cy + "a" + r + " " + r + " 0 1 0 " + (2 * r) + " 0a" + r + " " + r + " 0 1 0 " + (-2 * r) + " 0"; }
   const ICONES = {
+    "ico-ballon": "M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18",
+    "ico-casier": "M5 3h14v18H5zM12 3v18M9 11v2M15 11v2",
+    "ico-boite": "M3 8l9-5 9 5v9l-9 5-9-5zM3 8l9 5 9-5M12 13v9",
+    "ico-cadenas": "M6 11h12v10H6zM8.5 11V7.5a3.5 3.5 0 0 1 7 0V11M12 15v2",
+    "ico-parapluie": "M3 12a9 9 0 0 1 18 0zM12 12v7a2 2 0 0 1-4 0",
+    "ico-ampoule": "M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z",
+    "ico-appareil photo": "M4 8h3l2-3h6l2 3h3v12H4zM8.5 14a3.5 3.5 0 1 0 7.0 0a3.5 3.5 0 1 0 -7.0 0",
+    "ico-velo": "M2 16a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M14 16a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M6 16l4-8h5l3 8M10 8H8M15 8l-3 8",
+    "ico-plante": "M12 21v-9M12 12c0-4-3-6-7-6 0 4 3 6 7 6zM12 15c0-3 2-5 6-5 0 3-2 5-6 5zM8 21h8",
+    "ico-coeur": "M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11z",
+    "ico-etoile": "M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.2 6.5 20.2l1-6.2L3 9.6l6.2-.9z",
+    "ico-cadeau": "M4 11h16v10H4zM3 7h18v4H3zM12 7v14M12 7c-2-4-6-3-5 0M12 7c2-4 6-3 5 0",
+    "ico-reveil": "M4 13a8 8 0 1 0 16 0a8 8 0 1 0 -16 0M12 9v4l3 2M5 4l-2 2M19 4l2 2",
+    "ico-tasse": "M5 8h11v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM16 10h2a2 2 0 0 1 0 4h-2M8 3v2M12 3v2",
+    "ico-couverts": "M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 2-2 6 0 8v10",
+    "ico-biberon": "M9 3h6M10 3v3h4V3M9 6h6l1 3v11a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V9zM8 12h4M8 16h4",
+    "ico-cubes": "M4 4h7v7H4zM13 13h7v7h-7zM13 4h7v7h-7zM4 13h7v7H4z",
+    "ico-voiture": "M3 16v-4l2-5h14l2 5v4zM5 12h14M5.5 17a1.5 1.5 0 1 0 3.0 0a1.5 1.5 0 1 0 -3.0 0M15.5 17a1.5 1.5 0 1 0 3.0 0a1.5 1.5 0 1 0 -3.0 0",
+    "ico-moto": "M2 16a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M16 16a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M5 16l3-6h5l3 6M13 10l2-3h3M8 10H6",
+    "ico-bus": "M5 3h14a1 1 0 0 1 1 1v13H4V4a1 1 0 0 1 1-1zM4 11h16M7 17v3M17 17v3M8 14h.01M16 14h.01",
+    "ico-valise": "M4 7h16v13H4zM9 7V4h6v3M4 13h16M11 13v2h2v-2",
+    "ico-sac a dos": "M8 6a4 4 0 0 1 8 0M6 8h12a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1zM9 14h6v4H9zM9 11h6",
+    "ico-casque audio": "M4 15v-3a8 8 0 0 1 16 0v3M4 14h3v6H4zM17 14h3v6h-3z",
+    "ico-micro": "M9 3h6v9a3 3 0 0 1-6 0zM5 11a7 7 0 0 0 14 0M12 18v3M9 21h6",
+    "ico-haut-parleur": "M4 9h4l5-4v14l-5-4H4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11",
+    "ico-tablette": "M5 2h14v20H5zM11 19h2",
+    "ico-ecran": "M3 5h18v12H3zM8 21h8M12 17v4",
+    "ico-imprimante": "M7 8V3h10v5M5 8h14a2 2 0 0 1 2 2v6h-4M3 16V10a2 2 0 0 1 2-2M7 14h10v7H7z",
+    "ico-manette": "M7 8h10a5 5 0 0 1 5 5v1a3 3 0 0 1-5.5 1.7L15 14H9l-1.5 1.7A3 3 0 0 1 2 14v-1a5 5 0 0 1 5-5zM7 11v3M5.5 12.5h3M16 11.5h.01M18 13.5h.01",
+    "ico-crayon": "M4 20l1-4L16 5l3 3L8 19zM14 7l3 3",
+    "ico-regle": "M3 15L15 3l6 6L9 21zM7 13l2 2M10 10l2 2M13 7l2 2",
+    "ico-ciseaux": "M3 18a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M15 18a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M8 16L20 3M16 16L4 3",
+    "ico-loupe": "M4 10a6 6 0 1 0 12 0a6 6 0 1 0 -12 0M15 15l6 6",
+    "ico-drapeau": "M5 21V4M5 4h12l-2 4 2 4H5",
+    "ico-trophee": "M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M12 14v4M8 21h8M9 18h6",
+    "ico-pilule": "M10.5 3.5l10 10a4.2 4.2 0 0 1-6 6l-10-10a4.2 4.2 0 0 1 6-6zM8 8l8 8",
+    "ico-thermometre": "M10 4a2 2 0 0 1 4 0v10a4 4 0 1 1-4 0zM12 9v8",
+    "ico-lune": "M20 14a8 8 0 1 1-9.5-10 6.5 6.5 0 0 0 9.5 10zM17 5l.8 1.7 1.7.8-1.7.8L17 10l-.8-1.7-1.7-.8 1.7-.8z",
+    "ico-chapeau": "M3 17h18M6 17c0-6 2-10 6-10s6 4 6 10M6 14h12",
+    "ico-cravate": "M9 3h6l-1 4 2 12-4 2-4-2 2-12zM9 3l3 3 3-3",
+    "ico-ceinture": "M2 9h20v6H2zM15 9v6M17.5 12h.01M5 12h.01M8 12h.01",
+    "ico-dossier": "M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z",
+    "ico-enveloppe": "M3 5h18v14H3zM3 6l9 7 9-7",
+    "ico-panier": "M3 9h18l-2 11H5zM8 9l3-6M16 9l-3-6",
     "telephone": "M9.5 2h5A2.5 2.5 0 0 1 17 4.5v15a2.5 2.5 0 0 1-2.5 2.5h-5A2.5 2.5 0 0 1 7 19.5v-15A2.5 2.5 0 0 1 9.5 2zM11 18.5h2",
     "portefeuille": "M3 7.5A2.5 2.5 0 0 1 5.5 5H18a1 1 0 0 1 1 1v2M3 7.5V17a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H5.5A2.5 2.5 0 0 1 3 7.5zM16 13.5h.01",
     "cles": cercle(8, 15, 4) + "M10.85 12.15L19 4M18 5l3 3M15 8l2 2",
@@ -228,6 +272,14 @@
     "autre": "M21 8l-9-5-9 5v8l9 5 9-5V8zM3 8l9 5 9-5M12 13v8",
     "recherche": "M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-5-5"
   };
+
+  /* Catégories ajoutées par l'organisation : leur icône est celle choisie dans le catalogue (clé de recherche identique aux autres). */
+  function enregistrerIconesPerso(liste) {
+    (liste || []).forEach(function (c) {
+      const cle = (c.nom || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+      if (cle && !ICONES[cle]) ICONES[cle] = ICONES[c.icone] || ICONES.autre;
+    });
+  }
 
   function cleIcone(categorie) {
     const c = (categorie || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
@@ -635,6 +687,10 @@
     } catch (e) {
       categories = CATEGORIES_SECOURS;
     }
+    try {
+      const perso = await api("GET", "/portail/" + encodeURIComponent(slug) + "/categories/personnalisees", undefined, { sansDeconnexion: true });
+      enregistrerIconesPerso(perso);
+    } catch (e) { /* sans gravité */ }
     // Ordre alphabétique (« Autre » en dernier) : avec une longue liste, on retrouve plus vite sa catégorie.
     const tri = new Intl.Collator("fr", { sensitivity: "base" });
     categories = categories.slice().sort(function (a, b) {
@@ -1194,7 +1250,7 @@
   function formaterNombre(n) { return Number(n).toLocaleString("fr-FR"); }
 
   function formaterDelai(heures) {
-    if (heures === null || heures === undefined) return "Aucune";
+    if (heures === null || heures === undefined) return "0 h";
     if (heures < 1) return "< 1 h";
     if (heures < 48) return Math.round(heures) + " h";
     return (Math.round(heures / 2.4) / 10).toLocaleString("fr-FR") + " j";
@@ -1310,7 +1366,7 @@
       lien.addEventListener("click", function () { $("bord-org").value = l.organisation_id; chargerBord(l.organisation_id); window.scrollTo(0, 0); });
       premiere.appendChild(lien); ligne.appendChild(premiere);
       [formaterNombre(l.objets_en_attente), formaterNombre(l.restitues_ce_mois), formaterNombre(l.declarations_en_cours),
-        l.taux_restitution === null ? "Aucune" : l.taux_restitution + " %", formaterDelai(l.delai_moyen_heures), formaterNombre(l.proches_fin_retention)
+        l.taux_restitution === null ? "0 %" : l.taux_restitution + " %", formaterDelai(l.delai_moyen_heures), formaterNombre(l.proches_fin_retention)
       ].forEach(function (v) { ligne.appendChild(el("td", "num", v)); });
       corps.appendChild(ligne);
     });
@@ -1363,10 +1419,10 @@
       miniCourbe(trouvesJour, "Objets trouvés par jour sur 30 jours")));
     kpis.appendChild(tuileChiffre(formaterNombre(s.restitues_ce_mois), "Remis ce mois-ci", formaterNombre(s.objets_restitues) + " au total", false,
       miniCourbe(remisJour, "Objets remis par jour sur 30 jours")));
-    kpis.appendChild(tuileChiffre(s.taux_restitution === null ? "Aucune" : s.taux_restitution + " %", "Taux de remise", "Objets remis parmi ceux reçus", false,
+    kpis.appendChild(tuileChiffre(s.taux_restitution === null ? "0 %" : s.taux_restitution + " %", "Taux de remise", s.taux_restitution === null ? "Aucun objet reçu pour le moment" : "Objets remis parmi ceux reçus", false,
       s.taux_restitution === null ? null : anneau(s.taux_restitution)));
     kpis.appendChild(tuileChiffre(formaterNombre(s.declarations_en_cours), "Déclarations en cours", "Personnes qui cherchent un objet"));
-    kpis.appendChild(tuileChiffre(formaterDelai(s.delai_moyen_heures), "Délai moyen de remise", "Entre la découverte et la remise"));
+    kpis.appendChild(tuileChiffre(formaterDelai(s.delai_moyen_heures), "Délai moyen de remise", s.delai_moyen_heures === null || s.delai_moyen_heures === undefined ? "Aucun objet remis pour le moment" : "Entre la découverte et la remise"));
     kpis.appendChild(tuileChiffre(formaterNombre(s.proches_fin_retention), "Bientôt à traiter",
       "Gardés depuis presque " + s.delai_retention_jours + " jours", s.proches_fin_retention > 0));
     kpis.appendChild(tuileChiffre(formaterNombre(s.objets_archives), "Objets archivés", "Retirés de la liste (erreur, délai dépassé)"));
@@ -1695,6 +1751,8 @@
     objet_archive_auto: "Archivage automatique",
     objet_corrige: "Objet corrigé",
     objet_desarchive: "Objet désarchivé",
+    categorie_ajoutee: "Catégorie ajoutée",
+    categorie_modifiee: "Catégorie modifiée",
     declaration_corrigee: "Déclaration corrigée",
     organisation_modifiee: "Paramètres modifiés"
   };
@@ -1820,6 +1878,116 @@
     function (d) { d.append("retirer_fond_blanc", $("logo-fond-blanc").checked ? "true" : "false"); });
   brancherEnvoiImage("form-fond", "fond-fichier", "/fond", "fond", "fond-apercu", "Aucune photo de fond", "fond_url");
 
+  /* ---------- Catégories personnalisées (administrateurs) ---------- */
+
+  const ICONES_CATALOGUE = ["autre", "telephone", "portefeuille", "cles", "sac", "documents", "carte bancaire", "vetement", "lunettes", "ordinateur",
+    "ecouteurs ou baladeur", "montre", "bijou", "livre ou cahier", "tapis de priere", "casquette", "gourde", "chaussures",
+    "carte d'identite", "passeport", "cle usb", "disque dur", "chargeur", "argent", "bracelet", "batterie", "clavier", "souris",
+    "multiprise ou rallonge", "parfums", "boissons", "ustensiles de cuisine", "produits medicaux", "kit de maquillage",
+    "outils de reparation", "pieces mecaniques", "outils de chantier", "materiel electrique", "bic", "calculatrice",
+    "ico-ballon", "ico-casier", "ico-boite", "ico-cadenas", "ico-parapluie", "ico-ampoule", "ico-appareil photo", "ico-velo", "ico-plante", "ico-coeur", "ico-etoile", "ico-cadeau", "ico-reveil", "ico-tasse", "ico-couverts", "ico-biberon", "ico-cubes", "ico-voiture", "ico-moto", "ico-bus", "ico-valise", "ico-sac a dos", "ico-casque audio", "ico-micro", "ico-haut-parleur", "ico-tablette", "ico-ecran", "ico-imprimante", "ico-manette", "ico-crayon", "ico-regle", "ico-ciseaux", "ico-loupe", "ico-drapeau", "ico-trophee", "ico-pilule", "ico-thermometre", "ico-lune", "ico-chapeau", "ico-cravate", "ico-ceinture", "ico-dossier", "ico-enveloppe", "ico-panier"];
+  const LANGUES_CAT = ["en", "ha", "dje", "ar"];
+  let categoriesPerso = [], categorieEnEdition = null;
+
+  function construireChoixIcones() {
+    const zone = $("cat-icones");
+    if (zone.children.length) return;
+    ICONES_CATALOGUE.forEach(function (cle, i) {
+      const lab = el("label"), inp = el("input");
+      inp.type = "radio"; inp.name = "cat-icone"; inp.value = cle; inp.checked = i === 0;
+      const nomIcone = cle.replace(/^ico-/, "");
+      inp.setAttribute("aria-label", nomIcone);
+      lab.title = nomIcone;
+      lab.appendChild(inp);
+      const caseIcone = el("span", "icone-case");
+      caseIcone.appendChild(icone(cle));
+      lab.appendChild(caseIcone);
+      zone.appendChild(lab);
+    });
+  }
+
+  function iconeChoisie() { const c = document.querySelector('input[name="cat-icone"]:checked'); return c ? c.value : "autre"; }
+
+  function reinitialiserFormCategorie() {
+    categorieEnEdition = null;
+    $("form-categorie").reset();
+    $("cat-nom").disabled = false;
+    $("cat-envoyer").textContent = "Ajouter la catégorie";
+    $("cat-annuler").hidden = true;
+    $("cat-traductions").open = false;
+    const premier = document.querySelector('input[name="cat-icone"]'); if (premier) premier.checked = true;
+    montrerErreur("erreur-cat-nom", ""); montrerErreur("cat-erreur", "");
+  }
+
+  async function chargerCategoriesPerso() {
+    construireChoixIcones();
+    const etat = $("cat-etat"), corps = vider($("cat-corps"));
+    etat.textContent = "Chargement…";
+    try { categoriesPerso = await api("GET", "/categories/"); }
+    catch (err) { etat.textContent = err.message; $("cat-tableau").hidden = true; return; }
+    enregistrerIconesPerso(categoriesPerso);
+    etat.textContent = categoriesPerso.length ? "" : "Aucune catégorie personnalisée pour le moment.";
+    categoriesPerso.forEach(function (c) {
+      const tr = el("tr");
+      const tdIcone = el("td"), pastille = el("span", "cat-pastille"); pastille.appendChild(icone(c.icone)); tdIcone.appendChild(pastille); tr.appendChild(tdIcone);
+      tr.appendChild(el("td", null, c.nom));
+      const n = LANGUES_CAT.filter(function (l) { return c.traductions && c.traductions[l]; }).length;
+      tr.appendChild(el("td", null, n + " / " + LANGUES_CAT.length));
+      const tdEtat = el("td"); tdEtat.appendChild(el("span", "badge " + (c.actif ? "badge--vif" : "badge--gris"), c.actif ? "Active" : "Désactivée")); tr.appendChild(tdEtat);
+      const tdAct = el("td", "tableau__actions");
+      const bMod = el("button", "bouton bouton--doux", "Modifier"); bMod.type = "button";
+      bMod.addEventListener("click", function () {
+        categorieEnEdition = c;
+        $("cat-nom").value = c.nom; $("cat-nom").disabled = true;
+        const radio = document.querySelector('input[name="cat-icone"][value="' + c.icone.replace(/"/g, "") + '"]'); if (radio) radio.checked = true;
+        LANGUES_CAT.forEach(function (l) { $("cat-tr-" + l).value = (c.traductions && c.traductions[l]) || ""; });
+        $("cat-traductions").open = true;
+        $("cat-envoyer").textContent = "Enregistrer les modifications";
+        $("cat-annuler").hidden = false;
+        $("form-categorie").scrollIntoView({ block: "center" });
+      });
+      tdAct.appendChild(bMod);
+      const bActif = el("button", c.actif ? "bouton bouton--danger-doux" : "bouton bouton--doux", c.actif ? "Désactiver" : "Réactiver"); bActif.type = "button";
+      bActif.addEventListener("click", async function () {
+        if (c.actif && !await demanderConfirmation("Désactiver « " + c.nom + " » ?", "Elle ne sera plus proposée dans les formulaires. Les objets déjà enregistrés gardent cette catégorie.", "Désactiver")) return;
+        try { await api("PATCH", "/categories/" + encodeURIComponent(c.id), { actif: !c.actif }); categories = null; chargerCategoriesPerso(); }
+        catch (err) { etat.textContent = err.message; }
+      });
+      tdAct.appendChild(bActif);
+      tr.appendChild(tdAct);
+      corps.appendChild(tr);
+    });
+    $("cat-tableau").hidden = !corps.children.length;
+  }
+
+  $("cat-annuler").addEventListener("click", reinitialiserFormCategorie);
+
+  $("form-categorie").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    montrerErreur("erreur-cat-nom", ""); montrerErreur("cat-erreur", ""); $("cat-ok").hidden = true;
+    const nom = $("cat-nom").value.trim().replace(/\s+/g, " ");
+    if (!categorieEnEdition) {
+      if (nom.length < 2) { montrerErreur("erreur-cat-nom", "Indiquez le nom de la catégorie (2 caractères au moins)."); return; }
+      if (!/^[\p{L}\p{N}_' ()/.&+-]+$/u.test(nom)) { montrerErreur("erreur-cat-nom", "Lettres, chiffres, espaces et . ' ( ) / & + - seulement."); return; }
+    }
+    const traductions = {};
+    LANGUES_CAT.forEach(function (l) { const v = $("cat-tr-" + l).value.trim(); if (v) traductions[l] = v; });
+    const bouton = $("cat-envoyer"); bouton.disabled = true;
+    try {
+      if (categorieEnEdition) await api("PATCH", "/categories/" + encodeURIComponent(categorieEnEdition.id), { icone: iconeChoisie(), traductions: traductions });
+      else await api("POST", "/categories/", { nom: nom, icone: iconeChoisie(), traductions: traductions });
+      const modif = !!categorieEnEdition;
+      reinitialiserFormCategorie();
+      categories = null;   // la liste de l'écran « Enregistrer » est rechargée
+      $("cat-ok").textContent = modif ? "Catégorie modifiée." : "Catégorie ajoutée : elle est déjà proposée dans les formulaires.";
+      $("cat-ok").hidden = false;
+      chargerCategoriesPerso();
+    } catch (err) {
+      if (err.status === 409 && !categorieEnEdition) montrerErreur("erreur-cat-nom", err.message);
+      else montrerErreur("cat-erreur", err.message);
+    } finally { bouton.disabled = false; }
+  });
+
   /* ---------- Équipe : gestion des comptes agents (administrateurs) ---------- */
 
   const ALPHABET_MDP = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";  // sans caractères qui se ressemblent (0/O, 1/l/I)
@@ -1879,6 +2047,11 @@
     if (!$("eq-mdp").value) $("eq-mdp").value = genererMotDePasse();
     chargerEquipe();
   }
+
+  $("eq-role").addEventListener("change", function () {
+    const admin = $("eq-role").value === "administrateur";
+    $("eq-droits").hidden = admin; $("eq-role-aide").hidden = !admin;
+  });
 
   $("eq-generer").addEventListener("click", function () { $("eq-mdp").value = genererMotDePasse(); });
 
@@ -1953,19 +2126,21 @@
     let ok = true;
     if (!nom) { montrerErreur("erreur-eq-nom", "Indiquez le nom de la personne."); ok = false; }
     if (!/^[a-z0-9._-]{3,50}$/.test(identifiant)) { montrerErreur("erreur-eq-identifiant", "3 à 50 caractères : lettres minuscules sans accent, chiffres, point, tiret ou souligné."); ok = false; }
-    if (!$("eq-enreg").checked && !$("eq-resti").checked) { montrerErreur("erreur-eq-droits", "Cochez au moins un droit, sinon l'agent ne pourra rien faire."); ok = false; }
+    const roleChoisi = $("eq-role").value === "administrateur" ? "administrateur" : "agent";
+    if (roleChoisi === "agent" && !$("eq-enreg").checked && !$("eq-resti").checked) { montrerErreur("erreur-eq-droits", "Cochez au moins un droit, sinon l'agent ne pourra rien faire."); ok = false; }
     if (mdp.length < 8) { montrerErreur("erreur-eq-mdp", "Le mot de passe doit contenir au moins 8 caractères."); ok = false; }
     else if (new TextEncoder().encode(mdp).length > 72) { montrerErreur("erreur-eq-mdp", "Le mot de passe est trop long (72 octets au maximum)."); ok = false; }
     if (!ok) return;
     const bouton = $("eq-envoyer"); bouton.disabled = true;
     try {
       await api("POST", "/utilisateurs/", {
-        nom: nom, identifiant: identifiant, role: "agent", organisation_id: org.id,
-        droit_enregistrement: $("eq-enreg").checked, droit_restitution: $("eq-resti").checked, mot_de_passe: mdp
+        nom: nom, identifiant: identifiant, role: roleChoisi, organisation_id: org.id,
+        droit_enregistrement: roleChoisi === "administrateur" ? true : $("eq-enreg").checked, droit_restitution: roleChoisi === "administrateur" ? true : $("eq-resti").checked, mot_de_passe: mdp
       });
       montrerResultatEquipe("Compte créé pour " + nom, identifiant, mdp);
       $("eq-nom").value = ""; $("eq-identifiant").value = ""; $("eq-mdp").value = genererMotDePasse();
       $("eq-enreg").checked = true; $("eq-resti").checked = true;
+      $("eq-role").value = "agent"; $("eq-droits").hidden = false; $("eq-role-aide").hidden = true;
       chargerEquipe();
     } catch (err) {
       if (err.status === 409) montrerErreur("erreur-eq-identifiant", "Cet identifiant existe déjà. Choisissez-en un autre.");
@@ -2134,6 +2309,8 @@
     ["erreur-par-delai", "parametres-erreur"].forEach(function (i) { montrerErreur(i, ""); });
     $("parametres-ok").hidden = true;
     remplirApparence();
+    reinitialiserFormCategorie();
+    chargerCategoriesPerso();
   }
 
   $("form-parametres").addEventListener("submit", async function (e) {

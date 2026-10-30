@@ -16,6 +16,7 @@ from app.models.objet import Objet
 from app.models.restitution import Restitution
 from app.models.signalement_perte import SignalementPerte
 from app.models.journal_audit import JournalAudit
+from app.models.categorie_personnalisee import CategoriePersonnalisee
 
 __all__ = [
     "Organisation",
@@ -25,4 +26,5 @@ __all__ = [
     "Restitution",
     "SignalementPerte",
     "JournalAudit",
+    "CategoriePersonnalisee",
 ]

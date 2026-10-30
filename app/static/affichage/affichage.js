@@ -73,6 +73,50 @@
 
   function cercle(cx, cy, r) { return "M" + (cx - r) + " " + cy + "a" + r + " " + r + " 0 1 0 " + (2 * r) + " 0a" + r + " " + r + " 0 1 0 " + (-2 * r) + " 0"; }
   const ICONES = {
+    "ico-ballon": "M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18",
+    "ico-casier": "M5 3h14v18H5zM12 3v18M9 11v2M15 11v2",
+    "ico-boite": "M3 8l9-5 9 5v9l-9 5-9-5zM3 8l9 5 9-5M12 13v9",
+    "ico-cadenas": "M6 11h12v10H6zM8.5 11V7.5a3.5 3.5 0 0 1 7 0V11M12 15v2",
+    "ico-parapluie": "M3 12a9 9 0 0 1 18 0zM12 12v7a2 2 0 0 1-4 0",
+    "ico-ampoule": "M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z",
+    "ico-appareil photo": "M4 8h3l2-3h6l2 3h3v12H4zM8.5 14a3.5 3.5 0 1 0 7.0 0a3.5 3.5 0 1 0 -7.0 0",
+    "ico-velo": "M2 16a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M14 16a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M6 16l4-8h5l3 8M10 8H8M15 8l-3 8",
+    "ico-plante": "M12 21v-9M12 12c0-4-3-6-7-6 0 4 3 6 7 6zM12 15c0-3 2-5 6-5 0 3-2 5-6 5zM8 21h8",
+    "ico-coeur": "M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11z",
+    "ico-etoile": "M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.2 6.5 20.2l1-6.2L3 9.6l6.2-.9z",
+    "ico-cadeau": "M4 11h16v10H4zM3 7h18v4H3zM12 7v14M12 7c-2-4-6-3-5 0M12 7c2-4 6-3 5 0",
+    "ico-reveil": "M4 13a8 8 0 1 0 16 0a8 8 0 1 0 -16 0M12 9v4l3 2M5 4l-2 2M19 4l2 2",
+    "ico-tasse": "M5 8h11v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM16 10h2a2 2 0 0 1 0 4h-2M8 3v2M12 3v2",
+    "ico-couverts": "M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 2-2 6 0 8v10",
+    "ico-biberon": "M9 3h6M10 3v3h4V3M9 6h6l1 3v11a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V9zM8 12h4M8 16h4",
+    "ico-cubes": "M4 4h7v7H4zM13 13h7v7h-7zM13 4h7v7h-7zM4 13h7v7H4z",
+    "ico-voiture": "M3 16v-4l2-5h14l2 5v4zM5 12h14M5.5 17a1.5 1.5 0 1 0 3.0 0a1.5 1.5 0 1 0 -3.0 0M15.5 17a1.5 1.5 0 1 0 3.0 0a1.5 1.5 0 1 0 -3.0 0",
+    "ico-moto": "M2 16a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M16 16a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M5 16l3-6h5l3 6M13 10l2-3h3M8 10H6",
+    "ico-bus": "M5 3h14a1 1 0 0 1 1 1v13H4V4a1 1 0 0 1 1-1zM4 11h16M7 17v3M17 17v3M8 14h.01M16 14h.01",
+    "ico-valise": "M4 7h16v13H4zM9 7V4h6v3M4 13h16M11 13v2h2v-2",
+    "ico-sac a dos": "M8 6a4 4 0 0 1 8 0M6 8h12a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1zM9 14h6v4H9zM9 11h6",
+    "ico-casque audio": "M4 15v-3a8 8 0 0 1 16 0v3M4 14h3v6H4zM17 14h3v6h-3z",
+    "ico-micro": "M9 3h6v9a3 3 0 0 1-6 0zM5 11a7 7 0 0 0 14 0M12 18v3M9 21h6",
+    "ico-haut-parleur": "M4 9h4l5-4v14l-5-4H4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11",
+    "ico-tablette": "M5 2h14v20H5zM11 19h2",
+    "ico-ecran": "M3 5h18v12H3zM8 21h8M12 17v4",
+    "ico-imprimante": "M7 8V3h10v5M5 8h14a2 2 0 0 1 2 2v6h-4M3 16V10a2 2 0 0 1 2-2M7 14h10v7H7z",
+    "ico-manette": "M7 8h10a5 5 0 0 1 5 5v1a3 3 0 0 1-5.5 1.7L15 14H9l-1.5 1.7A3 3 0 0 1 2 14v-1a5 5 0 0 1 5-5zM7 11v3M5.5 12.5h3M16 11.5h.01M18 13.5h.01",
+    "ico-crayon": "M4 20l1-4L16 5l3 3L8 19zM14 7l3 3",
+    "ico-regle": "M3 15L15 3l6 6L9 21zM7 13l2 2M10 10l2 2M13 7l2 2",
+    "ico-ciseaux": "M3 18a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M15 18a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M8 16L20 3M16 16L4 3",
+    "ico-loupe": "M4 10a6 6 0 1 0 12 0a6 6 0 1 0 -12 0M15 15l6 6",
+    "ico-drapeau": "M5 21V4M5 4h12l-2 4 2 4H5",
+    "ico-trophee": "M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M12 14v4M8 21h8M9 18h6",
+    "ico-pilule": "M10.5 3.5l10 10a4.2 4.2 0 0 1-6 6l-10-10a4.2 4.2 0 0 1 6-6zM8 8l8 8",
+    "ico-thermometre": "M10 4a2 2 0 0 1 4 0v10a4 4 0 1 1-4 0zM12 9v8",
+    "ico-lune": "M20 14a8 8 0 1 1-9.5-10 6.5 6.5 0 0 0 9.5 10zM17 5l.8 1.7 1.7.8-1.7.8L17 10l-.8-1.7-1.7-.8 1.7-.8z",
+    "ico-chapeau": "M3 17h18M6 17c0-6 2-10 6-10s6 4 6 10M6 14h12",
+    "ico-cravate": "M9 3h6l-1 4 2 12-4 2-4-2 2-12zM9 3l3 3 3-3",
+    "ico-ceinture": "M2 9h20v6H2zM15 9v6M17.5 12h.01M5 12h.01M8 12h.01",
+    "ico-dossier": "M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z",
+    "ico-enveloppe": "M3 5h18v14H3zM3 6l9 7 9-7",
+    "ico-panier": "M3 9h18l-2 11H5zM8 9l3-6M16 9l-3-6",
     "telephone": "M9.5 2h5A2.5 2.5 0 0 1 17 4.5v15a2.5 2.5 0 0 1-2.5 2.5h-5A2.5 2.5 0 0 1 7 19.5v-15A2.5 2.5 0 0 1 9.5 2zM11 18.5h2",
     "portefeuille": "M3 7.5A2.5 2.5 0 0 1 5.5 5H18a1 1 0 0 1 1 1v2M3 7.5V17a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H5.5A2.5 2.5 0 0 1 3 7.5zM16 13.5h.01",
     "cles": cercle(8, 15, 4) + "M10.85 12.15L19 4M18 5l3 3M15 8l2 2",
@@ -155,6 +199,15 @@
     "casque de moto": "M3 14a9 9 0 0 1 18 0v4H3zM3 14h18M12 5v9M14 14h7",
     "autre": "M21 8l-9-5-9 5v8l9 5 9-5V8zM3 8l9 5 9-5M12 13v8"
   };
+
+  /* Catégories ajoutées par l'organisation : traductions, et icône choisie dans le catalogue (même clé de recherche que les autres). */
+  function enregistrerCategoriesPerso(liste) {
+    I18N.ajouterCategories(liste);
+    (liste || []).forEach(function (c) {
+      const cle = (c.nom || "").normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
+      if (cle && !ICONES[cle]) ICONES[cle] = ICONES[c.icone] || ICONES.autre;
+    });
+  }
 
   function icone(categorie) {
     const cle = (categorie || "").normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
@@ -405,6 +458,7 @@
       return;
     }
     I18N.definirContexte({ secteur: org.secteur === "transport" ? "transport" : "education" });
+    try { enregistrerCategoriesPerso(await lireJson("/portail/" + encodeURIComponent(slug) + "/categories/personnalisees")); } catch (e) { /* sans gravité : la liste standard suffit */ }
     appliquerTheme();
     $("chargement").hidden = true;
     $("ecran").hidden = false;

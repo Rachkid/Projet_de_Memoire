@@ -451,8 +451,10 @@
     document.addEventListener("tsintuwa:langue", actualiserLangue);
     Promise.all([
       api("GET", "/organisations/par-slug/" + encodeURIComponent(slug)),
-      api("GET", "/portail/" + encodeURIComponent(slug) + "/categories")
+      api("GET", "/portail/" + encodeURIComponent(slug) + "/categories"),
+      api("GET", "/portail/" + encodeURIComponent(slug) + "/categories/personnalisees").catch(function () { return []; })
     ]).then(function (resultats) {
+      I18N.ajouterCategories(resultats[2]);
       org = resultats[0];
       I18N.definirContexte({ secteur: org.secteur === "transport" ? "transport" : "education" });
       appliquerTheme();

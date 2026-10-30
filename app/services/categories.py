@@ -99,10 +99,21 @@ CATEGORIES_PAR_SECTEUR: dict[str, list[str]] = {
 }
 
 
-def categories_pour(secteur: str | None) -> list[str]:
-    """Liste des catégories d'un secteur (éducation par défaut)."""
+def categories_pour(secteur: str | None, personnalisees: list[str] | None = None) -> list[str]:
+    """
+    Liste des catégories d'un secteur (éducation par défaut). « personnalisees » : les noms des catégories
+    ajoutées par l'organisation (étape 19), placés avant « Autre ».
+    """
     propres = CATEGORIES_PAR_SECTEUR.get((secteur or "").strip().lower(), CATEGORIES_PAR_SECTEUR["education"])
-    return [*CATEGORIES_COMMUNES, *propres, "Autre"]
+    return [*CATEGORIES_COMMUNES, *propres, *(personnalisees or []), "Autre"]
+
+
+def toutes_les_categories_standard() -> set[str]:
+    """Tous les noms de la liste standard, tous secteurs confondus (pour refuser un doublon)."""
+    noms = set(CATEGORIES_COMMUNES) | {"Autre"}
+    for liste in CATEGORIES_PAR_SECTEUR.values():
+        noms.update(liste)
+    return noms
 
 
 # Liste par défaut (route /portail/categories, sans organisation précisée).
